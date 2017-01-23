@@ -95,6 +95,7 @@ void KirigamiPlugin::registerTypes(const char *uri)
     qmlRegisterType(componentPath(QStringLiteral("ScrollablePage.qml")), uri, 1, 0, "ScrollablePage");
     qmlRegisterType(componentPath(QStringLiteral("SplitDrawer.qml")), uri, 1, 0, "SplitDrawer");
     qmlRegisterType(componentPath(QStringLiteral("SwipeListItem.qml")), uri, 1, 0, "SwipeListItem");
+    qmlProtectModule(uri, 1);
 }
 
 #include "moc_kirigamiplugin.cpp"
