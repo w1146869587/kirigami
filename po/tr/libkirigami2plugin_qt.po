@@ -1,0 +1,32 @@
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2017-10-23 09:50+0000\n"
+"Last-Translator: Kaan <kaanozdincer@gmail.com>\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Pootle 2.5.1.1\n"
+"X-Qt-Contexts: true\n"
+"X-POOTLE-MTIME: 1497529432.000000\n"
+
+#: controls/ContextDrawer.qml:77
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "Eylemler"
+
+#: controls/GlobalDrawer.qml:396
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "Geri"
+
+#: controls/templates/private/BackButton.qml:54
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "Geriye Git"
+
+#: controls/templates/private/ForwardButton.qml:50
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "İleri Git"
