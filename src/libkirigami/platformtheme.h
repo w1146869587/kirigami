@@ -25,9 +25,7 @@
 #include <QColor>
 #include <QPalette>
 
-#ifndef KIRIGAMI_BUILD_TYPE_STATIC
 #include <kirigami2_export.h>
-#endif
 
 namespace Kirigami {
 
@@ -40,11 +38,7 @@ class PlatformThemePrivate;
  * different platforms can reimplement this class to integrate with
  * system platform colors of a given platform
  */
-#ifdef KIRIGAMI_BUILD_TYPE_STATIC
-class PlatformTheme : public QObject
-#else
 class KIRIGAMI2_EXPORT PlatformTheme : public QObject
-#endif
 {
     Q_OBJECT
 

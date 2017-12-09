@@ -22,14 +22,14 @@
 #ifndef MOBILECOMPONENTSPLUGIN_H
 #define MOBILECOMPONENTSPLUGIN_H
 
+#include <QUrl>
+
 #ifdef KIRIGAMI_BUILD_TYPE_STATIC
-#include <QObject>
-#include <QString>
-#include <QUrl>
+ #include <QObject>
+ #include <QString>
 #else
-#include <QQmlEngine>
-#include <QQmlExtensionPlugin>
-#include <QUrl>
+ #include <QQmlEngine>
+ #include <QQmlExtensionPlugin>
 #endif
 
 

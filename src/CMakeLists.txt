@@ -22,21 +22,20 @@ set(kirigami_SRCS
     ${KIRIGAMI_STATIC_FILES}
     )
 
+add_library(kirigamiplugin ${kirigami_SRCS} ${RESOURCES})
+
 if(STATIC_LIBRARY)
-
+    # When using the static library, all QML files need to be shipped within the
+    # .a file.
     qt5_add_resources(RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../kirigami.qrc)
-
-    add_library(kirigamiplugin STATIC ${kirigami_SRCS} ${RESOURCES})
-    target_link_libraries(kirigamiplugin Qt5::Core  Qt5::Qml Qt5::Quick Qt5::QuickControls2)
-
 else(STATIC_LIBRARY)
-
     add_subdirectory(libkirigami)
-    add_library(kirigamiplugin SHARED ${kirigami_SRCS})
-
     set_target_properties(kirigamiplugin PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/org/kde/kirigami.2)
-    target_link_libraries(kirigamiplugin KF5::Kirigami2 Qt5::Core  Qt5::Qml Qt5::Quick Qt5::QuickControls2)
+endif(STATIC_LIBRARY)
 
+target_link_libraries(kirigamiplugin KF5::Kirigami2 Qt5::Core Qt5::Qml Qt5::Quick Qt5::QuickControls2)
+
+if (NOT STATIC_LIBRARY)
 
     add_custom_target(copy)
 
@@ -73,4 +72,4 @@ else(STATIC_LIBRARY)
     install(FILES ${PRI_FILENAME}
             DESTINATION ${ECM_MKSPECS_INSTALL_DIR})
 
-endif(STATIC_LIBRARY)
+endif(NOT STATIC_LIBRARY)
