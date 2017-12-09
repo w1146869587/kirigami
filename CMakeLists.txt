@@ -7,6 +7,8 @@ project(kirigami2 VERSION ${KF5_VERSION})
 
 set(REQUIRED_QT_VERSION "5.7.0")
 
+SET(CMAKE_CXX_STANDARD 11)
+
 ################# Disallow in-source build #################
 
 if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
@@ -109,7 +111,7 @@ else(STATIC_LIBRARY)
     ################# Enable C++11 features for clang and gcc #################
 
     if(UNIX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++0x")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
     endif()
 
     #########################################################################
