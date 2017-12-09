@@ -22,6 +22,8 @@ set(kirigami_SRCS
     ${KIRIGAMI_STATIC_FILES}
     )
 
+add_subdirectory(libkirigami)
+
 add_library(kirigamiplugin ${kirigami_SRCS} ${RESOURCES})
 
 if(STATIC_LIBRARY)
@@ -29,7 +31,6 @@ if(STATIC_LIBRARY)
     # .a file.
     qt5_add_resources(RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../kirigami.qrc)
 else(STATIC_LIBRARY)
-    add_subdirectory(libkirigami)
     set_target_properties(kirigamiplugin PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/org/kde/kirigami.2)
 endif(STATIC_LIBRARY)
 
@@ -48,9 +49,6 @@ if (NOT STATIC_LIBRARY)
                             copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/styles  ${CMAKE_BINARY_DIR}/bin/org/kde/kirigami.2/styles)
 
     add_dependencies(kirigamiplugin copy)
-
-
-    install(TARGETS kirigamiplugin DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/kirigami.2)
 
     install(DIRECTORY controls/ DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/kirigami.2)
 
@@ -73,3 +71,5 @@ if (NOT STATIC_LIBRARY)
             DESTINATION ${ECM_MKSPECS_INSTALL_DIR})
 
 endif(NOT STATIC_LIBRARY)
+
+install(TARGETS kirigamiplugin DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/kirigami.2)

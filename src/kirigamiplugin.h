@@ -24,51 +24,8 @@
 
 #include <QUrl>
 
-#ifdef KIRIGAMI_BUILD_TYPE_STATIC
- #include <QObject>
- #include <QString>
-#else
- #include <QQmlEngine>
- #include <QQmlExtensionPlugin>
-#endif
-
-
-#ifdef KIRIGAMI_BUILD_TYPE_STATIC
-
-class KirigamiPlugin : public QObject
-{
-public:
-    static KirigamiPlugin& getInstance()
-    {
-        static KirigamiPlugin instance;
-        return instance;
-    }
-    KirigamiPlugin(KirigamiPlugin const&) = delete;
-    void operator=(KirigamiPlugin const&) = delete;
-    void registerTypes(const char *uri);
-    static void registerTypes()
-    {
-        getInstance().registerTypes("org.kde.kirigami");
-    }
-
-private:
-    KirigamiPlugin() {}
-    QUrl componentUrl(const QString &fileName) const;
-    QString resolveFilePath(const QString &path) const
-    {
-        return QLatin1Char(':') + path;
-    }
-    QString resolveFileUrl(const QString &filePath) const
-    {
-        if (filePath.startsWith(QLatin1Char(':'))) {
-            return QStringLiteral("qrc:") + filePath.right(filePath.length() - 1);
-        }
-        return QStringLiteral("qrc:/") + filePath;
-    }
-    QStringList m_stylesFallbackChain;
-};
-
-#else
+#include <QQmlEngine>
+#include <QQmlExtensionPlugin>
 
 class KirigamiPlugin : public QQmlExtensionPlugin
 {
@@ -90,7 +47,5 @@ private:
     }
     QStringList m_stylesFallbackChain;
 };
-
-#endif
 
 #endif
