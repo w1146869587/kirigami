@@ -16,10 +16,15 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
 endif()
 
 option(BUILD_SHARED_LIBS "Build a shared module" ON)
-option(PLASMA_ENABLED "Build and install The Plasma style" ON)
 option(DESKTOP_ENABLED "Build and install The Desktop style" ON)
 option(STATIC_LIBRARY "Build as a static library" OFF)
 option(BUILD_EXAMPLES "Build and install examples" OFF)
+
+if (BUILD_SHARED_LIBS)
+    option(PLASMA_ENABLED "Build and install The Plasma style" ON)
+else()
+    option(PLASMA_ENABLED "Build and install The Plasma style" OFF)
+endif()
 
 if(NOT BUILD_SHARED_LIBS)
     set(STATIC_LIBRARY 1)
