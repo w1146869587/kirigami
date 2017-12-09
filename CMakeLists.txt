@@ -27,12 +27,12 @@ endif()
 include(CPack)
 include(FeatureSummary)
 
+find_package(Qt5 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS Core Quick Test Gui Svg QuickControls2)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 if(STATIC_LIBRARY)
-    set(CMAKE_AUTOMOC ON)
-    set(CMAKE_INCLUDE_CURRENT_DIR ON)
     add_definitions(-DKIRIGAMI_BUILD_TYPE_STATIC)
-    find_package(Qt5 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS Core Quick Test Gui Svg)
-    add_subdirectory(src)
 else(STATIC_LIBRARY)
 
     ################# set KDE specific information #################
@@ -89,8 +89,6 @@ else(STATIC_LIBRARY)
         SOVERSION 5
     )
 
-    find_package(Qt5 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS Core Quick Test Gui Svg QuickControls2)
-
     if(BUILD_EXAMPLES AND CMAKE_SYSTEM_NAME STREQUAL "Android")
         # treat plasma as an optinal dep: full functionality is expected with only Qt
         find_package(Qt5AndroidExtras ${REQUIRED_QT_VERSION} REQUIRED)
@@ -118,13 +116,15 @@ else(STATIC_LIBRARY)
     add_definitions(-DQT_NO_URL_CAST_FROM_STRING)
 
     add_subdirectory(autotests)
-    add_subdirectory(src)
 
-    if (BUILD_EXAMPLES)
-        add_subdirectory(examples)
-    endif()
 
 endif(STATIC_LIBRARY)
+
+add_subdirectory(src)
+
+if (BUILD_EXAMPLES AND NOT STATIC_LIBRARY)
+    add_subdirectory(examples)
+endif()
 
 if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/po")
     ecm_install_po_files_as_qm(po)
