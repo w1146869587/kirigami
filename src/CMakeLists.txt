@@ -22,55 +22,55 @@ set(kirigami_SRCS
     ${KIRIGAMI_STATIC_FILES}
     )
 
-IF(STATIC_LIBRARY)
+if(STATIC_LIBRARY)
 
-qt5_add_resources(RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../kirigami.qrc)
+    qt5_add_resources(RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../kirigami.qrc)
 
-add_library(kirigamiplugin STATIC ${kirigami_SRCS} ${RESOURCES})
-target_link_libraries(kirigamiplugin Qt5::Core  Qt5::Qml Qt5::Quick Qt5::QuickControls2)
+    add_library(kirigamiplugin STATIC ${kirigami_SRCS} ${RESOURCES})
+    target_link_libraries(kirigamiplugin Qt5::Core  Qt5::Qml Qt5::Quick Qt5::QuickControls2)
 
-ELSE(STATIC_LIBRARY)
+else(STATIC_LIBRARY)
 
-add_subdirectory(libkirigami)
-add_library(kirigamiplugin SHARED ${kirigami_SRCS})
+    add_subdirectory(libkirigami)
+    add_library(kirigamiplugin SHARED ${kirigami_SRCS})
 
-set_target_properties(kirigamiplugin PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/org/kde/kirigami.2)
-target_link_libraries(kirigamiplugin KF5::Kirigami2 Qt5::Core  Qt5::Qml Qt5::Quick Qt5::QuickControls2)
-
-
-add_custom_target(copy)
-
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/org/kde/kirigami.2)
-add_custom_command(TARGET copy PRE_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E
-                        copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/controls ${CMAKE_BINARY_DIR}/bin/org/kde/kirigami.2/)
-add_custom_command(TARGET copy PRE_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E
-                        copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/styles  ${CMAKE_BINARY_DIR}/bin/org/kde/kirigami.2/styles)
-
-add_dependencies(kirigamiplugin copy)
+    set_target_properties(kirigamiplugin PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/org/kde/kirigami.2)
+    target_link_libraries(kirigamiplugin KF5::Kirigami2 Qt5::Core  Qt5::Qml Qt5::Quick Qt5::QuickControls2)
 
 
-install(TARGETS kirigamiplugin DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/kirigami.2)
+    add_custom_target(copy)
 
-install(DIRECTORY controls/ DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/kirigami.2)
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/org/kde/kirigami.2)
+    add_custom_command(TARGET copy PRE_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E
+                            copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/controls ${CMAKE_BINARY_DIR}/bin/org/kde/kirigami.2/)
+    add_custom_command(TARGET copy PRE_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E
+                            copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/styles  ${CMAKE_BINARY_DIR}/bin/org/kde/kirigami.2/styles)
 
-if (PLASMA_ENABLED)
-    install(DIRECTORY styles/Plasma DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/kirigami.2/styles)
-endif()
-if (DESKTOP_ENABLED)
-    install(DIRECTORY styles/org.kde.desktop DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/kirigami.2/styles)
-endif()
-if (PLASMA_ENABLED AND DESKTOP_ENABLED)
-install(DIRECTORY styles/org.kde.desktop.plasma DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/kirigami.2/styles)
-endif()
-install(DIRECTORY styles/Material DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/kirigami.2/styles)
+    add_dependencies(kirigamiplugin copy)
 
-install(FILES ${platformspecific} DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/kirigami.2)
 
-include(ECMGeneratePriFile)
-ecm_generate_pri_file(BASE_NAME Kirigami2 LIB_NAME KF5Kirigami2 DEPS "core qml quick svg" FILENAME_VAR PRI_FILENAME )
-install(FILES ${PRI_FILENAME}
-        DESTINATION ${ECM_MKSPECS_INSTALL_DIR})
+    install(TARGETS kirigamiplugin DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/kirigami.2)
 
-ENDIF(STATIC_LIBRARY)
+    install(DIRECTORY controls/ DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/kirigami.2)
+
+    if (PLASMA_ENABLED)
+        install(DIRECTORY styles/Plasma DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/kirigami.2/styles)
+    endif()
+    if (DESKTOP_ENABLED)
+        install(DIRECTORY styles/org.kde.desktop DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/kirigami.2/styles)
+    endif()
+    if (PLASMA_ENABLED AND DESKTOP_ENABLED)
+        install(DIRECTORY styles/org.kde.desktop.plasma DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/kirigami.2/styles)
+    endif()
+    install(DIRECTORY styles/Material DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/kirigami.2/styles)
+
+    install(FILES ${platformspecific} DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/kirigami.2)
+
+    include(ECMGeneratePriFile)
+    ecm_generate_pri_file(BASE_NAME Kirigami2 LIB_NAME KF5Kirigami2 DEPS "core qml quick svg" FILENAME_VAR PRI_FILENAME )
+    install(FILES ${PRI_FILENAME}
+            DESTINATION ${ECM_MKSPECS_INSTALL_DIR})
+
+endif(STATIC_LIBRARY)

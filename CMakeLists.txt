@@ -27,104 +27,104 @@ endif()
 include(CPack)
 include(FeatureSummary)
 
-IF(STATIC_LIBRARY)
-	set(CMAKE_AUTOMOC ON)
-	set(CMAKE_INCLUDE_CURRENT_DIR ON)
-	ADD_DEFINITIONS(-DKIRIGAMI_BUILD_TYPE_STATIC)
-	find_package(Qt5 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS Core Quick Test Gui Svg)
-	add_subdirectory(src)
+if(STATIC_LIBRARY)
+    set(CMAKE_AUTOMOC ON)
+    set(CMAKE_INCLUDE_CURRENT_DIR ON)
+    add_definitions(-DKIRIGAMI_BUILD_TYPE_STATIC)
+    find_package(Qt5 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS Core Quick Test Gui Svg)
+    add_subdirectory(src)
+else(STATIC_LIBRARY)
 
-ELSE(STATIC_LIBRARY)
+    ################# set KDE specific information #################
 
+    find_package(ECM 5.41.0 NO_MODULE)
+    set_package_properties(ECM PROPERTIES TYPE REQUIRED DESCRIPTION "Extra CMake Modules." URL "https://projects.kde.org/projects/kdesupport/extra-cmake-modules")
 
-################# set KDE specific information #################
+    # where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/ is checked
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
-find_package(ECM 5.41.0 NO_MODULE)
-set_package_properties(ECM PROPERTIES TYPE REQUIRED DESCRIPTION "Extra CMake Modules." URL "https://projects.kde.org/projects/kdesupport/extra-cmake-modules")
+    include(GenerateExportHeader)
+    include(ECMSetupVersion)
+    include(ECMGenerateHeaders)
+    include(CMakePackageConfigHelpers)
+    include(ECMPoQmTools)
+    include(ECMQMLModules)
+    include(KDEInstallDirs)
+    include(KDECMakeSettings)
+    include(ECMQtDeclareLoggingCategory)
+    include(ECMAddQch)
+    include(KDECompilerSettings NO_POLICY_SCOPE)
 
-# where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/ is checked
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
+    set(CMAKECONFIG_INSTALL_DIR "${KDE_INSTALL_CMAKEPACKAGEDIR}/KF5Kirigami2")
 
-include(GenerateExportHeader)
-include(ECMSetupVersion)
-include(ECMGenerateHeaders)
-include(CMakePackageConfigHelpers)
-include(ECMPoQmTools)
-include(ECMQMLModules)
-include(KDEInstallDirs)
-include(KDECMakeSettings)
-include(ECMQtDeclareLoggingCategory)
-include(ECMAddQch)
-include(KDECompilerSettings NO_POLICY_SCOPE)
+    option(BUILD_QCH "Build API documentation in QCH format (for e.g. Qt Assistant, Qt Creator & KDevelop)" OFF)
+    add_feature_info(QCH ${BUILD_QCH} "API documentation in QCH format (for e.g. Qt Assistant, Qt Creator & KDevelop)")
 
-set(CMAKECONFIG_INSTALL_DIR "${KDE_INSTALL_CMAKEPACKAGEDIR}/KF5Kirigami2")
+    configure_package_config_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/KF5Kirigami2Config.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/KF5Kirigami2Config.cmake"
+        INSTALL_DESTINATION  ${CMAKECONFIG_INSTALL_DIR}
+        PATH_VARS  KF5_INCLUDE_INSTALL_DIR CMAKE_INSTALL_PREFIX
+    )
 
-option(BUILD_QCH "Build API documentation in QCH format (for e.g. Qt Assistant, Qt Creator & KDevelop)" OFF)
-add_feature_info(QCH ${BUILD_QCH} "API documentation in QCH format (for e.g. Qt Assistant, Qt Creator & KDevelop)")
+    install(FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/KF5Kirigami2Config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/KF5Kirigami2ConfigVersion.cmake"
+        "${CMAKE_CURRENT_SOURCE_DIR}/KF5Kirigami2Macros.cmake"
+        DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
+        COMPONENT Devel
+    )
 
-configure_package_config_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/KF5Kirigami2Config.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/KF5Kirigami2Config.cmake"
-  INSTALL_DESTINATION  ${CMAKECONFIG_INSTALL_DIR}
-  PATH_VARS  KF5_INCLUDE_INSTALL_DIR CMAKE_INSTALL_PREFIX
-)
-
-install(FILES
-  "${CMAKE_CURRENT_BINARY_DIR}/KF5Kirigami2Config.cmake"
-  "${CMAKE_CURRENT_BINARY_DIR}/KF5Kirigami2ConfigVersion.cmake"
-  "${CMAKE_CURRENT_SOURCE_DIR}/KF5Kirigami2Macros.cmake"
-  DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
-  COMPONENT Devel
-)
-
-install(EXPORT KF5Kirigami2Targets
+    install(EXPORT KF5Kirigami2Targets
         DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
         FILE KF5Kirigami2Targets.cmake
-        NAMESPACE KF5::)
+        NAMESPACE KF5::
+    )
 
 
-ecm_setup_version(${KF5_VERSION}
-    VARIABLE_PREFIX KIRIGAMI2
-    VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/kirigami_version.h"
-    PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KF5Kirigami2ConfigVersion.cmake"
-    SOVERSION 5)
+    ecm_setup_version(${KF5_VERSION}
+        VARIABLE_PREFIX KIRIGAMI2
+        VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/kirigami_version.h"
+        PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KF5Kirigami2ConfigVersion.cmake"
+        SOVERSION 5
+    )
 
-find_package(Qt5 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS Core Quick Test Gui Svg QuickControls2)
+    find_package(Qt5 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS Core Quick Test Gui Svg QuickControls2)
 
-if(BUILD_EXAMPLES AND CMAKE_SYSTEM_NAME STREQUAL "Android")
-# treat plasma as an optinal dep: full functionality is expected with only Qt
-find_package(Qt5AndroidExtras ${REQUIRED_QT_VERSION} REQUIRED)
-endif()
+    if(BUILD_EXAMPLES AND CMAKE_SYSTEM_NAME STREQUAL "Android")
+        # treat plasma as an optinal dep: full functionality is expected with only Qt
+        find_package(Qt5AndroidExtras ${REQUIRED_QT_VERSION} REQUIRED)
+    endif()
 
-if(PLASMA_ENABLED)
-# treat plasma as an optional dep: full functionality is expected with only Qt
-find_package(KF5 ${KF5_DEP_VERSION} COMPONENTS Plasma)
-set_package_properties(KF5Plasma PROPERTIES DESCRIPTION "Plasma framework"
-                       TYPE OPTIONAL
-                       PURPOSE "Optional Look and feel integration with Plasma Mobile."
-                      )
-endif()
+    if(PLASMA_ENABLED)
+        # treat plasma as an optional dep: full functionality is expected with only Qt
+        find_package(KF5 ${KF5_DEP_VERSION} COMPONENTS Plasma)
+        set_package_properties(KF5Plasma PROPERTIES DESCRIPTION "Plasma framework"
+                            TYPE OPTIONAL
+                            PURPOSE "Optional Look and feel integration with Plasma Mobile."
+                            )
+    endif()
 
-ecm_find_qmlmodule(QtGraphicalEffects 1.0)
+    ecm_find_qmlmodule(QtGraphicalEffects 1.0)
 
-################# Enable C++11 features for clang and gcc #################
+    ################# Enable C++11 features for clang and gcc #################
 
-if(UNIX)
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++0x")
-endif()
+    if(UNIX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++0x")
+    endif()
 
-#########################################################################
+    #########################################################################
 
-add_definitions(-DQT_NO_URL_CAST_FROM_STRING)
+    add_definitions(-DQT_NO_URL_CAST_FROM_STRING)
 
-add_subdirectory(autotests)
-add_subdirectory(src)
+    add_subdirectory(autotests)
+    add_subdirectory(src)
 
-if (BUILD_EXAMPLES)
-    add_subdirectory(examples)
-endif()
+    if (BUILD_EXAMPLES)
+        add_subdirectory(examples)
+    endif()
 
-ENDIF(STATIC_LIBRARY)
+endif(STATIC_LIBRARY)
 
 if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/po")
     ecm_install_po_files_as_qm(po)
