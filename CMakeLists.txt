@@ -113,14 +113,6 @@ else(STATIC_LIBRARY)
 
     ecm_find_qmlmodule(QtGraphicalEffects 1.0)
 
-    ################# Enable C++11 features for clang and gcc #################
-
-    if(UNIX)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-    endif()
-
-    #########################################################################
-
     add_definitions(-DQT_NO_URL_CAST_FROM_STRING)
 
     add_subdirectory(autotests)
