@@ -43,10 +43,19 @@ QUrl KirigamiPlugin::componentUrl(const QString &fileName) const
     foreach (const QString &style, m_stylesFallbackChain) {
         const QString candidate = QStringLiteral("styles/") + style + QLatin1Char('/') + fileName;
         if (QFile::exists(resolveFilePath(candidate))) {
+#ifdef KIRIGAMI_BUILD_TYPE_STATIC
+            return QUrl(QStringLiteral("qrc:/org/kde/kirigami/styles/") + style + QLatin1Char('/') + fileName);
+#else
             return QUrl(resolveFileUrl(candidate));
+#endif
         }
     }
+
+#ifdef KIRIGAMI_BUILD_TYPE_STATIC
+            return QUrl(QStringLiteral("qrc:/org/kde/kirigami/") + fileName);
+#else
     return QUrl(resolveFileUrl(fileName));
+#endif
 }
 
 

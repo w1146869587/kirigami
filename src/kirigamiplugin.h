@@ -39,11 +39,19 @@ private:
     QUrl componentUrl(const QString &fileName) const;
     QString resolveFilePath(const QString &path) const
     {
+#ifdef KIRIGAMI_BUILD_TYPE_STATIC
+        return path;
+#else
         return baseUrl().toLocalFile() + QLatin1Char('/') + path;
+#endif
     }
     QString resolveFileUrl(const QString &filePath) const
     {
+#ifdef KIRIGAMI_BUILD_TYPE_STATIC
+        return filePath;
+#else
         return baseUrl().toString() + QLatin1Char('/') + filePath;
+#endif
     }
     QStringList m_stylesFallbackChain;
 };
