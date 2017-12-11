@@ -35,6 +35,9 @@
 
 static QString s_selectedStyle;
 
+//Q_INIT_RESOURCE(kirigami);
+#include <qrc_kirigami.cpp>
+
 QUrl KirigamiPlugin::componentUrl(const QString &fileName) const
 {
     foreach (const QString &style, m_stylesFallbackChain) {

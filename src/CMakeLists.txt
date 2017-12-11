@@ -24,12 +24,18 @@ set(kirigami_SRCS
 
 add_subdirectory(libkirigami)
 
-add_library(kirigamiplugin ${kirigami_SRCS} ${RESOURCES})
-
 if(STATIC_LIBRARY)
     # When using the static library, all QML files need to be shipped within the
     # .a file.
     qt5_add_resources(RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../kirigami.qrc)
+endif(STATIC_LIBRARY)
+
+
+add_library(kirigamiplugin ${kirigami_SRCS} ${RESOURCES})
+
+if(STATIC_LIBRARY)
+    SET_TARGET_PROPERTIES(kirigamiplugin PROPERTIES
+        AUTOMOC_MOC_OPTIONS -Muri=org.kde.kirigami)
 else(STATIC_LIBRARY)
     set_target_properties(kirigamiplugin PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/org/kde/kirigami.2)
 endif(STATIC_LIBRARY)

@@ -38,10 +38,13 @@ find_package(Qt5 ${REQUIRED_QT_VERSION} REQUIRED NO_MODULE COMPONENTS Core Quick
 find_package(Qt5Test ${REQUIRED_QT_VERSION} CONFIG QUIET)
 
 set(CMAKE_AUTOMOC ON)
+set(AUTOMOC_MOC_OPTIONS -Muri=org.kde.kirigami)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 if(STATIC_LIBRARY)
     add_definitions(-DKIRIGAMI_BUILD_TYPE_STATIC)
+    add_definitions(-DQT_PLUGIN)
+    add_definitions(-DQT_STATICPLUGIN=1)
 else(STATIC_LIBRARY)
     add_subdirectory(autotests)
 endif(STATIC_LIBRARY)
