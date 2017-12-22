@@ -36,7 +36,9 @@
 static QString s_selectedStyle;
 
 //Q_INIT_RESOURCE(kirigami);
+#ifdef KIRIGAMI_BUILD_TYPE_STATIC
 #include <qrc_kirigami.cpp>
+#endif
 
 QUrl KirigamiPlugin::componentUrl(const QString &fileName) const
 {
