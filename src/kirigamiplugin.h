@@ -35,12 +35,20 @@ class KirigamiPlugin : public QQmlExtensionPlugin
 public:
     void registerTypes(const char *uri) Q_DECL_OVERRIDE;
 
+#ifdef KIRIGAMI_BUILD_TYPE_STATIC
+    static void registerTypes()
+    {
+        static KirigamiPlugin instance;
+        instance.registerTypes("org.kde.kirigami");
+    }
+#endif
+
 private:
     QUrl componentUrl(const QString &fileName) const;
     QString resolveFilePath(const QString &path) const
     {
 #ifdef KIRIGAMI_BUILD_TYPE_STATIC
-        return path;
+        return QStringLiteral(":/org/kde/kirigami/") + path;
 #else
         return baseUrl().toLocalFile() + QLatin1Char('/') + path;
 #endif
