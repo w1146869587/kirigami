@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-set(KF5_VERSION "5.41.0") # handled by release scripts
+set(KF5_VERSION "5.42.0") # handled by release scripts
 set(KF5_DEP_VERSION "5.41.0") # handled by release scripts
 
 project(kirigami2 VERSION ${KF5_VERSION})
@@ -17,17 +17,13 @@ endif()
 
 option(BUILD_SHARED_LIBS "Build a shared module" ON)
 option(DESKTOP_ENABLED "Build and install The Desktop style" ON)
-option(STATIC_LIBRARY "Build as a static library" OFF)
+option(STATIC_LIBRARY "Build as a static library (deprecated, use BUILD_SHARED_LIBS instead)" OFF)
 option(BUILD_EXAMPLES "Build and install examples" OFF)
-
-if (BUILD_SHARED_LIBS)
-    option(PLASMA_ENABLED "Build and install The Plasma style" ON)
-else()
-    option(PLASMA_ENABLED "Build and install The Plasma style" OFF)
-endif()
 
 if(NOT BUILD_SHARED_LIBS)
     set(STATIC_LIBRARY 1)
+elseif(STATIC_LIBRARY)
+    set(BUILD_SHARED_LIBS 0)
 endif()
 
 # Make CPack available to easy generate binary packages
@@ -104,18 +100,9 @@ ecm_setup_version(${KF5_VERSION}
 )
 
 if(BUILD_EXAMPLES AND CMAKE_SYSTEM_NAME STREQUAL "Android")
-    # treat plasma as an optinal dep: full functionality is expected with only Qt
     find_package(Qt5AndroidExtras ${REQUIRED_QT_VERSION} REQUIRED)
 endif()
 
-if(PLASMA_ENABLED)
-    # treat plasma as an optional dep: full functionality is expected with only Qt
-    find_package(KF5 ${KF5_DEP_VERSION} COMPONENTS Plasma)
-    set_package_properties(KF5Plasma PROPERTIES DESCRIPTION "Plasma framework"
-                        TYPE OPTIONAL
-                        PURPOSE "Optional Look and feel integration with Plasma Mobile."
-                        )
-endif()
 
 ecm_find_qmlmodule(QtGraphicalEffects 1.0)
 
