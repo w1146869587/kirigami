@@ -36,11 +36,23 @@ add_library(kirigamiplugin ${kirigami_SRCS} ${RESOURCES})
 if(STATIC_LIBRARY)
     SET_TARGET_PROPERTIES(kirigamiplugin PROPERTIES
         AUTOMOC_MOC_OPTIONS -Muri=org.kde.kirigami)
+    target_link_libraries(kirigamiplugin
+        PUBLIC
+            Qt5::Core
+        PRIVATE
+            Qt5::Qml Qt5::Quick Qt5::QuickControls2
+    )
 else(STATIC_LIBRARY)
     set_target_properties(kirigamiplugin PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/org/kde/kirigami.2)
+    target_link_libraries(kirigamiplugin
+        PUBLIC
+            Qt5::Core
+        PRIVATE
+            KF5::Kirigami2 Qt5::Qml Qt5::Quick Qt5::QuickControls2
+    )
 endif(STATIC_LIBRARY)
 
-target_link_libraries(kirigamiplugin KF5::Kirigami2 Qt5::Core Qt5::Qml Qt5::Quick Qt5::QuickControls2)
+
 
 if (NOT STATIC_LIBRARY)
 
