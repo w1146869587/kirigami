@@ -1,4 +1,3 @@
-option(STATIC_LIBRARY "" ON)
-set(STATIC_LIBRARY 1)
+set(BUILD_SHARED_LIBS 0)
  
 add_subdirectory(kirigami)

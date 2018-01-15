@@ -10,7 +10,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/ ${CMAKE_MODULE_PATH} ${
 
 set(BREEZEICONS_DIR ${CMAKE_SOURCE_DIR}/3rdparty/breeze-icons/)
 
-find_package(Qt5 REQUIRED Core Quick Multimedia Test Widgets)
+find_package(Qt5 REQUIRED Core Quick Multimedia Test Widgets QuickControls2)
 
 include(KDEInstallDirs)
 include(KDECompilerSettings)
@@ -19,6 +19,7 @@ include(KDECMakeSettings)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+#FIXME: any way to avoid to have to explicitly set this in every project?
 add_definitions(-DKIRIGAMI_BUILD_TYPE_STATIC)
 
 add_subdirectory(3rdparty)

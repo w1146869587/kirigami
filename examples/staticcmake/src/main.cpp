@@ -22,6 +22,7 @@
 #else
 #include <QApplication>
 #endif
+
 #include <QQmlApplicationEngine>
 #include <QtQml>
 #include <QUrl>
@@ -38,6 +39,7 @@
 
 #endif
 
+#include "../3rdparty/kirigami/src/kirigamiplugin.h"
 
 Q_DECL_EXPORT int main(int argc, char *argv[])
 {
@@ -49,6 +51,7 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     QApplication app(argc, argv);
 #endif
 
+    KirigamiPlugin::registerTypes();
     //qputenv("QML_IMPORT_TRACE", "1");
     //FIXME
     //qputenv("QT_QUICK_CONTROLS_STYLE", "Material");

@@ -9,10 +9,9 @@ set(minimal_SRCS
 qt5_add_resources(RESOURCES kirigami-icons.qrc resources.qrc)
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Android")
-    find_package(KF5Kirigami2 ${KF5_DEP_VERSION})
     set(minimal_EXTRA_LIBS Qt5::AndroidExtras
     #FIXME: we shouldn't have to link to it but otherwise the lib won't be packaged on Android
-    Qt5::QuickControls2 KF5::Kirigami2)
+    Qt5::QuickControls2)
 else ()
 #qstyle-based qqc2 style needs a QApplication
     set(minimal_EXTRA_LIBS Qt5::Widgets)
@@ -20,7 +19,7 @@ endif()
 
 
 add_executable(minimal ${minimal_SRCS} ${RESOURCES})
-target_link_libraries(minimal kirigamiplugin Qt5::Core  Qt5::Qml Qt5::Quick ${minimal_EXTRA_LIBS})
+target_link_libraries(minimal ${CMAKE_BINARY_DIR}/lib/libkirigamiplugin.a Qt5::Core  Qt5::Qml Qt5::Quick Qt5::QuickControls2 ${minimal_EXTRA_LIBS})
 
 #install(TARGETS minimal ${KF5_INSTALL_TARGETS_DEFAULT_ARGS})
 
