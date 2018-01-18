@@ -19,9 +19,6 @@ include(KDECMakeSettings)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-#FIXME: any way to avoid to have to explicitly set this in every project?
-add_definitions(-DKIRIGAMI_BUILD_TYPE_STATIC)
-
 add_subdirectory(3rdparty)
 add_subdirectory(src)
 

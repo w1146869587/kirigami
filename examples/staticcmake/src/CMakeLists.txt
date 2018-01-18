@@ -19,7 +19,8 @@ endif()
 
 
 add_executable(minimal ${minimal_SRCS} ${RESOURCES})
-target_link_libraries(minimal ${CMAKE_BINARY_DIR}/lib/libkirigamiplugin.a Qt5::Core  Qt5::Qml Qt5::Quick Qt5::QuickControls2 ${minimal_EXTRA_LIBS})
+#kirigamiplugin is the static library built by us
+target_link_libraries(minimal kirigamiplugin Qt5::Core  Qt5::Qml Qt5::Quick Qt5::QuickControls2 ${minimal_EXTRA_LIBS})
 
 #install(TARGETS minimal ${KF5_INSTALL_TARGETS_DEFAULT_ARGS})
 
