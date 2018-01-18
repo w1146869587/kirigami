@@ -31,7 +31,7 @@
 #include <QQuickItem>
 #include <QQuickStyle>
 
-#include <platformtheme.h>
+#include "libkirigami/platformtheme.h"
 
 static QString s_selectedStyle;
 
