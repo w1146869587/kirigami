@@ -1,16 +1,18 @@
 TEMPLATE = app
 
-QT += qml quick
+QT += qml quick quickcontrols2
 
-android: {
-    include(3rdparty/kirigami/kirigami.pri)
-}
+#android: {
+#    include(3rdparty/kirigami/kirigami.pri)
+#}
 
 CONFIG += c++11
 
 SOURCES += main.cpp
 
 RESOURCES += qml.qrc
+
+LIBS += ../3rdparty/kirigami/org/kde/kirigami.2/libkirigamiplugin.a
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =

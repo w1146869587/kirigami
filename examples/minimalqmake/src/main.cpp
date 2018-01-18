@@ -19,9 +19,14 @@
 
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+
 #ifdef Q_OS_ANDROID
 #include "./3rdparty/kirigami/src/kirigamiplugin.h"
 #endif
+
+#include <QtPlugin>
+
+Q_IMPORT_PLUGIN(KirigamiPlugin)
 
 int main(int argc, char *argv[])
 {
@@ -29,10 +34,6 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
-
-#ifdef Q_OS_ANDROID
-    KirigamiPlugin::getInstance().registerTypes();
-#endif
 
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
     if (engine.rootObjects().isEmpty())
