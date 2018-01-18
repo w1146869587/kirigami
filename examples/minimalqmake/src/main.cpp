@@ -20,9 +20,6 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 
-#ifdef Q_OS_ANDROID
-#include "./3rdparty/kirigami/src/kirigamiplugin.h"
-#endif
 
 #include <QtPlugin>
 
