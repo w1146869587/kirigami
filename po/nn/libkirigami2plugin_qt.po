@@ -1,0 +1,41 @@
+# Translation of libkirigami2plugin_qt to Norwegian Nynorsk
+#
+# Karl Ove Hufthammer <karl@huftis.org>, 2016, 2018.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2018-03-12 19:10+0100\n"
+"Last-Translator: Karl Ove Hufthammer <karl@huftis.org>\n"
+"Language-Team: Norwegian Nynorsk <i18n-nn@lister.ping.uio.no>\n"
+"Language: nn\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 2.0\n"
+"X-Qt-Contexts: true\n"
+
+#: controls/ContextDrawer.qml:77
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "Handlingar"
+
+#: controls/GlobalDrawer.qml:401
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "Tilbake"
+
+#: controls/templates/private/BackButton.qml:56
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "Naviger tilbake"
+
+#: controls/templates/private/ForwardButton.qml:51
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "Naviger fram"
+
+#: controls/ToolBarApplicationHeader.qml:125
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "Fleire handlingar"
