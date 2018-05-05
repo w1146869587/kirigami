@@ -1,0 +1,40 @@
+# Adrián Chaves Fernández (Gallaecio) <adriyetichaves@gmail.com>, 2017.
+# Adrián Chaves (Gallaecio) <adrian@chaves.io>, 2018.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2018-04-22 08:53+0100\n"
+"Last-Translator: Adrian Chaves <adrian@chaves.io>\n"
+"Language-Team: Galician <kde-i18n-doc@kde.org>\n"
+"Language: gl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 2.0\n"
+
+#: controls/ContextDrawer.qml:77
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "Accións"
+
+#: controls/GlobalDrawer.qml:340
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "Atrás"
+
+#: controls/templates/private/BackButton.qml:51
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "Volver"
+
+#: controls/templates/private/ForwardButton.qml:48
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "Continuar"
+
+#: controls/ToolBarApplicationHeader.qml:123
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "Máis accións"

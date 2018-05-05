@@ -1,0 +1,41 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libkirigami2plugin_qt\n"
+"PO-Revision-Date: 2018-03-08 11:45+0000\n"
+"Last-Translator: José Nuno Coelho Pires <zepires@gmail.com>\n"
+"Language-Team: Portuguese <kde-i18n-pt@kde.org>\n"
+"Language: pt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#: controls/ContextDrawer.qml:77
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "Acções"
+
+#: controls/GlobalDrawer.qml:340
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "Recuar"
+
+#: controls/templates/private/BackButton.qml:51
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "Navegar para Trás"
+
+#: controls/templates/private/ForwardButton.qml:48
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "Navegar para a Frente"
+
+#: controls/ToolBarApplicationHeader.qml:123
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "Mais Acções"
