@@ -29,6 +29,21 @@ Kirigami.ScrollablePage {
     background: Rectangle {
         color: Kirigami.Theme.backgroundColor
     }
+    Rectangle {
+        Kirigami.Theme.colorOverrides: {
+            "Window": {"TextColor": "red"}
+        }
+        width: 10
+        height: 10
+        color: Kirigami.Theme.textColor
+    }
+    Rectangle {
+        Kirigami.Theme.textColor: "green"
+        x: 15
+        width: 10
+        height: 10
+        color: Kirigami.Theme.textColor
+    }
     ColumnLayout {
         GridLayout {
             columns: 2

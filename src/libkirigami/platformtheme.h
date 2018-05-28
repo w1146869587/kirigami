@@ -76,7 +76,7 @@ class KIRIGAMI2_EXPORT PlatformTheme : public QObject
      * Color for normal foregrounds, usually text, but not limited to it,
      * anything that should be painted with a clear contrast should use this color
      */
-    Q_PROPERTY(QColor textColor READ textColor NOTIFY colorsChanged)
+    Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY colorsChanged)
 
     /**
      * Foreground color for disabled areas, usually a mid-gray
@@ -145,6 +145,8 @@ class KIRIGAMI2_EXPORT PlatformTheme : public QObject
     //Active palette
     Q_PROPERTY(QPalette palette READ palette NOTIFY paletteChanged)
 
+    Q_PROPERTY(QJsonObject colorOverrides READ colorOverrides WRITE setColorOverrides NOTIFY colorOverridesChanged)
+
 public:
 
     enum ColorSet {
@@ -164,6 +166,11 @@ public:
         Normal = QPalette::Normal
     };
     Q_ENUM(ColorGroup)
+
+    enum Color {
+        TextColor = 0
+    };
+    Q_ENUM(Color)
 
     explicit PlatformTheme(QObject *parent = 0);
     ~PlatformTheme();
@@ -205,6 +212,9 @@ public:
     //this will be used by desktopicon to fetch icons with KIconLoader
     virtual Q_INVOKABLE QIcon iconFromTheme(const QString &name, const QColor &customColor = Qt::transparent);
 
+    QJsonObject colorOverrides() const;
+    void setColorOverrides(const QJsonObject &overrides);
+
     //QML attached property
     static PlatformTheme *qmlAttachedProperties(QObject *object);
 
@@ -216,6 +226,7 @@ Q_SIGNALS:
     void colorGroupChanged(Kirigami::PlatformTheme::ColorGroup colorGroup);
     void paletteChanged(const QPalette &pal);
     void inheritChanged(bool inherit);
+    void colorOverridesChanged(const QJsonObject &overrides);
 
 protected:
     //Setters, not accessible from QML but from implementations

@@ -49,6 +49,7 @@ public:
     QSet<PlatformTheme *> m_childThemes;
     QPointer<PlatformTheme> m_parentTheme;
 
+    QJsonObject m_colorOverrides;
     QColor textColor;
     QColor disabledTextColor;
     QColor highlightedTextColor;
@@ -210,9 +211,30 @@ void PlatformTheme::setInherit(bool inherit)
     emit inheritChanged(inherit);
 }
 
+QJsonObject PlatformTheme::colorOverrides() const
+{
+    return d->m_colorOverrides;
+}
+
+void PlatformTheme::setColorOverrides(const QJsonObject &overrides)
+{
+    if (d->m_colorOverrides == overrides) {
+        return;
+    }
+
+    d->m_colorOverrides = overrides;
+
+    emit colorOverridesChanged(overrides);
+}
 
 QColor PlatformTheme::textColor() const
 {
+qWarning()<<"textColor"<<d->m_colorOverrides;
+    if (d->m_inherit && d->m_parentTheme &&
+        d->m_colorOverrides.find("Window") != d->m_colorOverrides.end() &&
+        d->m_colorOverrides.value("Window").toObject().find("TextColor") != d->m_colorOverrides.value("Window").toObject().end()) {
+        return QColor(d->m_colorOverrides.value("Window").toObject().value("TextColor").toString());
+    }
     return d->textColor;
 }
 
