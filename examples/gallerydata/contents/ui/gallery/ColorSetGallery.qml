@@ -29,20 +29,19 @@ Kirigami.ScrollablePage {
     background: Rectangle {
         color: Kirigami.Theme.backgroundColor
     }
+
     Rectangle {
-        Kirigami.Theme.colorOverrides: {
-            "Window": {"TextColor": "red"}
-        }
-        width: 10
-        height: 10
-        color: Kirigami.Theme.textColor
-    }
-    Rectangle {
-        Kirigami.Theme.textColor: "green"
+        Kirigami.Theme.inherit: false
+        Kirigami.Theme.colorSet: Kirigami.Theme.Custom
+        Kirigami.Theme.textColor: "red"
+        Kirigami.Theme.backgroundColor: "green"
         x: 15
-        width: 10
-        height: 10
-        color: Kirigami.Theme.textColor
+        width: 100
+        height: 100
+        color: Kirigami.Theme.backgroundColor
+        Controls.Label {
+            text: "inherited color"
+        }
     }
     ColumnLayout {
         GridLayout {

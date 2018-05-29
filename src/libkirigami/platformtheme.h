@@ -122,7 +122,7 @@ class KIRIGAMI2_EXPORT PlatformTheme : public QObject
     /**
      * The generic background color
      */
-    Q_PROPERTY(QColor backgroundColor READ backgroundColor NOTIFY colorsChanged)
+    Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY colorsChanged)
 
     /**
      * The background color for selected areas
@@ -153,7 +153,8 @@ public:
         Button, /** Color set used by buttons */
         Selection, /** Color set used by selectged areas */
         Tooltip, /** Color set used by tooltips */
-        Complementary /** Color set meant to be complementary to Window: usually is a dark theme for light themes */
+        Complementary, /** Color set meant to be complementary to Window: usually is a dark theme for light themes */
+        Custom /**  Custom color set: the user sets the colors himself from QML @since 5.46*/
     };
     Q_ENUM(ColorSet)
 
@@ -164,11 +165,6 @@ public:
         Normal = QPalette::Normal
     };
     Q_ENUM(ColorGroup)
-
-    enum ColorName {
-        TextColor = 0
-    };
-    Q_ENUM(ColorName)
 
     explicit PlatformTheme(QObject *parent = 0);
     ~PlatformTheme();
@@ -209,9 +205,6 @@ public:
 
     //this will be used by desktopicon to fetch icons with KIconLoader
     virtual Q_INVOKABLE QIcon iconFromTheme(const QString &name, const QColor &customColor = Qt::transparent);
-
-    QColor colorOverride(ColorSet set, ColorName colorName) const;
-    void setColorOverride(ColorSet set, ColorName colorName, const QColor &color);
 
     //QML attached property
     static PlatformTheme *qmlAttachedProperties(QObject *object);

@@ -49,7 +49,6 @@ public:
     QSet<PlatformTheme *> m_childThemes;
     QPointer<PlatformTheme> m_parentTheme;
 
-    QHash<PlatformTheme::ColorSet, QHash<PlatformTheme::ColorName, QColor> > m_colorOverrides;
     QColor textColor;
     QColor disabledTextColor;
     QColor highlightedTextColor;
@@ -97,6 +96,10 @@ void PlatformThemePrivate::findParentStyle()
             m_parentTheme = t;
             if (m_inherit) {
                 q->setColorSet(t->colorSet());
+                if (m_colorSet == PlatformTheme::Custom) {
+                    //TODO: all colors
+                    q->setTextColor(t->textColor());
+                }
             }
             break;
         }
@@ -154,6 +157,10 @@ void PlatformTheme::setColorSet(PlatformTheme::ColorSet colorSet)
     for (PlatformTheme *t : d->m_childThemes) {
         if (t->inherit()) {
             t->setColorSet(colorSet);
+            if (colorSet == Custom) {
+                //TODO: all colors
+                t->setTextColor(d->textColor);
+            }
         }
     }
 
@@ -211,29 +218,9 @@ void PlatformTheme::setInherit(bool inherit)
     emit inheritChanged(inherit);
 }
 
-QColor PlatformTheme::colorOverride(ColorSet set, ColorName colorName) const
-{
-    auto it = d->m_colorOverrides.constFind(set);
-    if (it != d->m_colorOverrides.constEnd()) {
-        return (*it).value(colorName);
-    }
-    return QColor();
-}
-
-void PlatformTheme::setColorOverride(ColorSet set, ColorName colorName, const QColor &color)
-{
-    if (colorOverride(set, colorName) == color) {
-        return;
-    }
-
-    d->m_colorOverrides[set][colorName] = color;
-
-}
-
 QColor PlatformTheme::textColor() const
 {
-    QColor overridden = colorOverride(d->m_colorSet, TextColor);
-    return overridden.isValid() ? overridden : d->textColor;
+    return d->textColor;
 }
 
 QColor PlatformTheme::disabledTextColor() const
@@ -303,7 +290,13 @@ void PlatformTheme::setTextColor(const QColor &color)
         return;
     }
 
+    //TODO: for all other setters
     d->textColor = color;
+    for (PlatformTheme *t : d->m_childThemes) {
+        if (t->inherit() && t->colorSet() == Custom) {
+            t->setTextColor(color);
+        }
+    }
     d->setColorCompressTimer->start();
 }
 

@@ -133,6 +133,10 @@ BasicTheme::BasicTheme(QObject *parent)
                 syncColors();
                 if (basicThemeDeclarative()->instance(this)) {
                     QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagateColorSet", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, colorSet()));
+                    if (colorSet() == Custom) {
+                        //TODO: primary, accent and background
+                        QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagateTextColor", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, textColor()));
+                    }
                 }
             });
     connect(this, &BasicTheme::colorGroupChanged,
@@ -189,6 +193,10 @@ static inline QColor colorGroupTint(const QColor &color, PlatformTheme::ColorGro
 
 void BasicTheme::syncColors()
 {
+    //don't set ourselves for a custom color set
+    if (colorSet() == Custom) {
+        return;
+    }
     {
         RESOLVECOLOR(textColor, TextColor);
         setTextColor(color);

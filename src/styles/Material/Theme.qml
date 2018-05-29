@@ -90,4 +90,7 @@ QtObject {
             object.Material.theme = Material.Light;
         }
     }
+    function __propagateTextColor(object, color) {
+        object.Material.foreground = color;
+    }
 }
