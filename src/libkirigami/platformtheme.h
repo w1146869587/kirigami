@@ -145,8 +145,6 @@ class KIRIGAMI2_EXPORT PlatformTheme : public QObject
     //Active palette
     Q_PROPERTY(QPalette palette READ palette NOTIFY paletteChanged)
 
-    Q_PROPERTY(QJsonObject colorOverrides READ colorOverrides WRITE setColorOverrides NOTIFY colorOverridesChanged)
-
 public:
 
     enum ColorSet {
@@ -167,10 +165,10 @@ public:
     };
     Q_ENUM(ColorGroup)
 
-    enum Color {
+    enum ColorName {
         TextColor = 0
     };
-    Q_ENUM(Color)
+    Q_ENUM(ColorName)
 
     explicit PlatformTheme(QObject *parent = 0);
     ~PlatformTheme();
@@ -212,8 +210,8 @@ public:
     //this will be used by desktopicon to fetch icons with KIconLoader
     virtual Q_INVOKABLE QIcon iconFromTheme(const QString &name, const QColor &customColor = Qt::transparent);
 
-    QJsonObject colorOverrides() const;
-    void setColorOverrides(const QJsonObject &overrides);
+    QColor colorOverride(ColorSet set, ColorName colorName) const;
+    void setColorOverride(ColorSet set, ColorName colorName, const QColor &color);
 
     //QML attached property
     static PlatformTheme *qmlAttachedProperties(QObject *object);

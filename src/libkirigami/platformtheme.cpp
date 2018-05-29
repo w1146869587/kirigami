@@ -49,7 +49,7 @@ public:
     QSet<PlatformTheme *> m_childThemes;
     QPointer<PlatformTheme> m_parentTheme;
 
-    QJsonObject m_colorOverrides;
+    QHash<PlatformTheme::ColorSet, QHash<PlatformTheme::ColorName, QColor> > m_colorOverrides;
     QColor textColor;
     QColor disabledTextColor;
     QColor highlightedTextColor;
@@ -211,31 +211,29 @@ void PlatformTheme::setInherit(bool inherit)
     emit inheritChanged(inherit);
 }
 
-QJsonObject PlatformTheme::colorOverrides() const
+QColor PlatformTheme::colorOverride(ColorSet set, ColorName colorName) const
 {
-    return d->m_colorOverrides;
+    auto it = d->m_colorOverrides.constFind(set);
+    if (it != d->m_colorOverrides.constEnd()) {
+        return (*it).value(colorName);
+    }
+    return QColor();
 }
 
-void PlatformTheme::setColorOverrides(const QJsonObject &overrides)
+void PlatformTheme::setColorOverride(ColorSet set, ColorName colorName, const QColor &color)
 {
-    if (d->m_colorOverrides == overrides) {
+    if (colorOverride(set, colorName) == color) {
         return;
     }
 
-    d->m_colorOverrides = overrides;
+    d->m_colorOverrides[set][colorName] = color;
 
-    emit colorOverridesChanged(overrides);
 }
 
 QColor PlatformTheme::textColor() const
 {
-qWarning()<<"textColor"<<d->m_colorOverrides;
-    if (d->m_inherit && d->m_parentTheme &&
-        d->m_colorOverrides.find("Window") != d->m_colorOverrides.end() &&
-        d->m_colorOverrides.value("Window").toObject().find("TextColor") != d->m_colorOverrides.value("Window").toObject().end()) {
-        return QColor(d->m_colorOverrides.value("Window").toObject().value("TextColor").toString());
-    }
-    return d->textColor;
+    QColor overridden = colorOverride(d->m_colorSet, TextColor);
+    return overridden.isValid() ? overridden : d->textColor;
 }
 
 QColor PlatformTheme::disabledTextColor() const

@@ -3,6 +3,7 @@
 set(libkirigami_SRCS
     platformtheme.cpp
     basictheme.cpp
+    themeoverride.cpp
     kirigamipluginfactory.cpp
     tabletmodewatcher.cpp
 )
