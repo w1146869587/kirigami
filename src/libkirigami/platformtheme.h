@@ -81,42 +81,42 @@ class KIRIGAMI2_EXPORT PlatformTheme : public QObject
     /**
      * Foreground color for disabled areas, usually a mid-gray
      */
-    Q_PROPERTY(QColor disabledTextColor READ disabledTextColor NOTIFY colorsChanged)
+    Q_PROPERTY(QColor disabledTextColor READ disabledTextColor WRITE setDisabledTextColor NOTIFY colorsChanged)
 
     /**
      * Color for text that has been highlighted, often is a light color while normal text is dark
      */
-    Q_PROPERTY(QColor highlightedTextColor READ highlightedTextColor NOTIFY colorsChanged)
+    Q_PROPERTY(QColor highlightedTextColor READ highlightedTextColor WRITE setHighlightedTextColor NOTIFY colorsChanged)
 
     /**
      * Foreground for areas that are active or requesting attention
      */
-    Q_PROPERTY(QColor activeTextColor READ activeTextColor NOTIFY colorsChanged)
+    Q_PROPERTY(QColor activeTextColor READ activeTextColor WRITE setActiveTextColor NOTIFY colorsChanged)
 
     /**
      * Color for links
      */
-    Q_PROPERTY(QColor linkColor READ linkColor NOTIFY colorsChanged)
+    Q_PROPERTY(QColor linkColor READ linkColor WRITE setLinkColor NOTIFY colorsChanged)
 
     /**
      * Color for visited links, usually a bit darker than linkColor
      */
-    Q_PROPERTY(QColor visitedLinkColor READ visitedLinkColor NOTIFY colorsChanged)
+    Q_PROPERTY(QColor visitedLinkColor READ visitedLinkColor WRITE setVisitedLinkColor NOTIFY colorsChanged)
 
     /**
      * Foreground color for negative areas, such as critical error text
      */
-    Q_PROPERTY(QColor negativeTextColor READ negativeTextColor NOTIFY colorsChanged)
+    Q_PROPERTY(QColor negativeTextColor READ negativeTextColor WRITE setNegativeTextColor NOTIFY colorsChanged)
 
     /**
      * Foreground color for neutral areas, such as warning texts (but not critical)
      */
-    Q_PROPERTY(QColor neutralTextColor READ neutralTextColor NOTIFY colorsChanged)
+    Q_PROPERTY(QColor neutralTextColor READ neutralTextColor WRITE setNegativeTextColor NOTIFY colorsChanged)
 
     /**
      * Success messages, trusted content
      */
-    Q_PROPERTY(QColor positiveTextColor READ positiveTextColor NOTIFY colorsChanged)
+    Q_PROPERTY(QColor positiveTextColor READ positiveTextColor WRITE setPositiveTextColor NOTIFY colorsChanged)
 
     //background colors
     /**
@@ -127,18 +127,18 @@ class KIRIGAMI2_EXPORT PlatformTheme : public QObject
     /**
      * The background color for selected areas
      */
-    Q_PROPERTY(QColor highlightColor READ highlightColor NOTIFY colorsChanged)
+    Q_PROPERTY(QColor highlightColor READ highlightColor WRITE setHighlightColor NOTIFY colorsChanged)
 
     //decoration colors
     /**
      * A decoration color that indicates active focus
      */
-    Q_PROPERTY(QColor focusColor READ focusColor NOTIFY colorsChanged)
+    Q_PROPERTY(QColor focusColor READ focusColor WRITE setFocusColor NOTIFY colorsChanged)
 
     /**
      * A decoration color that indicates mouse hovering
      */
-    Q_PROPERTY(QColor hoverColor READ hoverColor NOTIFY colorsChanged)
+    Q_PROPERTY(QColor hoverColor READ hoverColor WRITE setHoverColor NOTIFY colorsChanged)
 
     // font and palette
     Q_PROPERTY(QFont defaultFont READ defaultFont NOTIFY defaultFontChanged)

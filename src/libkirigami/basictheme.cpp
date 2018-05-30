@@ -244,7 +244,7 @@ void BasicTheme::syncColors()
         m_viewFocusColor = PROXYCOLOR(viewFocusColor, ViewFocusColor);
     }
 
-    setPalette(QPalette(textColor(), buttonBackgroundColor(), buttonBackgroundColor().lighter(120), buttonBackgroundColor().darker(120), buttonBackgroundColor().darker(110), m_viewTextColor, highlightedTextColor(), m_viewTextColor, backgroundColor()));
+    setPalette(QPalette(textColor(), m_buttonBackgroundColor, m_buttonBackgroundColor.lighter(120), m_buttonBackgroundColor.darker(120), m_buttonBackgroundColor.darker(110), m_viewTextColor, highlightedTextColor(), m_viewTextColor, backgroundColor()));
 
     emit colorsChanged();
 }

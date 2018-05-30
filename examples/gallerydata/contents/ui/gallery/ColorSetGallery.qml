@@ -30,19 +30,6 @@ Kirigami.ScrollablePage {
         color: Kirigami.Theme.backgroundColor
     }
 
-    Rectangle {
-        Kirigami.Theme.inherit: false
-        Kirigami.Theme.colorSet: Kirigami.Theme.Custom
-        Kirigami.Theme.textColor: "red"
-        Kirigami.Theme.backgroundColor: "green"
-        x: 15
-        width: 100
-        height: 100
-        color: Kirigami.Theme.backgroundColor
-        Controls.Label {
-            text: "inherited color"
-        }
-    }
     ColumnLayout {
         GridLayout {
             columns: 2
@@ -171,6 +158,43 @@ Kirigami.ScrollablePage {
                 Kirigami.BasicListItem {
                     width: parent.width
                     label: "Delegate2"
+                }
+            }
+        }
+
+        Controls.Frame {
+            Kirigami.Theme.inherit: false
+            Kirigami.Theme.colorSet: Kirigami.Theme.Custom
+            Kirigami.Theme.backgroundColor: "#b9d795"
+            Kirigami.Theme.textColor: "#465c2b"
+            Kirigami.Theme.highlightColor: "#89e51c"
+            Layout.minimumHeight: childrenRect.height
+            Layout.fillWidth: true
+            height: childrenRect.height
+            width: parent.width
+            background: Rectangle {
+                color: Kirigami.Theme.backgroundColor
+            }
+            contentItem: ColumnLayout {
+                Controls.Label {
+                    text: "Complementary Set"
+                }
+                Kirigami.BasicListItem {
+                    width: parent.width
+                    icon: "view-right-close"
+                    label: "Delegate1"
+                    Controls.Button {
+                        Kirigami.Theme.inherit: true
+                        text: "Dynamic Color Button"
+                    }
+                }
+                Kirigami.BasicListItem {
+                    width: parent.width
+                    label: "Delegate2"
+                    Controls.TextField {
+                        Kirigami.Theme.inherit: true
+                        text: "Dynamic Color Text field"
+                    }
                 }
             }
         }
