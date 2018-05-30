@@ -97,8 +97,22 @@ void PlatformThemePrivate::findParentStyle()
             if (m_inherit) {
                 q->setColorSet(t->colorSet());
                 if (m_colorSet == PlatformTheme::Custom) {
-                    //TODO: all colors
                     q->setTextColor(t->textColor());
+                    q->setDisabledTextColor(t->disabledTextColor());
+                    q->setHighlightedTextColor(t->highlightedTextColor());
+                    q->setActiveTextColor(t->activeTextColor());
+                    q->setLinkColor(t->linkColor());
+                    q->setVisitedLinkColor(t->visitedLinkColor());
+                    q->setNegativeTextColor(t->negativeTextColor());
+                    q->setNeutralTextColor(t->neutralTextColor());
+                    q->setPositiveTextColor(t->positiveTextColor());
+                    q->setBackgroundColor(t->backgroundColor());
+                    q->setHighlightColor(t->highlightColor());
+                    q->setFocusColor(t->focusColor());
+                    q->setHoverColor(t->hoverColor());
+
+                    q->setPalette(t->palette());
+
                 }
             }
             break;
@@ -158,8 +172,21 @@ void PlatformTheme::setColorSet(PlatformTheme::ColorSet colorSet)
         if (t->inherit()) {
             t->setColorSet(colorSet);
             if (colorSet == Custom) {
-                //TODO: all colors
                 t->setTextColor(d->textColor);
+                t->setDisabledTextColor(d->disabledTextColor);
+                t->setHighlightedTextColor(d->highlightedTextColor);
+                t->setActiveTextColor(d->activeTextColor);
+                t->setLinkColor(d->linkColor);
+                t->setVisitedLinkColor(d->visitedLinkColor);
+                t->setNegativeTextColor(d->negativeTextColor);
+                t->setNeutralTextColor(d->neutralTextColor);
+                t->setPositiveTextColor(d->positiveTextColor);
+                t->setBackgroundColor(d->backgroundColor);
+                t->setHighlightColor(d->highlightColor);
+                t->setFocusColor(d->focusColor);
+                t->setHoverColor(d->hoverColor);
+
+                t->setPalette(d->palette);
             }
         }
     }
@@ -283,6 +310,14 @@ QColor PlatformTheme::hoverColor() const
     return d->hoverColor;
 }
 
+#define PROPAGATECUSTOMCOLOR(colorName, color)\
+          if (colorSet() == Custom) {\
+              for (PlatformTheme *t : d->m_childThemes) {\
+                  if (t->inherit() && t->colorSet() == Custom) {\
+                      t->set##colorName(color);\
+                  }\
+              }\
+          }
 
 void PlatformTheme::setTextColor(const QColor &color)
 {
@@ -290,13 +325,8 @@ void PlatformTheme::setTextColor(const QColor &color)
         return;
     }
 
-    //TODO: for all other setters
     d->textColor = color;
-    for (PlatformTheme *t : d->m_childThemes) {
-        if (t->inherit() && t->colorSet() == Custom) {
-            t->setTextColor(color);
-        }
-    }
+    PROPAGATECUSTOMCOLOR(TextColor, color)
     d->setColorCompressTimer->start();
 }
 
@@ -307,6 +337,7 @@ void PlatformTheme::setDisabledTextColor(const QColor &color)
     }
 
     d->disabledTextColor = color;
+    PROPAGATECUSTOMCOLOR(DisabledTextColor, color)
     d->setColorCompressTimer->start();
 }
 
@@ -317,6 +348,7 @@ void PlatformTheme::setBackgroundColor(const QColor &color)
     }
 
     d->backgroundColor = color;
+    PROPAGATECUSTOMCOLOR(BackgroundColor, color)
     d->setColorCompressTimer->start();
 }
 
@@ -327,6 +359,7 @@ void PlatformTheme::setHighlightColor(const QColor &color)
     }
 
     d->highlightColor = color;
+    PROPAGATECUSTOMCOLOR(HighlightColor, color)
     d->setColorCompressTimer->start();
 }
 
@@ -337,6 +370,7 @@ void PlatformTheme::setHighlightedTextColor(const QColor &color)
     }
 
     d->highlightedTextColor = color;
+    PROPAGATECUSTOMCOLOR(HighlightedTextColor, color)
     d->setColorCompressTimer->start();
 }
 
@@ -347,6 +381,7 @@ void PlatformTheme::setActiveTextColor(const QColor &color)
     }
 
     d->activeTextColor = color;
+    PROPAGATECUSTOMCOLOR(ActiveTextColor, color)
     d->setColorCompressTimer->start();
 }
 
@@ -357,6 +392,7 @@ void PlatformTheme::setLinkColor(const QColor &color)
     }
 
     d->linkColor = color;
+    PROPAGATECUSTOMCOLOR(LinkColor, color)
     d->setColorCompressTimer->start();
 }
 
@@ -367,6 +403,7 @@ void PlatformTheme::setVisitedLinkColor(const QColor &color)
     }
 
     d->visitedLinkColor = color;
+    PROPAGATECUSTOMCOLOR(VisitedLinkColor, color)
     d->setColorCompressTimer->start();
 }
 
@@ -377,6 +414,7 @@ void PlatformTheme::setNegativeTextColor(const QColor &color)
     }
 
     d->negativeTextColor = color;
+    PROPAGATECUSTOMCOLOR(NegativeTextColor, color)
     d->setColorCompressTimer->start();
 }
 
@@ -387,6 +425,7 @@ void PlatformTheme::setNeutralTextColor(const QColor &color)
     }
 
     d->neutralTextColor = color;
+    PROPAGATECUSTOMCOLOR(NeutralTextColor, color)
     d->setColorCompressTimer->start();
 }
 
@@ -397,6 +436,7 @@ void PlatformTheme::setPositiveTextColor(const QColor &color)
     }
 
     d->positiveTextColor = color;
+    PROPAGATECUSTOMCOLOR(PositiveTextColor, color)
     d->setColorCompressTimer->start();
 }
 
@@ -407,6 +447,7 @@ void PlatformTheme::setHoverColor(const QColor &color)
     }
 
     d->hoverColor = color;
+    PROPAGATECUSTOMCOLOR(HoverColor, color)
     d->setColorCompressTimer->start();
 }
 
@@ -417,6 +458,7 @@ void PlatformTheme::setFocusColor(const QColor &color)
     }
 
     d->focusColor = color;
+    PROPAGATECUSTOMCOLOR(FocusColor, color)
     d->setColorCompressTimer->start();
 }
 
@@ -447,6 +489,7 @@ void PlatformTheme::setPalette(const QPalette &palette)
     }
 
     d->palette = palette;
+    PROPAGATECUSTOMCOLOR(Palette, palette)
     emit paletteChanged(palette);
 }
 
