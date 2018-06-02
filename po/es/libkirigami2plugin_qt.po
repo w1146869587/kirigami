@@ -1,0 +1,39 @@
+# Eloy Cuadra <ecuadra@eloihr.net>, 2016, 2017, 2018.
+msgid ""
+msgstr ""
+"Project-Id-Version: libkirigamiplugin_qt\n"
+"PO-Revision-Date: 2018-03-18 22:24+0100\n"
+"Last-Translator: Eloy Cuadra <ecuadra@eloihr.net>\n"
+"Language-Team: Spanish <kde-l10n-es@kde.org>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 2.0\n"
+
+#: controls/ContextDrawer.qml:77
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "Acciones"
+
+#: controls/GlobalDrawer.qml:340
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "Atrás"
+
+#: controls/templates/private/BackButton.qml:51
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "Retroceder una página"
+
+#: controls/templates/private/ForwardButton.qml:48
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "Avanzar una página"
+
+#: controls/ToolBarApplicationHeader.qml:125
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "Más acciones"

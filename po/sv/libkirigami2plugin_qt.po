@@ -1,0 +1,39 @@
+# Stefan Asserhäll <stefan.asserhall@bredband.net>, 2016, 2017, 2018.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2018-03-08 21:43+0100\n"
+"Last-Translator: Stefan Asserhäll <stefan.asserhall@bredband.net>\n"
+"Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
+"Language: sv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 2.0\n"
+
+#: controls/ContextDrawer.qml:77
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "Åtgärder"
+
+#: controls/GlobalDrawer.qml:340
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "Tillbaka"
+
+#: controls/templates/private/BackButton.qml:51
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "Navigera bakåt"
+
+#: controls/templates/private/ForwardButton.qml:48
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "Navigera framåt"
+
+#: controls/ToolBarApplicationHeader.qml:125
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "Fler åtgärder"
