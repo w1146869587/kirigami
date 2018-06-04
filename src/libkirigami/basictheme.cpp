@@ -129,26 +129,7 @@ BasicTheme::BasicTheme(QObject *parent)
     connect(basicThemeDeclarative()->m_colorSyncTimer, &QTimer::timeout,
             this, &BasicTheme::syncColors);
     connect(this, &BasicTheme::colorSetChanged,
-            this, [this]() {
-                syncColors();
-                if (basicThemeDeclarative()->instance(this)) {
-                    QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagateColorSet", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, colorSet()));
-                    if (colorSet() == Custom) {
-                        if (!QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagateTextColor", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, textColor()))) {
-                            qWarning()<<"This QML color theme is missing __propagateTextColor()";
-                        }
-                        if (!QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagateBackgroundColor", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, backgroundColor()))) {
-                            qWarning()<<"This QML color theme is missing __propagateBackgroundColor()";
-                        }
-                        if (!QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagatePrimaryColor", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, highlightColor()))) {
-                            qWarning()<<"This QML color theme is missing __propagatePrimaryColor()";
-                        }
-                        if (!QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagateAccentColor", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, focusColor()))) {
-                            qWarning()<<"This QML color theme is missing __propagateAccentColor()";
-                        }
-                    }
-                }
-            });
+            this, &BasicTheme::syncColors);
     connect(this, &BasicTheme::colorGroupChanged,
             this, &BasicTheme::syncColors);
     syncColors();
@@ -203,10 +184,6 @@ static inline QColor colorGroupTint(const QColor &color, PlatformTheme::ColorGro
 
 void BasicTheme::syncColors()
 {
-    //don't set ourselves for a custom color set
-    if (colorSet() == Custom) {
-        return;
-    }
     {
         RESOLVECOLOR(textColor, TextColor);
         setTextColor(color);
@@ -252,6 +229,24 @@ void BasicTheme::syncColors()
     }
 
     setPalette(QPalette(textColor(), m_buttonBackgroundColor, m_buttonBackgroundColor.lighter(120), m_buttonBackgroundColor.darker(120), m_buttonBackgroundColor.darker(110), m_viewTextColor, highlightedTextColor(), m_viewTextColor, backgroundColor()));
+
+    if (basicThemeDeclarative()->instance(this)) {
+        QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagateColorSet", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, colorSet()));
+        if (colorSet() == Custom) {
+            if (!QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagateTextColor", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, textColor()))) {
+                qWarning()<<"This QML color theme is missing __propagateTextColor()";
+            }
+            if (!QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagateBackgroundColor", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, backgroundColor()))) {
+                qWarning()<<"This QML color theme is missing __propagateBackgroundColor()";
+            }
+            if (!QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagatePrimaryColor", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, highlightColor()))) {
+                qWarning()<<"This QML color theme is missing __propagatePrimaryColor()";
+            }
+            if (!QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagateAccentColor", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, focusColor()))) {
+                qWarning()<<"This QML color theme is missing __propagateAccentColor()";
+            }
+        }
+    }
 
     emit colorsChanged();
 }
