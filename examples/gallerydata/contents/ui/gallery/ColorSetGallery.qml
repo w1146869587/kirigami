@@ -177,7 +177,7 @@ Kirigami.ScrollablePage {
             }
             contentItem: ColumnLayout {
                 Controls.Label {
-                    text: "Complementary Set"
+                    text: "Custom Set"
                 }
                 Kirigami.BasicListItem {
                     width: parent.width

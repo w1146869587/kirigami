@@ -169,8 +169,6 @@ void KirigamiPlugin::registerTypes(const char *uri)
 
     qmlRegisterType<DelegateRecycler>(uri, 2, 4, "DelegateRecycler");
 
-    //qmlRegisterUncreatableType<Kirigami::ThemeOverride>(uri, 2, 5, "ThemeOverride", "Cannot create objects of type ThemeOverride, use it as an attached poperty");
-
     qmlProtectModule(uri, 2);
 }
 

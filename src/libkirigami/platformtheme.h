@@ -217,7 +217,6 @@ Q_SIGNALS:
     void colorGroupChanged(Kirigami::PlatformTheme::ColorGroup colorGroup);
     void paletteChanged(const QPalette &pal);
     void inheritChanged(bool inherit);
-    void colorOverridesChanged(const QJsonObject &overrides);
 
 protected:
     //Setters, not accessible from QML but from implementations
