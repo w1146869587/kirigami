@@ -75,7 +75,6 @@ QObject *BasicThemeDeclarative::instance(const BasicTheme *theme)
 }
 
 
-
 BasicTheme::BasicTheme(QObject *parent)
     : PlatformTheme(parent)
 {
@@ -132,6 +131,11 @@ BasicTheme::BasicTheme(QObject *parent)
             this, &BasicTheme::syncColors);
     connect(this, &BasicTheme::colorGroupChanged,
             this, &BasicTheme::syncColors);
+
+    connect(this, &PlatformTheme::colorSetChanged,
+            this, &BasicTheme::syncCustomColorsToQML);
+    connect(this, &PlatformTheme::colorsChanged,
+            this, &BasicTheme::syncCustomColorsToQML);
     syncColors();
 }
 
@@ -231,25 +235,31 @@ void BasicTheme::syncColors()
     setPalette(QPalette(textColor(), m_buttonBackgroundColor, m_buttonBackgroundColor.lighter(120), m_buttonBackgroundColor.darker(120), m_buttonBackgroundColor.darker(110), m_viewTextColor, highlightedTextColor(), m_viewTextColor, backgroundColor()));
 
     if (basicThemeDeclarative()->instance(this)) {
-        QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagateColorSet", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, colorSet()));
-        if (colorSet() == Custom) {
-            if (!QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagateTextColor", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, textColor()))) {
-                qWarning()<<"This QML color theme is missing __propagateTextColor()";
-            }
-qWarning()<<"Minchia, sto troppo propagando"<<backgroundColor();
-            if (!QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagateBackgroundColor", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, backgroundColor()))) {
-                qWarning()<<"This QML color theme is missing __propagateBackgroundColor()";
-            }
-            if (!QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagatePrimaryColor", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, highlightColor()))) {
-                qWarning()<<"This QML color theme is missing __propagatePrimaryColor()";
-            }
-            if (!QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagateAccentColor", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, focusColor()))) {
-                qWarning()<<"This QML color theme is missing __propagateAccentColor()";
-            }
+        if (!QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagateColorSet", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, colorSet()))) {
+            qWarning()<<"This QML color theme is missing __propagateColorSet()";
         }
     }
 
     emit colorsChanged();
+}
+
+
+void BasicTheme::syncCustomColorsToQML()
+{
+    if (basicThemeDeclarative()->instance(this) && colorSet() == Custom) {
+        if (!QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagateTextColor", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, textColor()))) {
+            qWarning()<<"This QML color theme is missing __propagateTextColor()";
+        }
+        if (!QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagateBackgroundColor", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, backgroundColor()))) {
+            qWarning()<<"This QML color theme is missing __propagateBackgroundColor()";
+        }
+        if (!QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagatePrimaryColor", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, highlightColor()))) {
+            qWarning()<<"This QML color theme is missing __propagatePrimaryColor()";
+        }
+        if (!QMetaObject::invokeMethod(basicThemeDeclarative()->instance(this), "__propagateAccentColor", Q_ARG(QVariant, QVariant::fromValue(this->parent())), Q_ARG(QVariant, highlightColor()))) {
+            qWarning()<<"This QML color theme is missing __propagateAccentColor()";
+        }
+    }
 }
 
 QColor BasicTheme::buttonTextColor() const
