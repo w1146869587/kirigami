@@ -215,7 +215,8 @@ Kirigami.ScrollablePage {
             Layout.minimumWidth: 32
             Layout.minimumHeight: 32
         }
-        RowLayout {
+        Flow {
+            Layout.fillWidth: true
             Controls.Label {
                 text: "RGB color for icon:"
             }
