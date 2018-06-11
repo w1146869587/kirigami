@@ -23,6 +23,7 @@ import QtQml.Models 2.2
 import QtQuick.Templates 2.0 as T
 import QtQuick.Controls 2.0 as QQC2
 import org.kde.kirigami 2.4
+import "private" as Private
 
 /**
  * PageRow implements a row-based navigation model, which can be used
@@ -570,13 +571,29 @@ T.Control {
             readonly property int hint: page && page.implicitWidth ? page.implicitWidth : root.defaultColumnWidth
             readonly property int roundedHint: Math.floor(root.width/hint) > 0 ? root.width/Math.floor(root.width/hint) : root.width
 
+            property Item header: header
+            Private.ToolBarPageHeader {
+                id: header
+                index: container.level
+                page: container.page
+                pageRow: root
+                anchors {
+                    left: page.left
+                    right: page.right
+                }
+            }
+            property Item footer
+
             property Item page
             property Item owner
             onPageChanged: {
                 if (page) {
                     owner = page.parent;
                     page.parent = container;
-                    page.anchors.fill = container;
+                    page.anchors.left = container.left;
+                    page.anchors.top = header.bottom;
+                    page.anchors.right = container.right;
+                    page.anchors.bottom = container.bottom;
                 }
             }
             drag.filterChildren: true
@@ -602,7 +619,7 @@ T.Control {
             Separator {
                 z: 999
                 anchors {
-                    top: parent.top
+                    top: header.bottom
                     bottom: parent.bottom
                     left: parent.left
                 }
