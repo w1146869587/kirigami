@@ -34,8 +34,8 @@ Item {
 
     readonly property bool current: pageRow.currentIndex == index
     implicitWidth: titleTextMetrics.width/2 + buttonTextMetrics.collapsedButtonsWidth
-//FIXME
-height: 45
+    Layout.minimumWidth: ctxActionsButton.width*4
+
     RowLayout {
         id: titleLayout
         anchors {

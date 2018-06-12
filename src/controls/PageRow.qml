@@ -349,6 +349,15 @@ T.Control {
             script: mainView.flick(100, 0)
         }
     }
+    //TODO: global toolbar
+    Rectangle {
+        id: globalToolbar
+        z:999
+        opacity: 0.5
+        color: "red"
+        width: 120
+        height: pagesLogic.get(root.currentIndex).header.height
+    }
     QQC2.StackView {
         id: layersStack
         z: 99
@@ -572,14 +581,20 @@ T.Control {
             readonly property int roundedHint: Math.floor(root.width/hint) > 0 ? root.width/Math.floor(root.width/hint) : root.width
 
             property Item header: header
-            Private.ToolBarPageHeader {
+            AbstractApplicationHeader {
                 id: header
-                index: container.level
-                page: container.page
-                pageRow: root
                 anchors {
+                    top: parent.top
                     left: page.left
                     right: page.right
+                }
+                leftPadding: Math.min(Math.max(container.width/2, contentItem[0].Layout.minimumWidth), Math.max(0, mainView.contentX - container.x + globalToolbar.width))
+                Private.ToolBarPageHeader {
+                    anchors.fill:parent
+                    index: container.level
+                    page: container.page
+                    pageRow: root
+                    
                 }
             }
             property Item footer
