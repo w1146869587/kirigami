@@ -41,6 +41,7 @@ Item {
     property int minimumHeight: 0
     property int preferredHeight: Units.gridUnit * 2
     property int maximumHeight: Units.gridUnit * 3
+    property Page page: __appWindow.pageStack.currentItem
     default property alias contentItem: mainItem.data
     readonly property int paintedHeight: headerItem.y + headerItem.height - 1
     LayoutMirroring.enabled: Qt.application.layoutDirection == Qt.RightToLeft 
@@ -78,7 +79,7 @@ Item {
     }
 
     Behavior on height {
-        enabled: __appWindow.pageStack.currentItem && __appWindow.pageStack.currentItem.flickable && !__appWindow.pageStack.currentItem.flickable.moving
+        enabled: root.page && root.page.flickable && !root.page.flickable.moving
         NumberAnimation {
             duration: Units.longDuration
             easing.type: Easing.InOutQuad
@@ -103,18 +104,18 @@ Item {
 
         Connections {
             id: headerSlideConnection
-            target: __appWindow.pageStack.currentItem ? __appWindow.pageStack.currentItem.flickable : null
+            target: root.page ? root.page.flickable : null
             property int oldContentY
             onContentYChanged: {
                 if (!Settings.isMobile ||
                     !__appWindow.controlsVisible ||
-                    !__appWindow.pageStack.currentItem ||
-                    __appWindow.pageStack.currentItem.flickable.atYBeginning ||
-                    __appWindow.pageStack.currentItem.flickable.atYEnd) {
+                    !root.page ||
+                    root.page.flickable.atYBeginning ||
+                    root.page.flickable.atYEnd) {
                     return;
                 //if moves but not dragging, just update oldContentY
-                } else if (!__appWindow.pageStack.currentItem.flickable.dragging) {
-                    oldContentY = __appWindow.pageStack.currentItem.flickable.contentY;
+                } else if (!root.page.flickable.dragging) {
+                    oldContentY = root.page.flickable.contentY;
                     return;
                 } 
                 
@@ -126,13 +127,13 @@ Item {
 
                     root.height = Math.max(root.minimumHeight,
                                             Math.min(root.preferredHeight,
-                                                 root.height + oldContentY - __appWindow.pageStack.currentItem.flickable.contentY));
-                
+                                                 root.height + oldContentY - root.page.flickable.contentY));
+
                     //if the height is changed, use that to simulate scroll
                     if (oldHeight != height) {
-                        __appWindow.pageStack.currentItem.flickable.contentY = oldContentY;
+                        root.page.flickable.contentY = oldContentY;
                     } else {
-                        oldContentY = __appWindow.pageStack.currentItem.flickable.contentY;
+                        oldContentY = root.page.flickable.contentY;
                     }
                 }
             }
@@ -150,11 +151,11 @@ Item {
         Connections {
             target: __appWindow.pageStack
             onCurrentItemChanged: {
-                if (!__appWindow.pageStack.currentItem) {
+                if (!root.page) {
                     return;
                 }
-                if (__appWindow.pageStack.currentItem.flickable) {
-                    headerSlideConnection.oldContentY = __appWindow.pageStack.currentItem.flickable.contentY;
+                if (root.page.flickable) {
+                    headerSlideConnection.oldContentY = root.page.flickable.contentY;
                 } else {
                     headerSlideConnection.oldContentY = 0;
                 }

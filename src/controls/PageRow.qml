@@ -588,6 +588,7 @@ T.Control {
                     left: page.left
                     right: page.right
                 }
+                page: container.page
                 leftPadding: Math.min(Math.max(container.width/2, contentItem[0].Layout.minimumWidth), Math.max(0, mainView.contentX - container.x + globalToolbar.width))
                 Private.ToolBarPageHeader {
                     anchors.fill:parent
