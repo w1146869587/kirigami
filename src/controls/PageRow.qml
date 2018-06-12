@@ -357,6 +357,7 @@ T.Control {
         color: "red"
         width: 120
         height: pagesLogic.get(root.currentIndex).header.height
+        //ApplicationHeader {}
     }
     QQC2.StackView {
         id: layersStack
@@ -589,13 +590,23 @@ T.Control {
                     right: page.right
                 }
                 page: container.page
-                leftPadding: Math.min(Math.max(container.width/2, contentItem[0].Layout.minimumWidth), Math.max(0, mainView.contentX - container.x + globalToolbar.width))
-                Private.ToolBarPageHeader {
-                    anchors.fill:parent
-                    index: container.level
-                    page: container.page
-                    pageRow: root
-                    
+                Item {
+                    anchors {
+                        fill: parent
+                        leftMargin: Math.max(0, mainView.contentX - container.x + globalToolbar.width)
+                    }
+                    clip: true
+                    Private.ToolBarPageHeader {
+                        id: toolBar
+                        anchors {
+                            fill: parent
+                            leftMargin: Mth.min (0, parent.width - Math.min(Math.max(container.width/2, toolBar.Layout.minimumWidth)))
+                        }
+                        index: container.level
+                        page: container.page
+                        pageRow: root
+                        
+                    }
                 }
             }
             property Item footer

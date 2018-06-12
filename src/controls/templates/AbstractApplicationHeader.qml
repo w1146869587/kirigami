@@ -46,7 +46,6 @@ Item {
     readonly property int paintedHeight: headerItem.y + headerItem.height - 1
     LayoutMirroring.enabled: Qt.application.layoutDirection == Qt.RightToLeft 
     LayoutMirroring.childrenInherit: true
-    property int leftPadding: 0
 
     //FIXME: remove
     property QtObject __appWindow: applicationWindow();
@@ -167,7 +166,6 @@ Item {
             id: mainItem
             anchors {
                 fill: parent
-                leftMargin: root.leftPadding
             }
         }
     }
