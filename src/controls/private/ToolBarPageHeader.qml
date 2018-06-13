@@ -43,10 +43,6 @@ Item {
             left: parent.left
             right: actionsLayout.left
         }
-        Separator {
-            id: separator
-            Layout.preferredHeight: parent.height * 0.6
-        }
 
         Heading {
             id: title

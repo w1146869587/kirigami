@@ -46,6 +46,10 @@ Item {
     readonly property int paintedHeight: headerItem.y + headerItem.height - 1
     LayoutMirroring.enabled: Qt.application.layoutDirection == Qt.RightToLeft 
     LayoutMirroring.childrenInherit: true
+    property int leftPadding: 0
+    property int topPadding: 0
+    property int rightPadding: 0
+    property int bottomPadding: 0
 
     //FIXME: remove
     property QtObject __appWindow: applicationWindow();
@@ -54,7 +58,7 @@ Item {
         left: parent.left
         right: parent.right
     }
-    height: preferredHeight
+    implicitHeight: preferredHeight
 
     /**
      * background: Item
@@ -87,7 +91,7 @@ Item {
 
     Connections {
         target: __appWindow
-        onControlsVisibleChanged: root.height = __appWindow.controlsVisible ? root.preferredHeight : 0;
+        onControlsVisibleChanged: root.implicitHeight = __appWindow.controlsVisible ? root.preferredHeight : 0;
     }
 
     Item {
@@ -120,11 +124,11 @@ Item {
                 
 
                 if (__appWindow.wideScreen || !Settings.isMobile) {
-                    root.height = root.preferredHeight;
+                    root.implicitHeight = root.preferredHeight;
                 } else {
                     var oldHeight = root.height;
 
-                    root.height = Math.max(root.minimumHeight,
+                    root.implicitHeight = Math.max(root.minimumHeight,
                                             Math.min(root.preferredHeight,
                                                  root.height + oldContentY - root.page.flickable.contentY));
 
@@ -141,9 +145,9 @@ Item {
                     return;
                 }
                 if (root.height > (root.preferredHeight - root.minimumHeight)/2 ) {
-                    root.height = root.preferredHeight;
+                    root.implicitHeight = root.preferredHeight;
                 } else {
-                    root.height = root.minimumHeight;
+                    root.implicitHeight = root.minimumHeight;
                 }
             }
         }
@@ -158,7 +162,7 @@ Item {
                 } else {
                     headerSlideConnection.oldContentY = 0;
                 }
-                root.height = root.preferredHeight;
+                root.implicitHeight = root.preferredHeight;
             }
         }
 
@@ -166,6 +170,10 @@ Item {
             id: mainItem
             anchors {
                 fill: parent
+                leftMargin: root.leftPadding
+                topMargin: root.topPadding
+                rightMargin: root.rightPadding
+                bottomMargin: root.bottomPadding
             }
         }
     }
