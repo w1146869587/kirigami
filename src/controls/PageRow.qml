@@ -25,6 +25,7 @@ import QtQuick.Controls 2.0 as QQC2
 import org.kde.kirigami 2.4
 import "private" as Private
 import "templates/private" as TemplatesPrivate
+import "templates" as KT
 
 /**
  * PageRow implements a row-based navigation model, which can be used
@@ -355,8 +356,61 @@ T.Control {
             script: mainView.flick(100, 0)
         }
     }
-    //TODO: global toolbar
-    topPadding: breadcrumbLoader.active ? breadcrumbLoader.implicitHeight : 0
+
+    AbstractApplicationHeader {
+        id: globalToolBarSizing
+        parent: mainView
+        anchors {
+            left: parent.left
+            top: parent.top
+            right: parent.right
+        }
+        RowLayout {
+            anchors {
+                fill:parent
+                bottomMargin: 1
+            }
+            spacing: 0
+            RowLayout {
+                id: buttonsLayout
+
+                visible: breadcrumbLoader.actualStyle != ApplicationHeaderStyle.TabBar && breadcrumbLoader.actualStyle != ApplicationHeaderStyle.None
+            
+                TemplatesPrivate.BackButton {
+                    Layout.fillHeight: true
+                }
+                TemplatesPrivate.ForwardButton {
+                    Layout.fillHeight: true
+                }
+                Separator {
+                    Layout.preferredHeight: parent.height * 0.6
+                    //FIXME: hacky
+                    opacity: buttonsLayout.visibleChildren.length > 1
+                }
+            }
+            Loader {
+                id: breadcrumbLoader
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                property int actualStyle: globalToolBar.style != ApplicationHeaderStyle.Auto
+                    ? globalToolBar.style
+                    : (Settings.isMobile
+                       ? (root.wideMode ? ApplicationHeaderStyle.Titles : ApplicationHeaderStyle.Breadcrumb)
+                       : ApplicationHeaderStyle.ToolBar)
+                active: breadcrumbLoader.actualStyle == ApplicationHeaderStyle.TabBar || breadcrumbLoader.actualStyle == ApplicationHeaderStyle.Breadcrumb
+
+                //TODO: different implementation
+                sourceComponent: ApplicationHeader {
+                    backButtonEnabled: false
+                    anchors.fill:parent
+                    background.visible: false
+                }
+            }
+        }
+        background.visible: breadcrumbLoader.active
+    }
+    //TODO: make it a grouped property
     Item {
         id: globalToolBar
         property int style: ApplicationHeaderStyle.Auto
@@ -365,73 +419,14 @@ T.Control {
         anchors {
             left: parent.left
             top: parent.top
-            right: breadcrumbLoader.active ? parent.right : undefined
         }
 
-        height: breadcrumbLoader.active ? breadcrumbLoader.implicitHeight : pagesLogic.get(root.currentIndex).header.height
-        implicitWidth: buttonsLayout.visible && buttonsLayout.visibleChildren.length > 1 ? buttonsLayout.width : 0
-        width: implicitWidth
+        height: globalToolBarSizing.height
+        width: buttonsLayout.visible && buttonsLayout.visibleChildren.length > 1 ? buttonsLayout.width : 0
 
         //TODO: in a Loader
         //TODO: erase its own background with a shader
-        RowLayout {
-            id: buttonsLayout
-            z: 1
-            height: breadcrumbLoader.active ? breadcrumbLoader.preferredHeight : pagesLogic.get(root.currentIndex).header.item.preferredHeight
-            visible: breadcrumbLoader.actualStyle != ApplicationHeaderStyle.TabBar && breadcrumbLoader.actualStyle != ApplicationHeaderStyle.None
-            anchors {
-                left: parent.left
-                bottom: parent.bottom
-                bottomMargin: 1
-            }
-            TemplatesPrivate.BackButton {
-                Layout.fillHeight: true
-            }
-            TemplatesPrivate.ForwardButton {
-                Layout.fillHeight: true
-            }
-            Separator {
-                Layout.preferredHeight: parent.height * 0.6
-                //FIXME: hacky
-                opacity: buttonsLayout.visibleChildren.length > 1
-            }
-        }
-        Loader {
-            id: breadcrumbLoader
-            anchors {
-                left: parent.left
-                right: parent.right
-            }
-
-            property int actualStyle: globalToolBar.style != ApplicationHeaderStyle.Auto
-                ? globalToolBar.style
-                : (Settings.isMobile
-                   ? (root.wideMode ? ApplicationHeaderStyle.Titles : ApplicationHeaderStyle.Breadcrumb)
-                   : ApplicationHeaderStyle.ToolBar)
-            active: breadcrumbLoader.actualStyle == ApplicationHeaderStyle.TabBar || breadcrumbLoader.actualStyle == ApplicationHeaderStyle.Breadcrumb
-            visible: active
-
-            readonly property Item currentHeader: {
-                var item = root.contentItem.itemAt(root.contentItem.contentX,0);
-                print(item)
-                if (item && item.header.item) {
-                    print("AA"+item.header.item)
-                    return item.header.item;
-                } else if (breadcrumbLoader.active) {
-                    return breadcrumbLoader.item;
-                }
-                return null;
-            }
-
-            sourceComponent: ApplicationHeader {
-                backButtonEnabled: false
-                leftPadding: buttonsLayout.width
-                anchors {
-                    left: undefined
-                    right: undefined
-                }
-            }
-        }
+        
     }
     QQC2.StackView {
         id: layersStack
@@ -520,6 +515,7 @@ T.Control {
                 currentItem.page.forceActiveFocus();
             }
         }
+
         model: ObjectModel {
             id: pagesLogic
             readonly property var componentCache: new Array()
@@ -658,27 +654,27 @@ T.Control {
             property Item header: header
             Loader {
                 id: header
+                z: 999
+                y: globalToolBarSizing.height - height
+                height: globalToolBarSizing.preferredHeight
                 anchors {
-                    top: parent.top
                     left: page.left
                     right: page.right
                 }
                 active: breadcrumbLoader.actualStyle == ApplicationHeaderStyle.ToolBar || breadcrumbLoader.actualStyle == ApplicationHeaderStyle.Titles
-                height: active ? implicitHeight : 0
-                sourceComponent: AbstractApplicationHeader {
-                    page: container.page
-                    leftPadding: Math.min(Math.max(container.width/2, contentItem[0].Layout.minimumWidth), Math.max(0, mainView.contentX - container.x + globalToolBar.width))
-                    Private.ToolBarPageHeader {
+                sourceComponent: QQC2.ToolBar {
+                    Theme.textColor: globalToolBarSizing.Theme.textColor
+                    leftPadding: Math.min(Math.max(container.width/2, contentItem.Layout.minimumWidth), Math.max(0, mainView.contentX - container.x + globalToolBar.width))
+                    contentItem: Private.ToolBarPageHeader {
                         id: toolBar
-                        anchors.fill:parent
                         index: container.level
                         page: container.page
                         pageRow: root
-                        
                     }
                 }
             }
             Separator {
+                z: 999
                 anchors.verticalCenter: header.verticalCenter
                 height: header.height * 0.6
                 visible: mainView.contentX < container.x

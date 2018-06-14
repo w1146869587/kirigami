@@ -18,7 +18,7 @@
  */
 
 import QtQuick 2.5
-import org.kde.kirigami 2.4
+import org.kde.kirigami 2.5
 
 import "private"
 import "templates" as T
@@ -37,6 +37,9 @@ import "templates" as T
  */
 T.AbstractApplicationHeader {
     id: root
+
+    Theme.inherit: false
+    Theme.textColor: root.parent.Theme.highlightedTextColor
 
     background: Rectangle {
         color: Theme.highlightColor
