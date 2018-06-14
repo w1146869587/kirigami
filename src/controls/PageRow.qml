@@ -398,6 +398,11 @@ T.Control {
         }
         Loader {
             id: breadcrumbLoader
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+
             property int actualStyle: globalToolBar.style != ApplicationHeaderStyle.Auto
                 ? globalToolBar.style
                 : (Settings.isMobile
@@ -406,10 +411,18 @@ T.Control {
             active: breadcrumbLoader.actualStyle == ApplicationHeaderStyle.TabBar || breadcrumbLoader.actualStyle == ApplicationHeaderStyle.Breadcrumb
             visible: active
 
-            anchors {
-                left: parent.left
-                right: parent.right
+            readonly property Item currentHeader: {
+                var item = root.contentItem.itemAt(root.contentItem.contentX,0);
+                print(item)
+                if (item && item.header.item) {
+                    print("AA"+item.header.item)
+                    return item.header.item;
+                } else if (breadcrumbLoader.active) {
+                    return breadcrumbLoader.item;
+                }
+                return null;
             }
+
             sourceComponent: ApplicationHeader {
                 backButtonEnabled: false
                 leftPadding: buttonsLayout.width
