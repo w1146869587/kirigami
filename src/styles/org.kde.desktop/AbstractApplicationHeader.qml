@@ -40,6 +40,7 @@ T.AbstractApplicationHeader {
     background: Rectangle {
         color: Theme.backgroundColor
         Separator {
+            visible: (!root.page.header || root.page.header.toString().indexOf("ToolBar") === -1)
             anchors {
                 left: parent.left
                 right: parent.right

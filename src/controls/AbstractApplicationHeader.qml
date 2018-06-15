@@ -40,16 +40,25 @@ T.AbstractApplicationHeader {
 
     Theme.inherit: false
     Theme.textColor: root.parent.Theme.highlightedTextColor
+    Theme.backgroundColor: root.parent.Theme.highlightColor
+    Theme.highlightColor: root.parent.Theme.backgroundColor
 
     background: Rectangle {
-        color: Theme.highlightColor
+        color: Theme.backgroundColor
         EdgeShadow {
             id: shadow
-            edge: Qt.TopEdge
             anchors {
                 right: parent.right
                 left: parent.left
                 top: parent.bottom
+            }
+            edge: Qt.TopEdge
+            opacity: (!root.page.header || root.page.header.toString().indexOf("ToolBar") === -1)
+            Behavior on opacity {
+                OpacityAnimator {
+                    duration: Units.longDuration
+                    easing.type: Easing.InOutQuad
+                }
             }
         }
     }

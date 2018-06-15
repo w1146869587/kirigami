@@ -662,11 +662,17 @@ T.Control {
                     right: page.right
                 }
                 active: breadcrumbLoader.actualStyle == ApplicationHeaderStyle.ToolBar || breadcrumbLoader.actualStyle == ApplicationHeaderStyle.Titles
-                sourceComponent: QQC2.ToolBar {
+                sourceComponent: AbstractApplicationHeader {
+                    anchors.fill: parent
+                    minimumHeight: parent.height
+                    maximumHeight: parent.height
+                    preferredHeight: parent.height
+                    page: container.page
                     Theme.textColor: globalToolBarSizing.Theme.textColor
-                    leftPadding: Math.min(Math.max(container.width/2, contentItem.Layout.minimumWidth), Math.max(0, mainView.contentX - container.x + globalToolBar.width))
-                    contentItem: Private.ToolBarPageHeader {
+                    leftPadding: Math.min(Math.max(container.width/2, contentItem[0].Layout.minimumWidth), Math.max(0, mainView.contentX - container.x + globalToolBar.width))
+                    Private.ToolBarPageHeader {
                         id: toolBar
+                        anchors.fill: parent
                         index: container.level
                         page: container.page
                         pageRow: root
@@ -678,6 +684,7 @@ T.Control {
                 anchors.verticalCenter: header.verticalCenter
                 height: header.height * 0.6
                 visible: mainView.contentX < container.x
+                Theme.textColor: globalToolBarSizing.Theme.textColor
             }
 
             property Item footer
@@ -720,6 +727,8 @@ T.Control {
                     top: header.bottom
                     bottom: parent.bottom
                     left: parent.left
+                    //ensure a shard angle
+                    topMargin: -width
                 }
                 visible: root.separatorVisible && mainView.contentX < container.x
             }
