@@ -662,22 +662,20 @@ T.Control {
                     right: page.right
                 }
                 active: breadcrumbLoader.actualStyle == ApplicationHeaderStyle.ToolBar || breadcrumbLoader.actualStyle == ApplicationHeaderStyle.Titles
-                sourceComponent: AbstractApplicationHeader {
+               /* sourceComponent: AbstractApplicationHeader {
                     anchors.fill: parent
                     minimumHeight: parent.height
                     maximumHeight: parent.height
                     preferredHeight: parent.height
                     page: container.page
-                    Theme.textColor: globalToolBarSizing.Theme.textColor
                     leftPadding: Math.min(Math.max(container.width/2, contentItem[0].Layout.minimumWidth), Math.max(0, mainView.contentX - container.x + globalToolBar.width))
                     Private.ToolBarPageHeader {
                         id: toolBar
                         anchors.fill: parent
-                        index: container.level
                         page: container.page
-                        pageRow: root
+                        current: root.currentIndex == container.level
                     }
-                }
+                }*/
             }
             Separator {
                 z: 999
@@ -699,6 +697,7 @@ T.Control {
                     page.anchors.top = header.bottom;
                     page.anchors.right = container.right;
                     page.anchors.bottom = container.bottom;
+                    header.setSource(Qt.resolvedUrl("private/ToolBarPageHeader.qml"), {"container": container, "page": container.page, "current": Qt.binding(function() {return root.currentIndex == container.level})});
                 }
             }
             drag.filterChildren: true
@@ -727,7 +726,7 @@ T.Control {
                     top: header.bottom
                     bottom: parent.bottom
                     left: parent.left
-                    //ensure a shard angle
+                    //ensure a sharp angle
                     topMargin: -width
                 }
                 visible: root.separatorVisible && mainView.contentX < container.x

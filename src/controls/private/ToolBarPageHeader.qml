@@ -24,15 +24,12 @@ import org.kde.kirigami 2.4
 
 
 
-Item {
+AbstractPageHeader {
     id: root
 
     property Page page
-    property int index
-    //FIXME PageRow type
-    property Item pageRow
+    property bool current
 
-    readonly property bool current: pageRow.currentIndex == index
     implicitWidth: titleTextMetrics.width/2 + buttonTextMetrics.collapsedButtonsWidth
     Layout.minimumWidth: ctxActionsButton.width*4
 
