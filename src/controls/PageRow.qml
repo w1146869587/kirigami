@@ -601,12 +601,20 @@ T.Control {
                     id: buttonsLayout
 
                     visible: globalToolBar.actualStyle != ApplicationHeaderStyle.TabBar && globalToolBar.actualStyle != ApplicationHeaderStyle.None
-                
+
+                    Item {
+                        visible: typeof applicationWindow() !== "undefined" && applicationWindow().globalDrawer.handle.handleAnchor == root
+                        Layout.preferredWidth: backButton.background.implicitHeight
+                        Layout.preferredHeight: backButton.background.implicitHeight
+                    }
                     TemplatesPrivate.BackButton {
-                        Layout.fillHeight: true
+                        id: backButton
+                        Layout.preferredWidth: background.implicitHeight
+                        Layout.preferredHeight: background.implicitHeight
                     }
                     TemplatesPrivate.ForwardButton {
-                        Layout.fillHeight: true
+                        Layout.preferredWidth: background.implicitHeight
+                        Layout.preferredHeight: background.implicitHeight
                     }
                     Separator {
                         Layout.preferredHeight: parent.height * 0.6

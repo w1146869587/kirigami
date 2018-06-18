@@ -108,10 +108,13 @@ T2.Drawer {
         hoverEnabled: desktopMode
         parent: applicationWindow().overlay.parent
 
+        property Item handleAnchor: (!Settings.isMobile && applicationWindow().pageStack && applicationWindow().pageStack.globalToolBar && applicationWindow().pageStack.globalToolBar.actualStyle != ApplicationHeaderStyle.None)
+                ? applicationWindow().pageStack
+                : (applicationWindow().header && applicationWindow().header.toString().indexOf("ToolBarApplicationHeader") !== -1 ? applicationWindow().header : null)
         property int startX
         property int mappedStartX
 
-        property bool desktopMode: applicationWindow() && applicationWindow().header && applicationWindow().header.toString().indexOf("ToolBarApplicationHeader") !== -1
+        property bool desktopMode: handleAnchor
         enabled: root.handleVisible && root.modal
 
         onPressed: {
@@ -157,10 +160,9 @@ T2.Drawer {
                 return 0;
             }
         }
+        y: handleAnchor ? handleAnchor.mapToItem(root.contentItem.parent, 0, handleAnchor.y).y : 0
 
         anchors {
-            top: drawerHandle.desktopMode ? parent.top : undefined
-
             bottom: drawerHandle.desktopMode ? undefined : parent.bottom
 
             bottomMargin: {
