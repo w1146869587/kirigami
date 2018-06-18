@@ -233,7 +233,7 @@ AbstractApplicationHeader {
 
     Flickable {
         id: titleList
-        readonly property bool wideMode: typeof __appWindow.pageStack.wideMode !== "undefined" ?  __appWindow.pageStack.wideMode : __appWindow.wideMode
+        readonly property bool wideMode: header.headerStyle != ApplicationHeaderStyle.Breadcrumb && typeof __appWindow.pageStack.wideMode !== "undefined" ?  __appWindow.pageStack.wideMode : __appWindow.wideMode
         property int internalHeaderStyle: header.headerStyle == ApplicationHeaderStyle.Auto ? (titleList.wideMode ? ApplicationHeaderStyle.Titles : ApplicationHeaderStyle.Breadcrumb) : header.headerStyle
         //if scrolling the titlebar should scroll also the pages and vice versa
         property bool scrollingLocked: (header.headerStyle == ApplicationHeaderStyle.Titles || titleList.wideMode)

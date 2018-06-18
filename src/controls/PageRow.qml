@@ -626,6 +626,7 @@ T.Control {
                         backButtonEnabled: false
                         anchors.fill:parent
                         background.visible: false
+                        headerStyle: globalToolBar.style
                     }
                 }
             }

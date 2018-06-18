@@ -35,19 +35,38 @@ Kirigami.ApplicationWindow {
 
         actions: [
             Kirigami.Action {
-                text: "Submenu 1"
+                text: "Top Bar Style"
                 iconName: "view-list-icons"
                 Kirigami.Action {
-                        text: "Action 1"
-                        onTriggered: showPassiveNotification(text + " clicked")
+                        text: "Auto"
+                        onTriggered: root.pageStack.globalToolBar.style = Kirigami.ApplicationHeaderStyle.Auto
+                        checked: root.pageStack.globalToolBar.style == Kirigami.ApplicationHeaderStyle.Auto
                 }
                 Kirigami.Action {
-                        text: "Action 2"
-                        onTriggered: showPassiveNotification(text + " clicked")
+                        text: "Breadcrumb"
+                        onTriggered: root.pageStack.globalToolBar.style = Kirigami.ApplicationHeaderStyle.Breadcrumb
+                        checked: root.pageStack.globalToolBar.style == Kirigami.ApplicationHeaderStyle.Breadcrumb
                 }
                 Kirigami.Action {
-                        text: "Action 3"
-                        onTriggered: showPassiveNotification(text + " clicked")
+                        text: "TabBar"
+                        onTriggered: root.pageStack.globalToolBar.style = Kirigami.ApplicationHeaderStyle.TabBar
+                        checked: root.pageStack.globalToolBar.style == Kirigami.ApplicationHeaderStyle.TabBar
+                }
+                Kirigami.Action {
+                        text: "Titles"
+                        onTriggered: root.pageStack.globalToolBar.style = Kirigami.ApplicationHeaderStyle.Titles
+                        checked: root.pageStack.globalToolBar.style == Kirigami.ApplicationHeaderStyle.Titles
+                }
+                Kirigami.Action {
+                        text: "ToolBar"
+                        visible: !Kirigami.Settings.isMobile
+                        onTriggered: root.pageStack.globalToolBar.style = Kirigami.ApplicationHeaderStyle.ToolBar
+                        checked: root.pageStack.globalToolBar.style == Kirigami.ApplicationHeaderStyle.ToolBar
+                }
+                Kirigami.Action {
+                        text: "None"
+                        onTriggered: root.pageStack.globalToolBar.style = Kirigami.ApplicationHeaderStyle.None
+                        checked: root.pageStack.globalToolBar.style == Kirigami.ApplicationHeaderStyle.None
                 }
             },
             Kirigami.Action {
