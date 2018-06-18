@@ -360,11 +360,27 @@ T.Control {
     QtObject {
         id: globalToolBar
         property int style: ApplicationHeaderStyle.Auto
-        property int actualStyle: globalToolBar.style != ApplicationHeaderStyle.Auto
+        property int actualStyle: {
+            if (globalToolBar.style == ApplicationHeaderStyle.Auto) {
+                //Legacy: if ApplicationHeader or ToolbarApplicationHeader are in the header or footer, disable the toolbar here
+                if (typeof applicationWindow !== "undefined" && applicationWindow().header && applicationWindow().header.toString().indexOf("ApplicationHeader") !== -1) {
+                    return ApplicationHeaderStyle.None
+                }
+
+                //non legacy logic
+                return (Settings.isMobile
+                       ? (root.wideMode ? ApplicationHeaderStyle.Titles : ApplicationHeaderStyle.Breadcrumb)
+                       : ApplicationHeaderStyle.ToolBar)
+            } else {
+                //forbid ToolBar on mobile systems
+                return Settings.isMobile && globalToolBar.style == ApplicationHeaderStyle.ToolBar ? ApplicationHeaderStyle.Breadcrumb : globalToolBar.style;
+            }
+          /*  globalToolBar.style != ApplicationHeaderStyle.Auto
                     ? globalToolBar.style
                     : (Settings.isMobile
                        ? (root.wideMode ? ApplicationHeaderStyle.Titles : ApplicationHeaderStyle.Breadcrumb)
-                       : ApplicationHeaderStyle.ToolBar)
+                       : ApplicationHeaderStyle.ToolBar)*/
+        }
 
         property bool showNavigationButtons: (style != ApplicationHeaderStyle.TabBar && (!Settings.isMobile || Qt.platform.os == "ios"))
     }
@@ -577,6 +593,10 @@ T.Control {
         AbstractApplicationHeader {
             id: globalToolBarUI
             readonly property int leftReservedSpace: buttonsLayout.visible && buttonsLayout.visibleChildren.length > 1 ? buttonsLayout.width : 0
+            visible: globalToolBar.actualStyle != ApplicationHeaderStyle.None
+            height: visible ? implicitHeight : 0
+            preferredHeight: 42
+            maximumHeight: preferredHeight
             anchors {
                 left: parent.left
                 top: parent.top
@@ -666,7 +686,7 @@ T.Control {
                 z: 999
                 anchors.verticalCenter: header.verticalCenter
                 height: header.height * 0.6
-                visible: mainView.contentX < container.x
+                visible: mainView.contentX < container.x && globalToolBarUI.visible
                 Theme.textColor: globalToolBarUI.Theme.textColor
             }
 

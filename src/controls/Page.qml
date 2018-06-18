@@ -262,9 +262,6 @@ T2.Page {
         height: item ? item.height : 0
         active: typeof applicationWindow !== "undefined" && applicationWindow().pageStack.globalToolBar.actualStyle != Kirigami.ApplicationHeaderStyle.ToolBar
         source: Qt.resolvedUrl("./private/ActionButton.qml")
-        /*source: typeof applicationWindow !== "undefined" && ((applicationWindow().header && applicationWindow().header.toString().indexOf("ToolBarApplicationHeader") === 0) ||
-                (applicationWindow().footer && applicationWindow().footer.visible && applicationWindow().footer.toString().indexOf("ToolBarApplicationHeader") === 0))
-                ? "" : Qt.resolvedUrl("./private/ActionButton.qml")*/
     }
 
     Layout.fillWidth: true
