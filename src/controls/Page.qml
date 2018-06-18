@@ -260,7 +260,11 @@ T2.Page {
         //It should be T2.Page, Qt 5.7 doesn't like it
         property Item page: root
         height: item ? item.height : 0
-        active: typeof applicationWindow !== "undefined" && applicationWindow().pageStack.globalToolBar.actualStyle != Kirigami.ApplicationHeaderStyle.ToolBar
+        active: typeof applicationWindow !== "undefined" && applicationWindow().pageStack.globalToolBar.actualStyle != Kirigami.ApplicationHeaderStyle.ToolBar &&
+               //Legacy
+                (typeof applicationWindow === "undefined" ||
+                 (!applicationWindow().header || applicationWindow().header.toString().indexOf("ToolBarApplicationHeader") === -1) &&
+                 (!applicationWindow().footer || applicationWindow().footer.toString().indexOf("ToolBarApplicationHeader") === -1))
         source: Qt.resolvedUrl("./private/ActionButton.qml")
     }
 
