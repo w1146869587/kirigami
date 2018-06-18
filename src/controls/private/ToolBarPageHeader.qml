@@ -27,9 +27,6 @@ import org.kde.kirigami 2.4
 AbstractPageHeader {
     id: root
 
-    property Page page
-    property bool current
-
     implicitWidth: titleTextMetrics.width/2 + buttonTextMetrics.collapsedButtonsWidth
     Layout.minimumWidth: ctxActionsButton.width*4
 

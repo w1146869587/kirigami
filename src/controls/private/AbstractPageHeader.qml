@@ -25,6 +25,8 @@ import org.kde.kirigami 2.4
 AbstractApplicationHeader {
     anchors.fill: parent
     property Item container
+    property bool current
+
     minimumHeight: parent.height
     maximumHeight: parent.height
     preferredHeight: parent.height

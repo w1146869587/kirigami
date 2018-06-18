@@ -621,7 +621,7 @@ T.Control {
 
                     active: globalToolBar.actualStyle == ApplicationHeaderStyle.TabBar || globalToolBar.actualStyle == ApplicationHeaderStyle.Breadcrumb
 
-                    //TODO: different implementation
+                    //TODO: different implementation?
                     sourceComponent: ApplicationHeader {
                         backButtonEnabled: false
                         anchors.fill:parent

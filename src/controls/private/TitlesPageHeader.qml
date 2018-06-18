@@ -27,9 +27,6 @@ import org.kde.kirigami 2.4
 AbstractPageHeader {
     id: root
 
-    property Page page
-    property bool current
-
     Heading {
         id: title
         leftPadding: Units.largeSpacing
