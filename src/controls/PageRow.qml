@@ -658,24 +658,20 @@ T.Control {
                 y: globalToolBarSizing.height - height
                 height: globalToolBarSizing.preferredHeight
                 anchors {
-                    left: page.left
-                    right: page.right
+                    left: page ? page.left : parent.left
+                    right: page? page.right : parent.right
                 }
                 active: breadcrumbLoader.actualStyle == ApplicationHeaderStyle.ToolBar || breadcrumbLoader.actualStyle == ApplicationHeaderStyle.Titles
-               /* sourceComponent: AbstractApplicationHeader {
-                    anchors.fill: parent
-                    minimumHeight: parent.height
-                    maximumHeight: parent.height
-                    preferredHeight: parent.height
-                    page: container.page
-                    leftPadding: Math.min(Math.max(container.width/2, contentItem[0].Layout.minimumWidth), Math.max(0, mainView.contentX - container.x + globalToolBar.width))
-                    Private.ToolBarPageHeader {
-                        id: toolBar
-                        anchors.fill: parent
-                        page: container.page
-                        current: root.currentIndex == container.level
+
+                function syncSource() {
+                    if (container.page && active) {
+                        header.setSource(Qt.resolvedUrl(breadcrumbLoader.actualStyle == ApplicationHeaderStyle.ToolBar ? "private/ToolBarPageHeader.qml" : "private/TitlesPageHeader.qml"), {"container": container, "page": container.page, "current": Qt.binding(function() {return root.currentIndex == container.level})});
                     }
-                }*/
+                }
+                Connections {
+                    target: breadcrumbLoader
+                    onActualStyleChanged: header.syncSource()
+                }
             }
             Separator {
                 z: 999
@@ -688,7 +684,6 @@ T.Control {
             property Item footer
 
             property Item page
-            property Item owner
             onPageChanged: {
                 if (page) {
                     owner = page.parent;
@@ -697,9 +692,10 @@ T.Control {
                     page.anchors.top = header.bottom;
                     page.anchors.right = container.right;
                     page.anchors.bottom = container.bottom;
-                    header.setSource(Qt.resolvedUrl("private/ToolBarPageHeader.qml"), {"container": container, "page": container.page, "current": Qt.binding(function() {return root.currentIndex == container.level})});
+                    header.syncSource()
                 }
             }
+            property Item owner
             drag.filterChildren: true
             onClicked: {
                 switch (mouse.button) {
