@@ -103,7 +103,20 @@ T.Control {
     property bool separatorVisible: true
 
     /**
-     * 
+     * globalToolBar: grouped property
+     * Controls the appearance of an optional global toolbar for the whole PageRow.
+     * It's a grouped property comprised of the following properties:
+     * * style: (Kirigami.ApplicationHeaderStyle) can have the following values:
+     *   ** Auto: depending on application formfactor, it can behave automatically like other values, such as a Breadcrumb on mobile and ToolBar on desktop
+     *   ** Breadcrumb: it will show a breadcrumb of all the page titles in the stack, for easy navigation
+     *   ** Titles: each page will only have its own tile on top 
+     *   ** TabBar: the global toolbar will look like a TabBar to select the pages
+     *   ** ToolBar: each page will have the title on top together buttons and menus to represent all of the page actions: not available on Mobile systems.
+     *   ** None: no global toolbar will be shown
+     *
+     * * actualStyle: this will represent the actual style of the toolbar: it can be different from style in the case style is Auto
+     * * showNavigationButtons: if true, forward and backward navigation buttons will be shown on the left of the toolbar
+     * @since 5.48
      */
     readonly property alias globalToolBar: globalToolBar
 //END PROPERTIES
@@ -357,32 +370,8 @@ T.Control {
         }
     }
 
-    QtObject {
+    Private.GlobalToolBarStyleGroup {
         id: globalToolBar
-        property int style: ApplicationHeaderStyle.Auto
-        property int actualStyle: {
-            if (globalToolBar.style == ApplicationHeaderStyle.Auto) {
-                //Legacy: if ApplicationHeader or ToolbarApplicationHeader are in the header or footer, disable the toolbar here
-                if (typeof applicationWindow !== "undefined" && applicationWindow().header && applicationWindow().header.toString().indexOf("ApplicationHeader") !== -1) {
-                    return ApplicationHeaderStyle.None
-                }
-
-                //non legacy logic
-                return (Settings.isMobile
-                       ? (root.wideMode ? ApplicationHeaderStyle.Titles : ApplicationHeaderStyle.Breadcrumb)
-                       : ApplicationHeaderStyle.ToolBar)
-            } else {
-                //forbid ToolBar on mobile systems
-                return Settings.isMobile && globalToolBar.style == ApplicationHeaderStyle.ToolBar ? ApplicationHeaderStyle.Breadcrumb : globalToolBar.style;
-            }
-          /*  globalToolBar.style != ApplicationHeaderStyle.Auto
-                    ? globalToolBar.style
-                    : (Settings.isMobile
-                       ? (root.wideMode ? ApplicationHeaderStyle.Titles : ApplicationHeaderStyle.Breadcrumb)
-                       : ApplicationHeaderStyle.ToolBar)*/
-        }
-
-        property bool showNavigationButtons: (style != ApplicationHeaderStyle.TabBar && (!Settings.isMobile || Qt.platform.os == "ios"))
     }
 
     QQC2.StackView {
