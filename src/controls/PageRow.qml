@@ -105,7 +105,7 @@ T.Control {
     /**
      * 
      */
-    readonly property alias toolbarStyle: globalToolBar
+    readonly property alias globalToolBar: globalToolBar
 //END PROPERTIES
 
 //BEGIN FUNCTIONS
@@ -357,77 +357,18 @@ T.Control {
         }
     }
 
-    AbstractApplicationHeader {
-        id: globalToolBarSizing
-        parent: mainView
-        anchors {
-            left: parent.left
-            top: parent.top
-            right: parent.right
-        }
-        RowLayout {
-            anchors {
-                fill:parent
-                bottomMargin: 1
-            }
-            spacing: 0
-            RowLayout {
-                id: buttonsLayout
-
-                visible: breadcrumbLoader.actualStyle != ApplicationHeaderStyle.TabBar && breadcrumbLoader.actualStyle != ApplicationHeaderStyle.None
-            
-                TemplatesPrivate.BackButton {
-                    Layout.fillHeight: true
-                }
-                TemplatesPrivate.ForwardButton {
-                    Layout.fillHeight: true
-                }
-                Separator {
-                    Layout.preferredHeight: parent.height * 0.6
-                    //FIXME: hacky
-                    opacity: buttonsLayout.visibleChildren.length > 1
-                }
-            }
-            Loader {
-                id: breadcrumbLoader
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                property int actualStyle: globalToolBar.style != ApplicationHeaderStyle.Auto
+    QtObject {
+        id: globalToolBar
+        property int style: ApplicationHeaderStyle.Auto
+        property int actualStyle: globalToolBar.style != ApplicationHeaderStyle.Auto
                     ? globalToolBar.style
                     : (Settings.isMobile
                        ? (root.wideMode ? ApplicationHeaderStyle.Titles : ApplicationHeaderStyle.Breadcrumb)
                        : ApplicationHeaderStyle.ToolBar)
-                active: breadcrumbLoader.actualStyle == ApplicationHeaderStyle.TabBar || breadcrumbLoader.actualStyle == ApplicationHeaderStyle.Breadcrumb
 
-                //TODO: different implementation
-                sourceComponent: ApplicationHeader {
-                    backButtonEnabled: false
-                    anchors.fill:parent
-                    background.visible: false
-                }
-            }
-        }
-        background.visible: breadcrumbLoader.active
-    }
-    //TODO: make it a grouped property
-    Item {
-        id: globalToolBar
-        property int style: ApplicationHeaderStyle.Auto
         property bool showNavigationButtons: (style != ApplicationHeaderStyle.TabBar && (!Settings.isMobile || Qt.platform.os == "ios"))
-        z:999
-        anchors {
-            left: parent.left
-            top: parent.top
-        }
-
-        height: globalToolBarSizing.height
-        width: buttonsLayout.visible && buttonsLayout.visibleChildren.length > 1 ? buttonsLayout.width : 0
-
-        //TODO: in a Loader
-        //TODO: erase its own background with a shader
-        
     }
+
     QQC2.StackView {
         id: layersStack
         z: 99
@@ -633,6 +574,54 @@ T.Control {
             }
         }
 
+        AbstractApplicationHeader {
+            id: globalToolBarUI
+            readonly property int leftReservedSpace: buttonsLayout.visible && buttonsLayout.visibleChildren.length > 1 ? buttonsLayout.width : 0
+            anchors {
+                left: parent.left
+                top: parent.top
+                right: parent.right
+            }
+            RowLayout {
+                anchors {
+                    fill: parent
+                    bottomMargin: 1
+                }
+                spacing: 0
+                RowLayout {
+                    id: buttonsLayout
+
+                    visible: globalToolBar.actualStyle != ApplicationHeaderStyle.TabBar && globalToolBar.actualStyle != ApplicationHeaderStyle.None
+                
+                    TemplatesPrivate.BackButton {
+                        Layout.fillHeight: true
+                    }
+                    TemplatesPrivate.ForwardButton {
+                        Layout.fillHeight: true
+                    }
+                    Separator {
+                        Layout.preferredHeight: parent.height * 0.6
+                        //FIXME: hacky
+                        opacity: buttonsLayout.visibleChildren.length > 1
+                    }
+                }
+                Loader {
+                    id: breadcrumbLoader
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    active: globalToolBar.actualStyle == ApplicationHeaderStyle.TabBar || globalToolBar.actualStyle == ApplicationHeaderStyle.Breadcrumb
+
+                    //TODO: different implementation
+                    sourceComponent: ApplicationHeader {
+                        backButtonEnabled: false
+                        anchors.fill:parent
+                        background.visible: false
+                    }
+                }
+            }
+            background.visible: breadcrumbLoader.active
+        }
         onContentWidthChanged: mainView.positionViewAtIndex(root.currentIndex, ListView.Contain)
     }
 
@@ -655,21 +644,21 @@ T.Control {
             Loader {
                 id: header
                 z: 999
-                y: globalToolBarSizing.height - height
-                height: globalToolBarSizing.preferredHeight
+                y: globalToolBarUI.height - height
+                height: globalToolBarUI.preferredHeight
                 anchors {
                     left: page ? page.left : parent.left
                     right: page? page.right : parent.right
                 }
-                active: breadcrumbLoader.actualStyle == ApplicationHeaderStyle.ToolBar || breadcrumbLoader.actualStyle == ApplicationHeaderStyle.Titles
+                active: globalToolBar.actualStyle == ApplicationHeaderStyle.ToolBar || globalToolBar.actualStyle == ApplicationHeaderStyle.Titles
 
                 function syncSource() {
                     if (container.page && active) {
-                        header.setSource(Qt.resolvedUrl(breadcrumbLoader.actualStyle == ApplicationHeaderStyle.ToolBar ? "private/ToolBarPageHeader.qml" : "private/TitlesPageHeader.qml"), {"container": container, "page": container.page, "current": Qt.binding(function() {return root.currentIndex == container.level})});
+                        header.setSource(Qt.resolvedUrl(globalToolBar.actualStyle == ApplicationHeaderStyle.ToolBar ? "private/ToolBarPageHeader.qml" : "private/TitlesPageHeader.qml"), {"container": container, "page": container.page, "current": Qt.binding(function() {return root.currentIndex == container.level})});
                     }
                 }
                 Connections {
-                    target: breadcrumbLoader
+                    target: globalToolBar
                     onActualStyleChanged: header.syncSource()
                 }
             }
@@ -678,7 +667,7 @@ T.Control {
                 anchors.verticalCenter: header.verticalCenter
                 height: header.height * 0.6
                 visible: mainView.contentX < container.x
-                Theme.textColor: globalToolBarSizing.Theme.textColor
+                Theme.textColor: globalToolBarUI.Theme.textColor
             }
 
             property Item footer
