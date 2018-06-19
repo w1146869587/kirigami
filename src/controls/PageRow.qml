@@ -600,7 +600,7 @@ T.Control {
                 RowLayout {
                     id: buttonsLayout
 
-                    visible: globalToolBar.actualStyle != ApplicationHeaderStyle.TabBar && globalToolBar.actualStyle != ApplicationHeaderStyle.None
+                    visible: globalToolBar.showNavigationButtons && globalToolBar.actualStyle != ApplicationHeaderStyle.TabBar && globalToolBar.actualStyle != ApplicationHeaderStyle.None
 
                     Item {
                         visible: typeof applicationWindow() !== "undefined" && applicationWindow().globalDrawer.handle.handleAnchor == root
@@ -631,6 +631,9 @@ T.Control {
 
                     //TODO: different implementation?
                     sourceComponent: ApplicationHeader {
+                        minimumHeight: height
+                        preferredHeight: height
+                        maximumHeight: height
                         backButtonEnabled: false
                         anchors.fill:parent
                         background.visible: false

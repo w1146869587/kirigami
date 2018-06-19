@@ -120,8 +120,7 @@ Item {
                 } else if (!root.page.flickable.dragging) {
                     oldContentY = root.page.flickable.contentY;
                     return;
-                } 
-                
+                }
 
                 if (__appWindow.wideScreen || !Settings.isMobile) {
                     root.implicitHeight = root.preferredHeight;
