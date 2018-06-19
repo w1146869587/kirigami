@@ -37,6 +37,8 @@ import "../../templates" as T
 T.AbstractApplicationHeader {
     id: root
 
+    Theme.inherit: false
+
     background: Rectangle {
         color: Theme.backgroundColor
         Separator {

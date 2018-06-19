@@ -612,36 +612,9 @@ T.Control {
 
             readonly property int hint: page && page.implicitWidth ? page.implicitWidth : root.defaultColumnWidth
             readonly property int roundedHint: Math.floor(root.width/hint) > 0 ? root.width/Math.floor(root.width/hint) : root.width
-
-            property Item header: header
-            Loader {
-                id: header
-                z: 999
-                y: globalToolBarUI.height - height
-                height: globalToolBar.preferredHeight
-                anchors {
-                    left: page ? page.left : parent.left
-                    right: page? page.right : parent.right
-                }
-                active: globalToolBar.actualStyle == ApplicationHeaderStyle.ToolBar || globalToolBar.actualStyle == ApplicationHeaderStyle.Titles
-
-                function syncSource() {
-                    if (container.page && active) {
-                        header.setSource(Qt.resolvedUrl(globalToolBar.actualStyle == ApplicationHeaderStyle.ToolBar ? "private/ToolBarPageHeader.qml" : "private/TitlesPageHeader.qml"), {"container": container, "page": container.page, "current": Qt.binding(function() {return root.currentIndex == container.level})});
-                    }
-                }
-                Connections {
-                    target: globalToolBar
-                    onActualStyleChanged: header.syncSource()
-                }
-            }
-            Separator {
-                z: 999
-                anchors.verticalCenter: header.verticalCenter
-                height: header.height * 0.6
-                visible: mainView.contentX < container.x && globalToolBarUI.visible
-                Theme.textColor: globalToolBarUI.item ? globalToolBarUI.item.Theme.textColor : undefined
-            }
+            property ListView __view: mainView
+            //TODO: remove
+            property int __leftReservedSpace: globalToolBarUI.leftReservedSpace
 
             property Item footer
 
@@ -651,10 +624,10 @@ T.Control {
                     owner = page.parent;
                     page.parent = container;
                     page.anchors.left = container.left;
-                    page.anchors.top = header.bottom;
+                    page.anchors.top = container.top;
                     page.anchors.right = container.right;
                     page.anchors.bottom = container.bottom;
-                    header.syncSource()
+                    page.anchors.topMargin = Qt.binding(function() {return globalToolBar.preferredHeight});
                 }
             }
             property Item owner
@@ -681,7 +654,7 @@ T.Control {
             Separator {
                 z: 999
                 anchors {
-                    top: header.bottom
+                    top: page ? page.top : parent.top
                     bottom: parent.bottom
                     left: parent.left
                     //ensure a sharp angle

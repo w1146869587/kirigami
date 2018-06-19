@@ -246,8 +246,46 @@ T2.Page {
         }
     }
 
-    //on material the shadow would bleed over
-    clip: header !== undefined
+    //FIXME: on material the shadow would bleed over
+    
+    Component.onCompleted: {root.clip = root.header != null; print(root.clip+" "+(root.header == null))}
+
+    Loader {
+        id: globalToolBar
+        z: 9999
+        parent: root.clip ? root.parent : root
+        height: applicationWindow().pageStack.globalToolBar.preferredHeight
+        anchors {
+            left:  parent ? root.left : undefined
+            right: parent ? root.right : undefined
+            bottom: parent ? root.top : undefined
+        }
+        active: applicationWindow().pageStack.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar || applicationWindow().pageStack.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.Titles
+
+        function syncSource() {
+            if (active) {
+                globalToolBar.setSource(Qt.resolvedUrl(applicationWindow().pageStack.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar ? "private/ToolBarPageHeader.qml" : "private/TitlesPageHeader.qml"),
+                //TODO: find container reliably, remove assumption
+                {"container": Qt.binding(function() {return root.parent}),
+                 "page": root,
+                 "current": Qt.binding(function() {return root.parent.__view.currentIndex == root.parent.level})});
+            }
+        }
+        Connections {
+            target: applicationWindow().pageStack.globalToolBar
+            onActualStyleChanged: globalToolBar.syncSource()
+        }
+        Component.onCompleted: globalToolBar.syncSource()
+        Separator {
+            z: 999
+            anchors.verticalCenter: globalToolBar.verticalCenter
+            height: globalToolBar.height * 0.6
+            //TODO: remove this assumption
+            visible: root.parent.__view.contentX < root.parent.x
+            Kirigami.Theme.textColor: globalToolBar.item ? globalToolBar.item.Kirigami.Theme.textColor : undefined
+        }
+    }
+    //bottom action buttons
     Loader {
         id: actionButtons
         z: 9999
