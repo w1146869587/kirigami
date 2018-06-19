@@ -24,7 +24,6 @@ import QtQuick.Templates 2.0 as T
 import QtQuick.Controls 2.0 as QQC2
 import org.kde.kirigami 2.4
 import "private" as Private
-import "templates/private" as TemplatesPrivate
 import "templates" as KT
 
 /**
@@ -579,69 +578,17 @@ T.Control {
             }
         }
 
-        AbstractApplicationHeader {
+        Loader {
             id: globalToolBarUI
-            readonly property int leftReservedSpace: buttonsLayout.visible && buttonsLayout.visibleChildren.length > 1 ? buttonsLayout.width : 0
-            visible: globalToolBar.actualStyle != ApplicationHeaderStyle.None
-            height: visible ? implicitHeight : 0
-            preferredHeight: 42
-            maximumHeight: preferredHeight
             anchors {
                 left: parent.left
                 top: parent.top
                 right: parent.right
             }
-            RowLayout {
-                anchors {
-                    fill: parent
-                    bottomMargin: 1
-                }
-                spacing: 0
-                RowLayout {
-                    id: buttonsLayout
-
-                    visible: globalToolBar.showNavigationButtons && globalToolBar.actualStyle != ApplicationHeaderStyle.None
-
-                    Item {
-                        visible: typeof applicationWindow() !== "undefined" && applicationWindow().globalDrawer.handle.handleAnchor == root
-                        Layout.preferredWidth: backButton.background.implicitHeight
-                        Layout.preferredHeight: backButton.background.implicitHeight
-                    }
-                    TemplatesPrivate.BackButton {
-                        id: backButton
-                        Layout.preferredWidth: background.implicitHeight
-                        Layout.preferredHeight: background.implicitHeight
-                    }
-                    TemplatesPrivate.ForwardButton {
-                        Layout.preferredWidth: background.implicitHeight
-                        Layout.preferredHeight: background.implicitHeight
-                    }
-                    Separator {
-                        Layout.preferredHeight: parent.height * 0.6
-                        //FIXME: hacky
-                        opacity: buttonsLayout.visibleChildren.length > 1
-                    }
-                }
-                Loader {
-                    id: breadcrumbLoader
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-
-                    active: globalToolBar.actualStyle == ApplicationHeaderStyle.TabBar || globalToolBar.actualStyle == ApplicationHeaderStyle.Breadcrumb
-
-                    //TODO: different implementation?
-                    sourceComponent: ApplicationHeader {
-                        minimumHeight: height
-                        preferredHeight: height
-                        maximumHeight: height
-                        backButtonEnabled: false
-                        anchors.fill:parent
-                        background.visible: false
-                        headerStyle: globalToolBar.style
-                    }
-                }
-            }
-            background.visible: breadcrumbLoader.active
+            readonly property int leftReservedSpace: item ? item.leftReservedSpace : 0
+            active: globalToolBar.actualStyle != ApplicationHeaderStyle.None
+            visible: active
+            source: Qt.resolvedUrl("private/PageRowGlobalToolBarUI.qml");
         }
         onContentWidthChanged: mainView.positionViewAtIndex(root.currentIndex, ListView.Contain)
     }
@@ -666,7 +613,7 @@ T.Control {
                 id: header
                 z: 999
                 y: globalToolBarUI.height - height
-                height: globalToolBarUI.preferredHeight
+                height: globalToolBar.preferredHeight
                 anchors {
                     left: page ? page.left : parent.left
                     right: page? page.right : parent.right
@@ -688,7 +635,7 @@ T.Control {
                 anchors.verticalCenter: header.verticalCenter
                 height: header.height * 0.6
                 visible: mainView.contentX < container.x && globalToolBarUI.visible
-                Theme.textColor: globalToolBarUI.Theme.textColor
+                Theme.textColor: globalToolBarUI.item ? globalToolBarUI.item.Theme.textColor : undefined
             }
 
             property Item footer
