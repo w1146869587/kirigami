@@ -376,7 +376,10 @@ T.Control {
     QQC2.StackView {
         id: layersStack
         z: 99
-        anchors.fill: parent
+        anchors {
+            fill: parent
+            topMargin: depth > 1 && globalToolBarUI.visible ? globalToolBarUI.height: 0
+        }
         initialItem: mainView
         function clear () {
             //don't let it kill the main page row
@@ -438,6 +441,20 @@ T.Control {
                 easing.type: Easing.OutCubic
             }
         }
+    }
+
+    Loader {
+        id: globalToolBarUI
+        anchors {
+            left: parent.left
+            top: parent.top
+            right: parent.right
+        }
+        z: 100
+        readonly property int leftReservedSpace: item ? item.leftReservedSpace : 0
+        active: globalToolBar.actualStyle != ApplicationHeaderStyle.None
+        visible: active
+        source: Qt.resolvedUrl("private/PageRowGlobalToolBarUI.qml");
     }
 
     ListView {
@@ -578,18 +595,6 @@ T.Control {
             }
         }
 
-        Loader {
-            id: globalToolBarUI
-            anchors {
-                left: parent.left
-                top: parent.top
-                right: parent.right
-            }
-            readonly property int leftReservedSpace: item ? item.leftReservedSpace : 0
-            active: globalToolBar.actualStyle != ApplicationHeaderStyle.None
-            visible: active
-            source: Qt.resolvedUrl("private/PageRowGlobalToolBarUI.qml");
-        }
         onContentWidthChanged: mainView.positionViewAtIndex(root.currentIndex, ListView.Contain)
     }
 

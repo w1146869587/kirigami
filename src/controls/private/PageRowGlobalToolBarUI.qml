@@ -24,6 +24,7 @@ import "../templates/private" as TemplatesPrivate
 
  
 Kirigami.AbstractApplicationHeader {
+    id: header
     readonly property int leftReservedSpace: buttonsLayout.visible && buttonsLayout.visibleChildren.length > 1 ? buttonsLayout.width : 0
 
     height: visible ? implicitHeight : 0
