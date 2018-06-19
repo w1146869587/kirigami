@@ -600,7 +600,7 @@ T.Control {
                 RowLayout {
                     id: buttonsLayout
 
-                    visible: globalToolBar.showNavigationButtons && globalToolBar.actualStyle != ApplicationHeaderStyle.TabBar && globalToolBar.actualStyle != ApplicationHeaderStyle.None
+                    visible: globalToolBar.showNavigationButtons && globalToolBar.actualStyle != ApplicationHeaderStyle.None
 
                     Item {
                         visible: typeof applicationWindow() !== "undefined" && applicationWindow().globalDrawer.handle.handleAnchor == root
