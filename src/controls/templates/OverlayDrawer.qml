@@ -105,7 +105,7 @@ T2.Drawer {
         id: drawerHandle
         z: root.modal ? applicationWindow().overlay.z + (root.position > 0 ? +1 : -1) : root.background.parent.z + 1
         preventStealing: true
-        hoverEnabled: desktopMode
+        hoverEnabled: handleAnchor
         parent: applicationWindow().overlay.parent
 
         property Item handleAnchor: (!Settings.isMobile && applicationWindow().pageStack && applicationWindow().pageStack.globalToolBar && applicationWindow().pageStack.globalToolBar.actualStyle != ApplicationHeaderStyle.None)
@@ -114,10 +114,9 @@ T2.Drawer {
         property int startX
         property int mappedStartX
 
-        property bool desktopMode: handleAnchor
-        enabled: root.handleVisible && root.modal
+        enabled: root.handleVisible
 
-        onPressed: {
+        onPressed: {print(handleAnchor.mapToItem(root.contentItem.parent, 0, handleAnchor.y).y+" "+y)
             root.peeking = true;
             startX = mouse.x;
             mappedStartX = mapToItem(parent, startX, 0).x
@@ -163,7 +162,7 @@ T2.Drawer {
         y: handleAnchor ? handleAnchor.mapToItem(root.contentItem.parent, 0, handleAnchor.y).y : 0
 
         anchors {
-            bottom: drawerHandle.desktopMode ? undefined : parent.bottom
+            bottom: drawerHandle.handleAnchor ? undefined : parent.bottom
 
             bottomMargin: {
                 if (!applicationWindow()) {

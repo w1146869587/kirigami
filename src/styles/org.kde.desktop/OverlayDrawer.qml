@@ -44,7 +44,7 @@ T.OverlayDrawer {
             anchors.fill: parent
 
             DropShadow {
-                visible: !parent.parent.desktopMode || root.handle.pressed || (root.modal && root.position > 0)
+                visible: !parent.parent.handleAnchor || root.handle.pressed || (root.modal && root.position > 0)
                 anchors.fill: handleGraphics
                 horizontalOffset: 0
                 verticalOffset: Units.devicePixelRatio
@@ -57,10 +57,10 @@ T.OverlayDrawer {
                 id: handleGraphics
                 anchors.centerIn: parent
                 color: root.handle.pressed ? Theme.highlightColor : Theme.backgroundColor
-                width: Units.iconSizes.smallMedium + Units.smallSpacing * 2
+                width: Units.iconSizes.medium
                 height: width
                 radius: Units.devicePixelRatio*2
-                border.color: parent.parent.desktopMode && parent.parent.containsMouse ? Theme.highlightColor : "transparent"
+                border.color: parent.parent.handleAnchor && parent.parent.containsMouse ? Theme.hoverColor : "transparent"
                 Loader {
                     anchors.centerIn: parent
                     width: height
@@ -122,7 +122,7 @@ T.OverlayDrawer {
     //default to a sidebar in desktop mode
     modal: true
     drawerOpen: !modal
-    closePolicy: modal ? Popup.CloseOnEscape | Popup.CloseOnPressOutside : Popup.NoAutoClose
+    closePolicy: modal ? Popup.CloseOnEscape | Popup.CloseOnReleaseOutside : Popup.NoAutoClose
     handleVisible: (modal || !drawerOpen) && (typeof(applicationWindow)===typeof(Function) && applicationWindow() ? applicationWindow().controlsVisible : true)
 
     onPositionChanged: {

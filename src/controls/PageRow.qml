@@ -115,11 +115,11 @@ T.Control {
      *
      * * actualStyle: this will represent the actual style of the toolbar: it can be different from style in the case style is Auto
      * * showNavigationButtons: if true, forward and backward navigation buttons will be shown on the left of the toolbar
-     * * minimumHeight: (int) minimum height of the 
-    property int preferredHeight: 42
-    property int maximumHeight: preferredHeight
-    property int leftReservedSpace: 0
-    property int rightReservedSpace: 0
+     * * minimumHeight: (int) minimum height of the header, which will be resized when scrolling, only in Mobile mode (default: preferredHeight, sliding but no scaling)
+    property int preferredHeight: (int) the height the toolbar will usually have (default: 42)
+    property int maximumHeight: (int) The height the toolbar will have in mobile mode when the app is in reachable mode (default: preferredHeight * 1.5)
+     * * leftReservedSpace: (int, readonly) how many pixels are reserved at the left of the page toolBar (for navigation buttons or drawer handle)
+    property int rightReservedSpace: (int, readonly) how many pixels are reserved at the right of the page toolbar (drawer handle)
      * @since 5.48
      */
     readonly property alias globalToolBar: globalToolBar

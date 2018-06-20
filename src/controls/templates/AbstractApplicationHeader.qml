@@ -104,7 +104,7 @@ Item {
             bottom: parent.bottom
         }
 
-        height: __appWindow.reachableMode && __appWindow.reachableModeEnabled ? root.maximumHeight : root.height
+        height: __appWindow.reachableMode && __appWindow.reachableModeEnabled ? root.maximumHeight : (root.minimumHeight > 0 ? Math.max(root.height, root.minimumHeight) : root.preferredHeight)
 
         Connections {
             id: headerSlideConnection
