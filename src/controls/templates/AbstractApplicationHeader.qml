@@ -41,7 +41,8 @@ Item {
     property int minimumHeight: 0
     property int preferredHeight: Units.gridUnit * 2
     property int maximumHeight: Units.gridUnit * 3
-    property Page page: __appWindow.pageStack.currentItem
+    property PageRow pageRow: __appWindow.pageStack
+    property Page page: pageRow.currentItem
     default property alias contentItem: mainItem.data
     readonly property int paintedHeight: headerItem.y + headerItem.height - 1
     LayoutMirroring.enabled: Qt.application.layoutDirection == Qt.RightToLeft 
@@ -67,6 +68,16 @@ Item {
      */
     property Item background
 
+    onContentItemChanged: {
+        if (contentItem.length > 0) {
+            var item = contentItem[contentItem.length - 1];
+            item.parent = mainItem;
+            item.anchors.top = mainItem.top;
+            item.anchors.right = mainItem.right;
+            item.anchors.bottom = mainItem.bottom;
+            item.width = Qt.binding(function() {return Math.max(mainItem.width, item.Layout.minimumWidth)});
+        }
+    }
     onBackgroundChanged: {
         background.z = -1;
         background.parent = headerItem;
@@ -151,7 +162,7 @@ Item {
             }
         }
         Connections {
-            target: __appWindow.pageStack
+            target: pageRow
             onCurrentItemChanged: {
                 if (!root.page) {
                     return;
@@ -167,6 +178,7 @@ Item {
 
         Item {
             id: mainItem
+            clip: childrenRect.width > width
             anchors {
                 fill: parent
                 leftMargin: root.leftPadding

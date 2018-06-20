@@ -207,11 +207,11 @@ T2.Page {
      *
      * @since 2.1
      */
-    readonly property bool isCurrentPage: typeof applicationWindow === "undefined" || !applicationWindow().pageStack
+    readonly property bool isCurrentPage: typeof applicationWindow === "undefined" || !globalToolBar.row
                 ? true
-                : (applicationWindow().pageStack.layers.depth > 1
-                    ? applicationWindow().pageStack.layers.currentItem == root
-                    : applicationWindow().pageStack.currentItem == root)
+                : (globalToolBar.row.layers.depth > 1
+                    ? globalToolBar.row.layers.currentItem == root
+                    : globalToolBar.row.currentItem == root)
 
     PageActionPropertyGroup {
         id: actionsGroup
@@ -246,42 +246,64 @@ T2.Page {
         }
     }
 
-    //FIXME: on material the shadow would bleed over
     
-    Component.onCompleted: {root.clip = root.header != null; print(root.clip+" "+(root.header == null))}
+    Component.onCompleted: {
+        //FIXME: on material the shadow would bleed over
+        root.clip = root.header != null;
+        parentChanged(root.parent);
+    }
+    onParentChanged: {
+        if (!parent) {
+            return;
+        }
+        globalToolBar.stack = null;
+        globalToolBar.row = null;
 
+        if (root.parent.hasOwnProperty("__pageRow")) {
+            globalToolBar.row = root.parent.__pageRow;
+        }
+        if (root.T2.StackView.view) {
+            globalToolBar.stack = root.T2.StackView.view;
+            globalToolBar.row = root.T2.StackView.view.parent;
+        }
+        if (globalToolBar.row) {
+            globalToolBar.row.globalToolBar.actualStyleChanged.connect(globalToolBar.syncSource);
+            globalToolBar.syncSource();
+        }
+    }
+
+    //global top toolbar if we are in a PageRow (in the row or as a layer)
     Loader {
         id: globalToolBar
         z: 9999
         parent: root.clip ? root.parent : root
-        height: applicationWindow().pageStack.globalToolBar.preferredHeight
+        height: row ? row.globalToolBar.preferredHeight : 0
         anchors {
             left:  parent ? root.left : undefined
             right: parent ? root.right : undefined
             bottom: parent ? root.top : undefined
         }
-        active: applicationWindow().pageStack.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar || applicationWindow().pageStack.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.Titles
+        property Kirigami.PageRow row
+        property T2.StackView stack
+
+        active: row && (row.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar || globalToolBar.row.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.Titles)
 
         function syncSource() {
-            if (active) {
-                globalToolBar.setSource(Qt.resolvedUrl(applicationWindow().pageStack.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar ? "private/ToolBarPageHeader.qml" : "private/TitlesPageHeader.qml"),
+            if (row && active) {
+                setSource(Qt.resolvedUrl(row.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar ? "private/ToolBarPageHeader.qml" : "private/TitlesPageHeader.qml"),
                 //TODO: find container reliably, remove assumption
-                {"container": Qt.binding(function() {return root.parent}),
+                {"pageRow": Qt.binding(function() {return row}),
                  "page": root,
-                 "current": Qt.binding(function() {return root.parent.__view.currentIndex == root.parent.level})});
+                 "current": Qt.binding(function() {return stack ? true : row.currentIndex == root.parent.level})});
             }
         }
-        Connections {
-            target: applicationWindow().pageStack.globalToolBar
-            onActualStyleChanged: globalToolBar.syncSource()
-        }
-        Component.onCompleted: globalToolBar.syncSource()
+
         Separator {
             z: 999
             anchors.verticalCenter: globalToolBar.verticalCenter
             height: globalToolBar.height * 0.6
             //TODO: remove this assumption
-            visible: root.parent.__view.contentX < root.parent.x
+            visible: globalToolBar.row && globalToolBar.row.contentItem.contentX < root.parent.x - globalToolBar.row.globalToolBar.leftReservedSpace
             Kirigami.Theme.textColor: globalToolBar.item ? globalToolBar.item.Kirigami.Theme.textColor : undefined
         }
     }
@@ -298,7 +320,7 @@ T2.Page {
         //It should be T2.Page, Qt 5.7 doesn't like it
         property Item page: root
         height: item ? item.height : 0
-        active: typeof applicationWindow !== "undefined" && applicationWindow().pageStack.globalToolBar.actualStyle != Kirigami.ApplicationHeaderStyle.ToolBar &&
+        active: typeof applicationWindow !== "undefined" && (!globalToolBar.row || globalToolBar.row.globalToolBar.actualStyle != Kirigami.ApplicationHeaderStyle.ToolBar) &&
                //Legacy
                 (typeof applicationWindow === "undefined" ||
                  (!applicationWindow().header || applicationWindow().header.toString().indexOf("ToolBarApplicationHeader") === -1) &&

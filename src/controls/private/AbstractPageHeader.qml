@@ -30,5 +30,8 @@ AbstractApplicationHeader {
     minimumHeight: parent.height
     maximumHeight: parent.height
     preferredHeight: parent.height
-    leftPadding: container ? Math.min(Math.max(container.width/2, contentItem[0].Layout.minimumWidth), Math.max(0, container.__view.contentX - container.x + container.__leftReservedSpace)) : 0
+
+    leftPadding: pageRow ? Math.max(0, pageRow.contentItem.contentX - mapToItem(pageRow.contentItem.contentItem, 0, 0).x + pageRow.globalToolBar.leftReservedSpace) : 0
+
+    rightPadding: pageRow ? Math.min(pageRow.globalToolBar.rightReservedSpace, Math.max(0, mapToItem(pageRow.contentItem.contentItem, width, 0).x - (pageRow.contentItem.contentX + pageRow.width) + pageRow.globalToolBar.rightReservedSpace)) : 0
 }

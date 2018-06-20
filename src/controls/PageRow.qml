@@ -371,6 +371,8 @@ T.Control {
 
     Private.GlobalToolBarStyleGroup {
         id: globalToolBar
+        leftReservedSpace: globalToolBarUI.item ? globalToolBarUI.item.leftReservedSpace : 0
+        rightReservedSpace: globalToolBarUI.item ? globalToolBarUI.item.rightReservedSpace : 0
     }
 
     QQC2.StackView {
@@ -451,7 +453,6 @@ T.Control {
             right: parent.right
         }
         z: 100
-        readonly property int leftReservedSpace: item ? item.leftReservedSpace : 0
         active: globalToolBar.actualStyle != ApplicationHeaderStyle.None
         visible: active
         source: Qt.resolvedUrl("private/PageRowGlobalToolBarUI.qml");
@@ -612,9 +613,7 @@ T.Control {
 
             readonly property int hint: page && page.implicitWidth ? page.implicitWidth : root.defaultColumnWidth
             readonly property int roundedHint: Math.floor(root.width/hint) > 0 ? root.width/Math.floor(root.width/hint) : root.width
-            property ListView __view: mainView
-            //TODO: remove
-            property int __leftReservedSpace: globalToolBarUI.leftReservedSpace
+            property T.Control __pageRow: root
 
             property Item footer
 
