@@ -27,7 +27,9 @@ Kirigami.ApplicationWindow {
     id: root
 
     //header: Kirigami.ApplicationHeader {}
-
+pageStack.globalToolBar.minimumHeight: 10
+pageStack.globalToolBar.preferredHeight: 40
+pageStack.globalToolBar.maximumHeight: 80
     globalDrawer: Kirigami.GlobalDrawer {
         title: "Widget gallery"
         titleIcon: "applications-graphics"

@@ -277,7 +277,7 @@ T2.Page {
         id: globalToolBar
         z: 9999
         parent: root.clip ? root.parent : root
-        height: row ? row.globalToolBar.preferredHeight : 0
+        height: row ? row.globalToolBar.height : 0
         anchors {
             left:  parent ? root.left : undefined
             right: parent ? root.right : undefined
@@ -294,7 +294,7 @@ T2.Page {
                 //TODO: find container reliably, remove assumption
                 {"pageRow": Qt.binding(function() {return row}),
                  "page": root,
-                 "current": Qt.binding(function() {return stack ? true : row.currentIndex == root.parent.level})});
+                 "current": Qt.binding(function() {return stack || !root.parent ? true : row.currentIndex == root.parent.level})});
             }
         }
 
@@ -303,7 +303,7 @@ T2.Page {
             anchors.verticalCenter: globalToolBar.verticalCenter
             height: globalToolBar.height * 0.6
             //TODO: remove this assumption
-            visible: globalToolBar.row && globalToolBar.row.contentItem.contentX < root.parent.x - globalToolBar.row.globalToolBar.leftReservedSpace
+            visible: globalToolBar.row && root.parent && globalToolBar.row.contentItem.contentX < root.parent.x - globalToolBar.row.globalToolBar.leftReservedSpace
             Kirigami.Theme.textColor: globalToolBar.item ? globalToolBar.item.Kirigami.Theme.textColor : undefined
         }
     }

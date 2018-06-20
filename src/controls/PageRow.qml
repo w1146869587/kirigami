@@ -115,6 +115,11 @@ T.Control {
      *
      * * actualStyle: this will represent the actual style of the toolbar: it can be different from style in the case style is Auto
      * * showNavigationButtons: if true, forward and backward navigation buttons will be shown on the left of the toolbar
+     * * minimumHeight: (int) minimum height of the 
+    property int preferredHeight: 42
+    property int maximumHeight: preferredHeight
+    property int leftReservedSpace: 0
+    property int rightReservedSpace: 0
      * @since 5.48
      */
     readonly property alias globalToolBar: globalToolBar
@@ -371,8 +376,9 @@ T.Control {
 
     Private.GlobalToolBarStyleGroup {
         id: globalToolBar
-        leftReservedSpace: globalToolBarUI.item ? globalToolBarUI.item.leftReservedSpace : 0
-        rightReservedSpace: globalToolBarUI.item ? globalToolBarUI.item.rightReservedSpace : 0
+        readonly property int leftReservedSpace: globalToolBarUI.item ? globalToolBarUI.item.leftReservedSpace : 0
+        readonly property int rightReservedSpace: globalToolBarUI.item ? globalToolBarUI.item.rightReservedSpace : 0
+        readonly property int height: globalToolBarUI.height
     }
 
     QQC2.StackView {
@@ -626,7 +632,7 @@ T.Control {
                     page.anchors.top = container.top;
                     page.anchors.right = container.right;
                     page.anchors.bottom = container.bottom;
-                    page.anchors.topMargin = Qt.binding(function() {return globalToolBar.preferredHeight});
+                    page.anchors.topMargin = Qt.binding(function() {return globalToolBarUI.height});
                 }
             }
             property Item owner

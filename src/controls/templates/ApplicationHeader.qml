@@ -95,7 +95,8 @@ AbstractApplicationHeader {
                 color: header.background && header.background.color && header.background.color == Theme.highlightColor ? Theme.highlightedTextColor : Theme.textColor
                 elide: Text.ElideRight
                 text: page ? page.title : ""
-                font.pointSize: Math.max(1, titleList.height / (1.6 * Units.devicePixelRatio))
+                font.pointSize: -1
+                font.pixelSize: Math.max(1, titleList.height * 0.7)
                 verticalAlignment: Text.AlignVCenter
                 wrapMode: Text.NoWrap
                 Rectangle {

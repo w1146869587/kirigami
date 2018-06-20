@@ -68,16 +68,6 @@ Item {
      */
     property Item background
 
-    onContentItemChanged: {
-        if (contentItem.length > 0) {
-            var item = contentItem[contentItem.length - 1];
-            item.parent = mainItem;
-            item.anchors.top = mainItem.top;
-            item.anchors.right = mainItem.right;
-            item.anchors.bottom = mainItem.bottom;
-            item.width = Qt.binding(function() {return Math.max(mainItem.width, item.Layout.minimumWidth)});
-        }
-    }
     onBackgroundChanged: {
         background.z = -1;
         background.parent = headerItem;
@@ -114,7 +104,7 @@ Item {
             bottom: parent.bottom
         }
 
-        height: __appWindow.reachableMode && __appWindow.reachableModeEnabled ? root.maximumHeight : root.preferredHeight
+        height: __appWindow.reachableMode && __appWindow.reachableModeEnabled ? root.maximumHeight : root.height
 
         Connections {
             id: headerSlideConnection

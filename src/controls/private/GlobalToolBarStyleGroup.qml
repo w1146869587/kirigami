@@ -45,6 +45,4 @@ QtObject {
     property int minimumHeight: 0
     property int preferredHeight: 42
     property int maximumHeight: preferredHeight
-    property int leftReservedSpace: 0
-    property int rightReservedSpace: 0
 }

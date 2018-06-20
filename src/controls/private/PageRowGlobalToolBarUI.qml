@@ -26,7 +26,7 @@ import "../templates/private" as TemplatesPrivate
 Kirigami.AbstractApplicationHeader {
     id: header
     readonly property int leftReservedSpace: buttonsLayout.visible && buttonsLayout.visibleChildren.length > 1 ? buttonsLayout.width : 0
-    readonly property int rightReservedSpace: typeof applicationWindow() !== "undefined" && applicationWindow().globalDrawer.handle.handleAnchor == root ? backButton.background.implicitHeight : 0
+    readonly property int rightReservedSpace: typeof applicationWindow() !== "undefined" && applicationWindow().contextDrawer && applicationWindow().contextDrawer.handle.handleAnchor == root ? backButton.background.implicitHeight : 0
 
     height: visible ? implicitHeight : 0
     minimumHeight: globalToolBar.minimumHeight

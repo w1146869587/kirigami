@@ -27,11 +27,12 @@ AbstractApplicationHeader {
     property Item container
     property bool current
 
-    minimumHeight: parent.height
-    maximumHeight: parent.height
-    preferredHeight: parent.height
+    minimumHeight: pageRow.globalToolBar.minimumHeight
+    maximumHeight: pageRow.globalToolBar.maximumHeight
+    preferredHeight: pageRow.globalToolBar.preferredHeight
+    implicitHeight: page.y
 
-    leftPadding: pageRow ? Math.max(0, pageRow.contentItem.contentX - mapToItem(pageRow.contentItem.contentItem, 0, 0).x + pageRow.globalToolBar.leftReservedSpace) : 0
+    leftPadding: Math.max(0, pageRow.contentItem.contentX - mapToItem(pageRow.contentItem.contentItem, 0, 0).x + pageRow.globalToolBar.leftReservedSpace)
 
-    rightPadding: pageRow ? Math.min(pageRow.globalToolBar.rightReservedSpace, Math.max(0, mapToItem(pageRow.contentItem.contentItem, width, 0).x - (pageRow.contentItem.contentX + pageRow.width) + pageRow.globalToolBar.rightReservedSpace)) : 0
+    rightPadding: Math.min(pageRow.globalToolBar.rightReservedSpace, Math.max(0, mapToItem(pageRow.contentItem.contentItem, width, 0).x - (pageRow.contentItem.contentX + pageRow.width) + pageRow.globalToolBar.rightReservedSpace))
 }
