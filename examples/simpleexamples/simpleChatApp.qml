@@ -25,10 +25,6 @@ import org.kde.kirigami 2.4 as Kirigami
 Kirigami.ApplicationWindow {
     id: root
 
-    header: Rectangle {
-        width: 100
-        height: 30
-    }
     //header: Kirigami.ToolBarApplicationHeader {}
     //FIXME: perhaps the default logic for going widescreen should be refined upstream
     wideScreen: width > columnWidth * 3

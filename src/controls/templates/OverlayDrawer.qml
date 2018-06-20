@@ -111,12 +111,13 @@ T2.Drawer {
         property Item handleAnchor: (!Settings.isMobile && applicationWindow().pageStack && applicationWindow().pageStack.globalToolBar && applicationWindow().pageStack.globalToolBar.actualStyle != ApplicationHeaderStyle.None)
                 ? applicationWindow().pageStack
                 : (applicationWindow().header && applicationWindow().header.toString().indexOf("ToolBarApplicationHeader") !== -1 ? applicationWindow().header : null)
+        onHandleAnchorChanged: handleAnchor.parent.yChanged.connect(handleAnchor.yChanged);
         property int startX
         property int mappedStartX
 
         enabled: root.handleVisible
 
-        onPressed: {print(handleAnchor.mapToItem(root.contentItem.parent, 0, handleAnchor.y).y+" "+y)
+        onPressed: {
             root.peeking = true;
             startX = mouse.x;
             mappedStartX = mapToItem(parent, startX, 0).x
@@ -159,7 +160,7 @@ T2.Drawer {
                 return 0;
             }
         }
-        y: handleAnchor ? handleAnchor.mapToItem(root.contentItem.parent, 0, handleAnchor.y).y : 0
+        y: handleAnchor ? handleAnchor.parent.mapToItem(root.contentItem, 0, handleAnchor.y).y : 0
 
         anchors {
             bottom: drawerHandle.handleAnchor ? undefined : parent.bottom
