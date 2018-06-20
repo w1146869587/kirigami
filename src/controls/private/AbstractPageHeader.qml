@@ -32,7 +32,11 @@ AbstractApplicationHeader {
     preferredHeight: pageRow.globalToolBar.preferredHeight
     implicitHeight: page.y
 
-    leftPadding: Math.max(0, pageRow.contentItem.contentX - mapToItem(pageRow.contentItem.contentItem, 0, 0).x + pageRow.globalToolBar.leftReservedSpace)
+    leftPadding: Qt.application.layoutDirection == Qt.LeftToRight
+            ? Math.max(0, pageRow.contentItem.contentX - mapToItem(pageRow.contentItem.contentItem, 0, 0).x + pageRow.globalToolBar.leftReservedSpace)
+            : Math.max(0, mapToItem(pageRow.contentItem.contentItem, width, 0).x - (pageRow.contentItem.contentX + pageRow.width) + pageRow.globalToolBar.leftReservedSpace)
 
-    rightPadding: Math.min(pageRow.globalToolBar.rightReservedSpace, Math.max(0, mapToItem(pageRow.contentItem.contentItem, width, 0).x - (pageRow.contentItem.contentX + pageRow.width) + pageRow.globalToolBar.rightReservedSpace))
+    rightPadding: Qt.application.layoutDirection == Qt.LeftToRight
+            ? Math.min(pageRow.globalToolBar.rightReservedSpace, Math.max(0, mapToItem(pageRow.contentItem.contentItem, width, 0).x - (pageRow.contentItem.contentX + pageRow.width) + pageRow.globalToolBar.rightReservedSpace))
+            : Math.max(0, pageRow.contentItem.contentX - mapToItem(pageRow.contentItem.contentItem, 0, 0).x + pageRow.globalToolBar.rightReservedSpace)
 }
