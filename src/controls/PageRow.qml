@@ -461,6 +461,7 @@ T.Control {
         z: 100
         active: globalToolBar.actualStyle != ApplicationHeaderStyle.None
         visible: active
+        height: active ? implicitHeight : 0
         source: Qt.resolvedUrl("private/PageRowGlobalToolBarUI.qml");
     }
 
