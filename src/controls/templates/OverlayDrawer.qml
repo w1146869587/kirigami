@@ -109,9 +109,14 @@ T2.Drawer {
         parent: applicationWindow().overlay.parent
 
         property Item handleAnchor: (!Settings.isMobile && applicationWindow().pageStack && applicationWindow().pageStack.globalToolBar && applicationWindow().pageStack.globalToolBar.actualStyle != ApplicationHeaderStyle.None)
-                ? applicationWindow().pageStack
+                ? (root.edge == Qt.LeftEdge
+                   ? applicationWindow().pageStack.globalToolBar.leftHandleAnchor
+                   : applicationWindow().pageStack.globalToolBar.rightHandleAnchor)
                 : (applicationWindow().header && applicationWindow().header.toString().indexOf("ToolBarApplicationHeader") !== -1 ? applicationWindow().header : null)
-        onHandleAnchorChanged: handleAnchor.parent.yChanged.connect(handleAnchor.yChanged);
+        //FIXME: temporary solution, we need a scenepostracker item
+        onHandleAnchorChanged: {
+            handleAnchor.parent.yChanged.connect(handleAnchor.yChanged);
+        }
         property int startX
         property int mappedStartX
 
@@ -153,9 +158,9 @@ T2.Drawer {
         x: {
             switch(root.edge) {
             case Qt.LeftEdge:
-                return root.background.width * root.position;
+                return root.background.width * root.position + Units.smallSpacing;
             case Qt.RightEdge:
-                return drawerHandle.parent.width - (root.background.width * root.position) - width;
+                return drawerHandle.parent.width - (root.background.width * root.position) - width - Units.smallSpacing;
             default:
                 return 0;
             }
@@ -209,8 +214,8 @@ T2.Drawer {
         }
 
         visible: root.enabled && (root.edge == Qt.LeftEdge || root.edge == Qt.RightEdge)
-        width: Units.iconSizes.medium + Units.smallSpacing*2
-        height: width
+        width: handleAnchor ? handleAnchor.width : Units.iconSizes.medium + Units.smallSpacing*2
+        height: handleAnchor ? handleAnchor.height : width
         opacity: root.handleVisible ? 1 : 0
         Behavior on opacity {
             NumberAnimation {

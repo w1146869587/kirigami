@@ -26,7 +26,10 @@ import "../templates/private" as TemplatesPrivate
 Kirigami.AbstractApplicationHeader {
     id: header
     readonly property int leftReservedSpace: buttonsLayout.visible && buttonsLayout.visibleChildren.length > 1 ? buttonsLayout.width : 0
-    readonly property int rightReservedSpace: typeof applicationWindow() !== "undefined" && applicationWindow().contextDrawer && applicationWindow().contextDrawer.handle.handleAnchor == root ? backButton.background.implicitHeight : 0
+    readonly property int rightReservedSpace: rightHandleAnchor.visible ? backButton.background.implicitHeight : 0
+
+    readonly property alias leftHandleAnchor: leftHandleAnchor
+    readonly property alias rightHandleAnchor: rightHandleAnchor
 
     height: visible ? implicitHeight : 0
     minimumHeight: globalToolBar.minimumHeight
@@ -42,7 +45,8 @@ Kirigami.AbstractApplicationHeader {
             visible: globalToolBar.showNavigationButtons && globalToolBar.actualStyle != Kirigami.ApplicationHeaderStyle.None
 
             Item {
-                visible: typeof applicationWindow() !== "undefined" && applicationWindow().globalDrawer.handle.handleAnchor == root
+                id: leftHandleAnchor
+                visible: typeof applicationWindow() !== "undefined" && applicationWindow().globalDrawer.handle.handleAnchor == leftHandleAnchor
                 Layout.preferredWidth: backButton.background.implicitHeight
                 Layout.preferredHeight: backButton.background.implicitHeight
             }
@@ -78,6 +82,12 @@ Kirigami.AbstractApplicationHeader {
                 background.visible: false
                 headerStyle: globalToolBar.style
             }
+        }
+        Item {
+            id: rightHandleAnchor
+            visible: typeof applicationWindow() !== "undefined" && applicationWindow().contextDrawer && applicationWindow().contextDrawer.handle.handleAnchor == rightHandleAnchor
+            Layout.preferredWidth: backButton.background.implicitHeight
+            Layout.preferredHeight: backButton.background.implicitHeight
         }
     }
     background.visible: breadcrumbLoader.active
