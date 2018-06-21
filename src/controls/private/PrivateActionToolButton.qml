@@ -29,7 +29,7 @@ Controls.ToolButton {
     implicitHeight: background.implicitHeight
 
     Theme.colorSet: Theme.Button
-    Theme.inherit: kirigamiAction.icon.color.a === 0
+    Theme.inherit: kirigamiAction && kirigamiAction.icon.color.a === 0
     Theme.backgroundColor: kirigamiAction && kirigamiAction.icon.color.a ? kirigamiAction.icon.color : undefined
     Theme.textColor: kirigamiAction && !flat && kirigamiAction.icon.color.a ? Theme.highlightedTextColor : undefined
 
@@ -74,7 +74,7 @@ Controls.ToolButton {
         hoverEnabled: true
         onPressed: mouse.accepted = false
         Theme.colorSet: checked && (!control.flat && control.kirigamiAction && control.kirigamiAction.icon.color.a) ? Theme.Selection : Theme.Button
-        Theme.inherit: Theme.colorSet != Theme.Selection && control.kirigamiAction.icon.color.a == 0
+        Theme.inherit: control.kirigamiAction && Theme.colorSet != Theme.Selection && control.kirigamiAction.icon.color.a == 0
         RowLayout {
             id: layout
 
