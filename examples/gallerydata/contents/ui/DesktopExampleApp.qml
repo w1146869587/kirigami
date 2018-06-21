@@ -72,13 +72,14 @@ Kirigami.ApplicationWindow {
             Kirigami.Action {
                 text: "Top Bar Sizing"
                 iconName: "folder-sync"
-                visible: Settings.isMobile
+                visible: Kirigami.Settings.isMobile
                 Kirigami.Action {
                         text: "Slide Away"
                         onTriggered: {
                             root.pageStack.globalToolBar.minimumHeight = 0;
                             root.pageStack.globalToolBar.preferredHeight = 42;
                         }
+                        checked: root.pageStack.globalToolBar.minimumHeight == 0
                 }
                 Kirigami.Action {
                         text: "Fixed"
@@ -86,6 +87,7 @@ Kirigami.ApplicationWindow {
                             root.pageStack.globalToolBar.minimumHeight = 42;
                             root.pageStack.globalToolBar.preferredHeight = 42;
                         }
+                        checked: root.pageStack.globalToolBar.minimumHeight == 42
                 }
                 Kirigami.Action {
                         text: "Resizing"
@@ -93,6 +95,7 @@ Kirigami.ApplicationWindow {
                             root.pageStack.globalToolBar.minimumHeight = 20;
                             root.pageStack.globalToolBar.preferredHeight = 52;
                         }
+                        checked: root.pageStack.globalToolBar.minimumHeight == 20
                 }
             },
             Kirigami.Action {
