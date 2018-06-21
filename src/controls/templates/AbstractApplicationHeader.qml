@@ -78,12 +78,6 @@ Item {
     onPreferredHeightChanged: implicitHeight = preferredHeight;
 
     opacity: height > 0 ? 1 : 0
-    Behavior on opacity {
-        OpacityAnimator {
-            duration: Units.longDuration
-            easing.type: Easing.InOutQuad
-        }
-    }
 
     Behavior on implicitHeight {
         enabled: root.page && root.page.flickable && !root.page.flickable.moving
