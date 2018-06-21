@@ -374,7 +374,7 @@ T.Control {
         }
     }
 
-    Private.GlobalToolBarStyleGroup {
+    Private.PageRowGlobalToolBarStyleGroup {
         id: globalToolBar
         readonly property int leftReservedSpace: globalToolBarUI.item ? globalToolBarUI.item.leftReservedSpace : 0
         readonly property int rightReservedSpace: globalToolBarUI.item ? globalToolBarUI.item.rightReservedSpace : 0

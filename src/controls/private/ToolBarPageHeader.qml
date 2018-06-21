@@ -76,7 +76,7 @@ AbstractPageHeader {
             right: ctxActionsButton.visible ? ctxActionsButton.left : parent.right
         }
 
-        readonly property bool toobig: root.width - titleTextMetrics.width - Units.gridUnit < buttonTextMetrics.requiredWidth
+        readonly property bool toobig: root.width - root.leftPadding - root.rightPadding - titleTextMetrics.width - Units.gridUnit < buttonTextMetrics.requiredWidth
 
         PrivateActionToolButton {
             Layout.alignment: Qt.AlignVCenter
