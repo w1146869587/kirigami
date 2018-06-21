@@ -30,6 +30,10 @@ AbstractPageHeader {
     implicitWidth: titleTextMetrics.width/2 + buttonTextMetrics.collapsedButtonsWidth
     Layout.minimumWidth: ctxActionsButton.width*4
 
+    MouseArea {
+        anchors.fill: parent
+        onClicked: page.forceActiveFocus()
+    }
     RowLayout {
         id: titleLayout
         anchors {

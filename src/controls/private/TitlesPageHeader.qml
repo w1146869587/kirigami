@@ -38,6 +38,10 @@ AbstractPageHeader {
         font.pointSize: -1
         font.pixelSize: Math.max(1, height*0.7)
         text: page ? page.title : ""
+        MouseArea {
+            anchors.fill: parent
+            onClicked: page.forceActiveFocus()
+        }
     }
 }
 
