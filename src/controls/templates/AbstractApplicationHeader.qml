@@ -74,6 +74,9 @@ Item {
         background.anchors.fill = headerItem;
     }
 
+    onMinimumHeightChanged: implicitHeight = preferredHeight;
+    onPreferredHeightChanged: implicitHeight = preferredHeight;
+
     opacity: height > 0 ? 1 : 0
     Behavior on opacity {
         OpacityAnimator {
@@ -82,7 +85,7 @@ Item {
         }
     }
 
-    Behavior on height {
+    Behavior on implicitHeight {
         enabled: root.page && root.page.flickable && !root.page.flickable.moving
         NumberAnimation {
             duration: Units.longDuration
@@ -144,7 +147,7 @@ Item {
                 if (__appWindow.wideScreen || !Settings.isMobile) {
                     return;
                 }
-                if (root.height > (root.preferredHeight - root.minimumHeight)/2 ) {
+                if (root.height > root.minimumHeight + (root.preferredHeight - root.minimumHeight)/2 ) {
                     root.implicitHeight = root.preferredHeight;
                 } else {
                     root.implicitHeight = root.minimumHeight;

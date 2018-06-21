@@ -70,15 +70,29 @@ Kirigami.ApplicationWindow {
                 }
             },
             Kirigami.Action {
-                text: "Submenu 2"
+                text: "Top Bar Sizing"
                 iconName: "folder-sync"
+                visible: Settings.isMobile
                 Kirigami.Action {
-                        text: "Action 4"
-                        onTriggered: showPassiveNotification(text + " clicked")
+                        text: "Slide Away"
+                        onTriggered: {
+                            root.pageStack.globalToolBar.minimumHeight = 0;
+                            root.pageStack.globalToolBar.preferredHeight = 42;
+                        }
                 }
                 Kirigami.Action {
-                        text: "Action 5"
-                        onTriggered: showPassiveNotification(text + " clicked")
+                        text: "Fixed"
+                        onTriggered: {
+                            root.pageStack.globalToolBar.minimumHeight = 42;
+                            root.pageStack.globalToolBar.preferredHeight = 42;
+                        }
+                }
+                Kirigami.Action {
+                        text: "Resizing"
+                        onTriggered: {
+                            root.pageStack.globalToolBar.minimumHeight = 20;
+                            root.pageStack.globalToolBar.preferredHeight = 52;
+                        }
                 }
             },
             Kirigami.Action {
