@@ -277,7 +277,7 @@ T2.Page {
         id: globalToolBar
         z: 9999
         parent: root.clip ? root.parent : root
-        height: row ? row.globalToolBar.height : 0
+        height: item ? item.implicitHeight : 0
         anchors {
             left:  parent ? root.left : undefined
             right: parent ? root.right : undefined
@@ -302,11 +302,11 @@ T2.Page {
             z: 999
             anchors.verticalCenter: globalToolBar.verticalCenter
             height: globalToolBar.height * 0.6
-            //TODO: remove this assumption
             visible: globalToolBar.row && root.parent && globalToolBar.row.contentItem.contentX < root.parent.x - globalToolBar.row.globalToolBar.leftReservedSpace
             Kirigami.Theme.textColor: globalToolBar.item ? globalToolBar.item.Kirigami.Theme.textColor : undefined
         }
     }
+
     //bottom action buttons
     Loader {
         id: actionButtons
