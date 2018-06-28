@@ -190,6 +190,9 @@ OverlayDrawer {
      */
     readonly property Action currentSubMenu: stackView.currentItem ? stackView.currentItem.current: null
 
+    
+    property bool collapsed: true
+
     /**
      * Notifies that the banner has been clicked
      */
@@ -207,12 +210,20 @@ OverlayDrawer {
 
     rightPadding: !Settings.isMobile && mainFlickable.contentHeight > mainFlickable.height ? Units.gridUnit : Units.smallSpacing
 
+    onCollapsedChanged: {
+        stackView.clear();
+        if (collapsed) {
+            stackView.push(collapsedMenuComponent);
+        } else {
+            stackView.push(menuComponent);
+        }
+    }
     contentItem: ScrollView {
         id: scrollView
         //ensure the attached property exists
         Theme.inherit: true
         anchors.fill: parent
-        implicitWidth: Math.min (Units.gridUnit * 20, root.parent.width * 0.8)
+        implicitWidth: root.collapsed ? Units.iconSizes.medium + Units.smallSpacing : Math.min (Units.gridUnit * 20, root.parent.width * 0.8)
         horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
         Flickable {
             id: mainFlickable
@@ -224,9 +235,21 @@ OverlayDrawer {
                 spacing: 0
                 height: Math.max(root.height, Layout.minimumHeight)
 
+                PrivateActionToolButton {
+                    id: collapseButton
+                    visible: true //TODO: collapsible
+                    z: 2
+                    Layout.bottomMargin: root.collapsed ? 0 : -height
+                    kirigamiAction: Action {
+                        icon.name: "application-menu"
+                        checkable: true
+                        checked: !root.collapsed
+                        onCheckedChanged: root.collapsed = !checked
+                    }
+                }
                 BannerImage {
                     id: bannerImage
-
+visible: !root.collapsed
                     Layout.fillWidth: true
 
                     fillMode: Image.PreserveAspectCrop
@@ -266,7 +289,7 @@ OverlayDrawer {
                     Layout.fillWidth: true
                     Layout.minimumHeight: currentItem ? currentItem.implicitHeight : 0
                     Layout.maximumHeight: Layout.minimumHeight
-                    initialItem: menuComponent
+                    initialItem: root.collapsed ? collapsedMenuComponent : menuComponent
                     //NOTE: it's important those are NumberAnimation and not XAnimators
                     // as while the animation is running the drawer may close, and
                     //the animator would stop when not drawing see BUG 381576
@@ -310,7 +333,7 @@ OverlayDrawer {
                     //NOTE: why this? just Layout.fillWidth: true doesn't seem sufficient
                     //as items are added only after this column creation
                     Layout.minimumWidth: parent.width - root.leftPadding - root.rightPadding
-                    visible: children.length > 0
+                    visible: !root.collapsed && children.length > 0
                 }
                 Item {
                     Layout.minimumWidth: Units.smallSpacing
@@ -350,7 +373,8 @@ OverlayDrawer {
                         Repeater {
                             id: actionsRepeater
                             model: actions
-                            delegate: BasicListItem {
+                            delegate:
+                            BasicListItem {
                                 id: listItem
                                 supportsMouseEvents: true
                                 checked: modelData.checked
@@ -390,6 +414,28 @@ OverlayDrawer {
                                     }
                                     checked = Qt.binding(function() { return modelData.checked });
                                 }
+                            }
+                        }
+                    }
+                }
+
+                Component {
+                    id: collapsedMenuComponent
+                    ColumnLayout {
+                        spacing: 0
+                        property alias model: actionsRepeater.model
+                        property Action current
+
+                        property int level: 0
+                        Layout.maximumHeight: Layout.minimumHeight
+
+
+                        Repeater {
+                            id: actionsRepeater
+                            model: actions
+                            delegate: PrivateActionToolButton {
+                                kirigamiAction: modelData
+                                showText: false
                             }
                         }
                     }
