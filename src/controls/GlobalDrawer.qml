@@ -190,8 +190,9 @@ OverlayDrawer {
      */
     readonly property Action currentSubMenu: stackView.currentItem ? stackView.currentItem.current: null
 
-    
-    property bool collapsed: true
+    //TODO cable those with modal
+    property bool collapsible: false
+    property bool collapsed: false
 
     /**
      * Notifies that the banner has been clicked
@@ -210,6 +211,7 @@ OverlayDrawer {
 
     rightPadding: !Settings.isMobile && mainFlickable.contentHeight > mainFlickable.height ? Units.gridUnit : Units.smallSpacing
 
+    //TODO: single component
     onCollapsedChanged: {
         stackView.clear();
         if (collapsed) {
@@ -223,8 +225,14 @@ OverlayDrawer {
         //ensure the attached property exists
         Theme.inherit: true
         anchors.fill: parent
-        implicitWidth: root.collapsed ? Units.iconSizes.medium + Units.smallSpacing : Math.min (Units.gridUnit * 20, root.parent.width * 0.8)
+        implicitWidth: root.collapsed ? Units.iconSizes.medium + 2 : Math.min (Units.gridUnit * 20, root.parent.width * 0.8)
         horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
+        Behavior on implicitWidth {
+            NumberAnimation {
+                duration: Units.longDuration
+                easing.type: Easing.InOutQuad
+            }
+        }
         Flickable {
             id: mainFlickable
             contentWidth: width
@@ -235,35 +243,49 @@ OverlayDrawer {
                 spacing: 0
                 height: Math.max(root.height, Layout.minimumHeight)
 
-                PrivateActionToolButton {
-                    id: collapseButton
-                    visible: true //TODO: collapsible
-                    z: 2
-                    Layout.bottomMargin: root.collapsed ? 0 : -height
-                    kirigamiAction: Action {
-                        icon.name: "application-menu"
-                        checkable: true
-                        checked: !root.collapsed
-                        onCheckedChanged: root.collapsed = !checked
-                    }
-                }
-                BannerImage {
-                    id: bannerImage
-visible: !root.collapsed
+                //TODO: cable visible of bannerimage
+                Item {
+                    implicitHeight: root.collapsible ? Math.max(collapseButton.height + Units.smallSpacing, bannerImage.Layout.preferredHeight) : bannerImage.Layout.preferredHeight
+
                     Layout.fillWidth: true
 
-                    fillMode: Image.PreserveAspectCrop
-                    MouseArea {
+                    BannerImage {
+                        id: bannerImage
                         anchors.fill: parent
-                        onClicked: root.bannerClicked()
+                        opacity: !root.collapsed
+                        fillMode: Image.PreserveAspectCrop
+
+                        Behavior on opacity {
+                            OpacityAnimator {
+                                duration: Units.longDuration
+                                easing.type: Easing.InOutQuad
+                            }
+                        }
+                        leftPadding: root.collapsible ? collapseButton.width + Units.smallSpacing*2 : topPadding
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: root.bannerClicked()
+                        }
+                        EdgeShadow {
+                            edge: Qt.BottomEdge
+                            visible: bannerImageSource != ""
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                                bottom: parent.top
+                            }
+                        }
                     }
-                    EdgeShadow {
-                        edge: Qt.BottomEdge
-                        visible: bannerImageSource != ""
-                        anchors {
-                            left: parent.left
-                            right: parent.right
-                            bottom: parent.top
+                    PrivateActionToolButton {
+                        id: collapseButton
+                        y: Units.smallSpacing
+
+                        visible: root.collapsible
+                        kirigamiAction: Action {
+                            icon.name: "application-menu"
+                            checkable: true
+                            checked: !root.collapsed
+                            onCheckedChanged: root.collapsed = !checked
                         }
                     }
                 }
@@ -333,7 +355,14 @@ visible: !root.collapsed
                     //NOTE: why this? just Layout.fillWidth: true doesn't seem sufficient
                     //as items are added only after this column creation
                     Layout.minimumWidth: parent.width - root.leftPadding - root.rightPadding
-                    visible: !root.collapsed && children.length > 0
+                    visible: children.length > 0
+                    opacity: !root.collapsed
+                    Behavior on opacity {
+                        OpacityAnimator {
+                            duration: Units.longDuration
+                            easing.type: Easing.InOutQuad
+                        }
+                    }
                 }
                 Item {
                     Layout.minimumWidth: Units.smallSpacing

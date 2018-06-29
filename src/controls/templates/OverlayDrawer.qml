@@ -234,7 +234,7 @@ T2.Drawer {
         }
     }
 
-    Theme.colorSet: Theme.View
+    Theme.colorSet: modal ? Theme.View : Theme.Window
     Theme.onColorSetChanged: {
         contentItem.Theme.colorSet = Theme.colorSet
         background.Theme.colorSet = Theme.colorSet
