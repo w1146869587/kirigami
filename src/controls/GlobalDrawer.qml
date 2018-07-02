@@ -19,6 +19,7 @@
 
 import QtQuick 2.6
 import QtQuick.Templates 2.0 as T2
+import QtQuick.Controls 2.0 as QQC2
 import QtQuick.Layouts 1.2
 import QtGraphicalEffects 1.0
 import org.kde.kirigami 2.4
@@ -211,21 +212,12 @@ OverlayDrawer {
 
     rightPadding: !Settings.isMobile && mainFlickable.contentHeight > mainFlickable.height ? Units.gridUnit : Units.smallSpacing
 
-    //TODO: single component
-    onCollapsedChanged: {
-        stackView.clear();
-        if (collapsed) {
-            stackView.push(collapsedMenuComponent);
-        } else {
-            stackView.push(menuComponent);
-        }
-    }
     contentItem: ScrollView {
         id: scrollView
         //ensure the attached property exists
         Theme.inherit: true
         anchors.fill: parent
-        implicitWidth: root.collapsed ? Units.iconSizes.medium + 2 : Math.min (Units.gridUnit * 20, root.parent.width * 0.8)
+        implicitWidth: root.collapsed ? Units.iconSizes.smallMedium + Units.largeSpacing * 2 : Math.min (Units.gridUnit * 20, root.parent.width * 0.8)
         horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
         Behavior on implicitWidth {
             NumberAnimation {
@@ -311,7 +303,7 @@ OverlayDrawer {
                     Layout.fillWidth: true
                     Layout.minimumHeight: currentItem ? currentItem.implicitHeight : 0
                     Layout.maximumHeight: Layout.minimumHeight
-                    initialItem: root.collapsed ? collapsedMenuComponent : menuComponent
+                    initialItem: menuComponent
                     //NOTE: it's important those are NumberAnimation and not XAnimators
                     // as while the animation is running the drawer may close, and
                     //the animator would stop when not drawing see BUG 381576
@@ -406,14 +398,23 @@ OverlayDrawer {
                             BasicListItem {
                                 id: listItem
                                 supportsMouseEvents: true
-                                checked: modelData.checked
+                                readonly property bool wideMode: width > height * 2
+                                checked: modelData.checked || (actionsMenu && actionsMenu.visible)
+                                width: parent.width
 
                                 icon: modelData.iconName
 
-                                label: MnemonicData.richTextLabel
+                                label: width > height * 2 ? MnemonicData.richTextLabel : ""
                                 MnemonicData.enabled: listItem.enabled && listItem.visible
                                 MnemonicData.controlType: MnemonicData.MenuItem
                                 MnemonicData.label: modelData.text
+                                property ActionsMenu actionsMenu: ActionsMenu {
+                                    x: Qt.application.layoutDirection == Qt.RightToLeft ? -width : listItem.width
+                                    actions: modelData.children
+                                    submenuComponent: Component {
+                                        ActionsMenu {}
+                                    }
+                                }
 
                                 separatorVisible: false
                                 visible: model ? model.visible || model.visible===undefined : modelData.visible
@@ -427,44 +428,44 @@ OverlayDrawer {
                                     isMask: true
                                     Layout.alignment: Qt.AlignVCenter
                                     Layout.rightMargin: !Settings.isMobile && mainFlickable.contentHeight > mainFlickable.height ? Units.gridUnit : 0
-                                    height: Units.iconSizes.smallMedium
+                                    Layout.leftMargin: !root.collapsed ? 0 : parent.width - listItem.width
+                                    Layout.preferredHeight: !root.collapsed ? Units.iconSizes.smallMedium : Units.iconSizes.small/2
                                     selected: listItem.checked || listItem.pressed
-                                    width: height
+                                    Layout.preferredWidth: Layout.preferredHeight
                                     source: (LayoutMirroring.enabled ? "go-next-symbolic-rtl" : "go-next-symbolic")
                                     visible: modelData.children!==undefined && modelData.children.length > 0
                                 }
+                                data: [
+                                    QQC2.ToolTip {
+                                        visible: (modelData.tooltip.length || root.collapsed) && (!actionsMenu || !actionsMenu.visible) &&  listItem.hovered && text.length > 0
+                                        text: modelData.tooltip.length ? modelData.tooltip : modelData.text
+                                        delay: 1000
+                                        timeout: 5000
+                                        y: listItem.height/2 - height/2
+                                        x: Qt.application.layoutDirection == Qt.RightToLeft ? -width : listItem.width
+                                    }
+                                ]
 
                                 onClicked: {
                                     modelData.trigger();
                                     if (modelData.children!==undefined && modelData.children.length > 0) {
-                                        stackView.push(menuComponent, {model: modelData.children, level: level + 1, current: modelData });
+                                        if (root.collapsed) {
+                                            //fallbacks needed for Qt 5.9
+                                            if ((!listItem.actionsMenu.hasOwnProperty("count") || listItem.actionsMenu.count>0) && !listItem.actionsMenu.visible) {
+                                                if (listItem.actionsMenu.hasOwnProperty("popup")) {
+                                                    listItem.actionsMenu.popup(control, 0, control.height)
+                                                } else {
+                                                    listItem.actionsMenu.visible = true;
+                                                }
+                                            }
+                                        } else {
+                                            stackView.push(menuComponent, {model: modelData.children, level: level + 1, current: modelData });
+                                        }
                                     } else if (root.resetMenuOnTriggered) {
                                         root.resetMenu();
                                     }
-                                    checked = Qt.binding(function() { return modelData.checked });
+                                    checked = Qt.binding(function() { return modelData.checked || (actionsMenu && actionsMenu.visible) });
                                 }
-                            }
-                        }
-                    }
-                }
-
-                Component {
-                    id: collapsedMenuComponent
-                    ColumnLayout {
-                        spacing: 0
-                        property alias model: actionsRepeater.model
-                        property Action current
-
-                        property int level: 0
-                        Layout.maximumHeight: Layout.minimumHeight
-
-
-                        Repeater {
-                            id: actionsRepeater
-                            model: actions
-                            delegate: PrivateActionToolButton {
-                                kirigamiAction: modelData
-                                showText: false
                             }
                         }
                     }
