@@ -1,0 +1,42 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: libkirigamiplugin_qt\n"
+"Language-Team: Japanese <kde-jp@kde.org>\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: &\n"
+"X-Text-Markup: qtrich\n"
+"X-Qt-Contexts: true\n"
+
+#: controls/ContextDrawer.qml:77
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr ""
+
+#: controls/GlobalDrawer.qml:340
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr ""
+
+#: controls/private/ToolBarPageHeader.qml:111
+msgctxt "ToolBarPageHeader|"
+msgid "More Actions"
+msgstr ""
+
+#: controls/templates/private/BackButton.qml:50
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr ""
+
+#: controls/templates/private/ForwardButton.qml:46
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr ""
+
+#: controls/ToolBarApplicationHeader.qml:126
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr ""

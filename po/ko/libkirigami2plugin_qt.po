@@ -1,0 +1,50 @@
+# Shinjo Park <kde@peremen.name>, 2017.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2017-12-02 22:47+0100\n"
+"Last-Translator: Shinjo Park <kde@peremen.name>\n"
+"Language-Team: Korean <kde@peremen.name>\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Lokalize 2.0\n"
+"X-Qt-Contexts: true\n"
+
+#: controls/ContextDrawer.qml:77
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "동작"
+
+#: controls/GlobalDrawer.qml:340
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "뒤로"
+
+#: controls/private/ToolBarPageHeader.qml:111
+#, fuzzy
+#| msgctxt "ContextDrawer|"
+#| msgid "Actions"
+msgctxt "ToolBarPageHeader|"
+msgid "More Actions"
+msgstr "동작"
+
+#: controls/templates/private/BackButton.qml:50
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "이전 탐색"
+
+#: controls/templates/private/ForwardButton.qml:46
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "다음 탐색"
+
+#: controls/ToolBarApplicationHeader.qml:126
+#, fuzzy
+#| msgctxt "ContextDrawer|"
+#| msgid "Actions"
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "동작"
