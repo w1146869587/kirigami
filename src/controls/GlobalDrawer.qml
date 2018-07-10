@@ -453,7 +453,7 @@ OverlayDrawer {
                                             //fallbacks needed for Qt 5.9
                                             if ((!listItem.actionsMenu.hasOwnProperty("count") || listItem.actionsMenu.count>0) && !listItem.actionsMenu.visible) {
                                                 if (listItem.actionsMenu.hasOwnProperty("popup")) {
-                                                    listItem.actionsMenu.popup(control, 0, control.height)
+                                                    listItem.actionsMenu.popup(listItem, listItem.width, 0)
                                                 } else {
                                                     listItem.actionsMenu.visible = true;
                                                 }
