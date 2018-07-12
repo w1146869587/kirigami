@@ -270,7 +270,23 @@ OverlayDrawer {
                     }
                     PrivateActionToolButton {
                         id: collapseButton
-                        y: Units.smallSpacing
+                        x: root.collapsed || (root.title.length == 0 && root.titleIcon.length == 0) ? 0 : Units.smallSpacing
+                        y: root.collapsed || (root.title.length == 0 && root.titleIcon.length == 0) ? 0 : Units.smallSpacing + Units.iconSizes.large/2 - height/2
+
+                        width: Units.iconSizes.smallMedium + Units.largeSpacing * 2
+                        height: width
+                        Behavior on x {
+                            XAnimator {
+                                duration: Units.longDuration
+                                easing.type: Easing.InOutQuad
+                            }
+                        }
+                        Behavior on y {
+                            YAnimator {
+                                duration: Units.longDuration
+                                easing.type: Easing.InOutQuad
+                            }
+                        }
 
                         visible: root.collapsible
                         kirigamiAction: Action {
@@ -417,7 +433,8 @@ OverlayDrawer {
                                 }
 
                                 separatorVisible: false
-                                visible: model ? model.visible || model.visible===undefined : modelData.visible
+                                //TODO: animate the hide by collapse
+                                visible: (model ? model.visible || model.visible===undefined : modelData.visible) && (!root.collapsed || icon.length > 0)
                                 enabled: (model && model.enabled != undefined) ? model.enabled : modelData.enabled
                                 opacity: enabled ? 1.0 : 0.3
                                 Icon {
