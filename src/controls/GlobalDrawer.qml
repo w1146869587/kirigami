@@ -191,10 +191,6 @@ OverlayDrawer {
      */
     readonly property Action currentSubMenu: stackView.currentItem ? stackView.currentItem.current: null
 
-    //TODO cable those with modal
-    property bool collapsible: false
-    property bool collapsed: false
-
     /**
      * Notifies that the banner has been clicked
      */

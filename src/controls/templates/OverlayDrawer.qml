@@ -62,6 +62,10 @@ T2.Drawer {
      */
     readonly property bool animating : enterAnimation.animating || exitAnimation.animating || positionResetAnim.running
 
+    //TODO cable those with modal
+    property bool collapsible: false
+    property bool collapsed: false
+
     /**
      * A grouped property describing an optional icon.
      * * source: The source of the icon, a freedesktop-compatible icon name is recommended.
