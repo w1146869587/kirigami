@@ -65,6 +65,23 @@ T2.Drawer {
     //TODO cable those with modal
     property bool collapsible: false
     property bool collapsed: false
+    onCollapsedChanged: {
+        if ((!collapsible || modal) && collapsed) {
+            collapsed = true;
+        }
+    }
+    onCollapsibleChanged: {
+        if (!collapsible) {
+            collapsed = false;
+        } else if (modal) {
+            collapsible = false;
+        }
+    }
+    onModalChanged: {
+        if (modal) {
+            collapsible = false;
+        }
+    }
 
     /**
      * A grouped property describing an optional icon.
