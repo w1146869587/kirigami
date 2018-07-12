@@ -319,6 +319,7 @@ OverlayDrawer {
                     Layout.fillWidth: true
                     Layout.minimumHeight: currentItem ? currentItem.implicitHeight : 0
                     Layout.maximumHeight: Layout.minimumHeight
+                    property ActionsMenu openSubMenu
                     initialItem: menuComponent
                     //NOTE: it's important those are NumberAnimation and not XAnimators
                     // as while the animation is running the drawer may close, and
@@ -379,6 +380,7 @@ OverlayDrawer {
 
                 Component {
                     id: menuComponent
+
                     ColumnLayout {
                         spacing: 0
                         property alias model: actionsRepeater.model
@@ -430,6 +432,13 @@ OverlayDrawer {
                                     submenuComponent: Component {
                                         ActionsMenu {}
                                     }
+                                    onVisibleChanged: {
+                                        if (visible) {
+                                            stackView.openSubMenu = listItem.actionsMenu;
+                                        } else if (stackView.openSubMenu == listItem.actionsMenu) {
+                                            stackView.openSubMenu = null;
+                                        }
+                                    }
                                 }
 
                                 separatorVisible: false
@@ -463,12 +472,29 @@ OverlayDrawer {
                                     }
                                 ]
 
+                                onHoveredChanged: {
+                                    if (!hovered) {
+                                        return;
+                                    }
+                                    if (stackView.openSubMenu) {
+                                        stackView.openSubMenu.visible = false;
+
+                                        if (!listItem.actionsMenu.hasOwnProperty("count") || listItem.actionsMenu.count>0) {
+                                            if (listItem.actionsMenu.hasOwnProperty("popup")) {
+                                                listItem.actionsMenu.popup(listItem, listItem.width, 0)
+                                            } else {
+                                                listItem.actionsMenu.visible = true;
+                                            }
+                                        }
+                                    }
+                                }
                                 onClicked: {
                                     modelData.trigger();
                                     if (modelData.children!==undefined && modelData.children.length > 0) {
                                         if (root.collapsed) {
                                             //fallbacks needed for Qt 5.9
                                             if ((!listItem.actionsMenu.hasOwnProperty("count") || listItem.actionsMenu.count>0) && !listItem.actionsMenu.visible) {
+                                                stackView.openSubMenu = listItem.actionsMenu;
                                                 if (listItem.actionsMenu.hasOwnProperty("popup")) {
                                                     listItem.actionsMenu.popup(listItem, listItem.width, 0)
                                                 } else {
