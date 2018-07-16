@@ -177,6 +177,28 @@ OverlayDrawer {
     property alias topContent: topContent.data
 
     /**
+     * showContentWhenCollapsed: bool
+     * If true, when the drawer is collapsed as a sidebar, the content items
+     * at the bottom will be hidden (default true).
+     * If you want to keep some items visible and some invisible, set this to 
+     * false and control the visibility/opacity of individual items,
+     * binded to the collapsed property
+     * @since 2.5
+     */
+    property bool hideContentWhenCollapsed: true
+
+    /**
+     * showContentWhenCollapsed: bool
+     * If true, when the drawer is collapsed as a sidebar, the top content items
+     * at the top will be hidden (default true).
+     * If you want to keep some items visible and some invisible, set this to 
+     * false and control the visibility/opacity of individual items,
+     * binded to the collapsed property
+     * @since 2.5
+     */
+    property bool hideTopContentWhenCollapsed: true
+
+    /**
      * resetMenuOnTriggered: bool
      *
      * On the actions menu, whenever a leaf action is triggered, the menu
@@ -304,10 +326,19 @@ OverlayDrawer {
                     Layout.topMargin: root.topPadding
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    Layout.preferredHeight: implicitHeight * opacity
                     //NOTE: why this? just Layout.fillWidth: true doesn't seem sufficient
                     //as items are added only after this column creation
                     Layout.minimumWidth: parent.width - root.leftPadding - root.rightPadding
-                    visible: children.length > 0 && childrenRect.height > 0
+                    visible: children.length > 0 && childrenRect.height > 0 && opacity > 0
+                    opacity: !root.collapsed || !hideTopContentWhenCollapsed
+                    Behavior on opacity {
+                        //not an animator as is binded
+                        NumberAnimation {
+                            duration: Units.longDuration
+                            easing.type: Easing.InOutQuad
+                        }
+                    }
                 }
 
                 T2.StackView {
@@ -360,8 +391,8 @@ OverlayDrawer {
                     //NOTE: why this? just Layout.fillWidth: true doesn't seem sufficient
                     //as items are added only after this column creation
                     Layout.minimumWidth: parent.width - root.leftPadding - root.rightPadding
-                    visible: children.length > 0
-                    opacity: !root.collapsed
+                    visible: children.length > 0 && opacity > 0
+                    opacity: !root.collapsed || !hideContentWhenCollapsed
                     Behavior on opacity {
                         OpacityAnimator {
                             duration: Units.longDuration
@@ -377,7 +408,7 @@ OverlayDrawer {
                 Component {
                     id: menuComponent
 
-                    ColumnLayout {
+                    Column {
                         spacing: 0
                         property alias model: actionsRepeater.model
                         property Action current
@@ -385,6 +416,12 @@ OverlayDrawer {
                         property int level: 0
                         Layout.maximumHeight: Layout.minimumHeight
 
+                        move: Transition {
+                            YAnimator {
+                                duration: Units.longDuration/2
+                                easing.type: Easing.InOutQuad
+                            }
+                        }
 
                         BasicListItem {
                             id: backItem
@@ -439,7 +476,14 @@ OverlayDrawer {
 
                                 separatorVisible: false
                                 //TODO: animate the hide by collapse
-                                visible: (model ? model.visible || model.visible===undefined : modelData.visible) && (!root.collapsed || icon.length > 0)
+                                visible: (model ? model.visible || model.visible===undefined : modelData.visible) && opacity > 0
+                                opacity: (!root.collapsed || icon.length > 0)
+                                Behavior on opacity {
+                                    OpacityAnimator {
+                                        duration: Units.longDuration/2
+                                        easing.type: Easing.InOutQuad
+                                    }
+                                }
                                 enabled: (model && model.enabled != undefined) ? model.enabled : modelData.enabled
                                 opacity: enabled ? 1.0 : 0.3
                                 Icon {
