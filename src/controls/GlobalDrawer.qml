@@ -391,10 +391,11 @@ OverlayDrawer {
                     //NOTE: why this? just Layout.fillWidth: true doesn't seem sufficient
                     //as items are added only after this column creation
                     Layout.minimumWidth: parent.width - root.leftPadding - root.rightPadding
-                    visible: children.length > 0 && opacity > 0
+                    visible: children.length > 0 && (opacity > 0 || mainContentAnimator.running)
                     opacity: !root.collapsed || !hideContentWhenCollapsed
                     Behavior on opacity {
                         OpacityAnimator {
+                            id: mainContentAnimator
                             duration: Units.longDuration
                             easing.type: Easing.InOutQuad
                         }
