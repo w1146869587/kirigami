@@ -62,27 +62,31 @@ T2.Drawer {
      */
     readonly property bool animating : enterAnimation.animating || exitAnimation.animating || positionResetAnim.running
 
-    //TODO cable those with modal
+    /**
+     * collapsible: Bool
+     * When true, the drawer can be collapsed to a very thin, usually icon only sidebar.
+     * Only modal drawers are collapsible.
+     * Collapsible is not supported in Mobile mode
+     * @since 2.5
+     */
     property bool collapsible: false
+
+    /**
+     * collapsed: bool
+     * When true, the drawer will be collapsed to a very thin sidebar,
+     * usually icon only.
+     * Only collapsible drawers can be collapsed
+     */
     property bool collapsed: false
+
+    /**
+     * collapsedSize: int
+     * When collapsed, the drawer will be resized to this size
+     * (which may be width for vertical drawers or height for
+     * horizontal drawers).
+     * By default it's just enough to accomodate medium sized icons
+     */
     property int collapsedSize: Units.iconSizes.medium + Units.smallSpacing * 2
-    onCollapsedChanged: {
-        if ((!collapsible || modal) && collapsed) {
-            collapsed = true;
-        }
-    }
-    onCollapsibleChanged: {
-        if (!collapsible) {
-            collapsed = false;
-        } else if (modal) {
-            collapsible = false;
-        }
-    }
-    onModalChanged: {
-        if (modal) {
-            collapsible = false;
-        }
-    }
 
     /**
      * A grouped property describing an optional icon.
@@ -326,6 +330,24 @@ T2.Drawer {
 
 
 //BEGIN signal handlers
+    onCollapsedChanged: {
+        if ((!collapsible || modal) && collapsed) {
+            collapsed = true;
+        }
+    }
+    onCollapsibleChanged: {
+        if (!collapsible) {
+            collapsed = false;
+        } else if (modal) {
+            collapsible = false;
+        }
+    }
+    onModalChanged: {
+        if (modal) {
+            collapsible = false;
+        }
+    }
+
     onPositionChanged: {
         if (peeking) {
             visible = true
@@ -388,7 +410,6 @@ T2.Drawer {
             duration: (root.position)*Units.longDuration
         }
         readonly property Item statesItem: Item {
-            parent: __internal
             states: [
                 State {
                     when: root.collapsed
