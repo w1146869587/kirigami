@@ -65,6 +65,7 @@ T2.Drawer {
     //TODO cable those with modal
     property bool collapsible: false
     property bool collapsed: false
+    property int collapsedSize: Units.iconSizes.medium + Units.smallSpacing * 2
     onCollapsedChanged: {
         if ((!collapsible || modal) && collapsed) {
             collapsed = true;
@@ -271,15 +272,11 @@ T2.Drawer {
     bottomPadding: Units.smallSpacing
 
     parent: modal ? T2.ApplicationWindow.overlay : T2.ApplicationWindow.contentItem
-    height: edge == Qt.LeftEdge || edge == Qt.RightEdge ? applicationWindow().height : Math.min(contentItem.implicitHeight, Math.round(applicationWindow().height*0.8))
-    width:  edge == Qt.TopEdge || edge == Qt.BottomEdge ? applicationWindow().width : Math.min(contentItem.implicitWidth, Math.round(applicationWindow().width*0.8))
+
     edge: Qt.LeftEdge
     modal: true
 
     dragMargin: enabled && (edge == Qt.LeftEdge || edge == Qt.RightEdge) ? Qt.styleHints.startDragDistance : 0
-    
-    implicitWidth: Math.max(background ? background.implicitWidth : 0, contentWidth + leftPadding + rightPadding)
-    implicitHeight: Math.max(background ? background.implicitHeight : 0, contentHeight + topPadding + bottomPadding)
 
     contentWidth: contentItem.implicitWidth || (contentChildren.length === 1 ? contentChildren[0].implicitWidth : 0)
     contentHeight: contentItem.implicitHeight || (contentChildren.length === 1 ? contentChildren[0].implicitHeight : 0)
@@ -389,6 +386,37 @@ T2.Drawer {
             to: 0
             property: "position"
             duration: (root.position)*Units.longDuration
+        }
+        readonly property Item statesItem: Item {
+            parent: __internal
+            states: [
+                State {
+                    when: root.collapsed
+                    PropertyChanges {
+                        target: root
+                        implicitWidth: edge == Qt.TopEdge || edge == Qt.BottomEdge ? applicationWindow().width : Math.min(collapsedSize, Math.round(applicationWindow().width*0.8))
+
+                        implicitHeight: edge == Qt.LeftEdge || edge == Qt.RightEdge ? applicationWindow().height : Math.min(collapsedSize, Math.round(applicationWindow().height*0.8))
+                    }
+                },
+                State {
+                    when: !root.collapsed
+                    PropertyChanges {
+                        target: root
+                        implicitWidth: edge == Qt.TopEdge || edge == Qt.BottomEdge ? applicationWindow().width : Math.min(contentItem.implicitWidth, Math.round(applicationWindow().width*0.8))
+
+                        implicitHeight: edge == Qt.LeftEdge || edge == Qt.RightEdge ? applicationWindow().height : Math.min(contentItem.implicitHeight, Math.round(applicationWindow().height*0.8))
+                    }
+                }
+            ]
+            transitions: Transition {
+                reversible: true
+                NumberAnimation {
+                    properties: "implicitWidth,implicitHeight"
+                    duration: Units.longDuration
+                    easing.type: Easing.InOutQuad
+                }
+            }
         }
     }
 }

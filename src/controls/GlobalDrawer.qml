@@ -235,14 +235,9 @@ OverlayDrawer {
         //ensure the attached property exists
         Theme.inherit: true
         anchors.fill: parent
-        implicitWidth: root.collapsed ? Units.iconSizes.smallMedium + Units.largeSpacing * 2 : Math.min (Units.gridUnit * 20, root.parent.width * 0.8)
+        implicitWidth: Math.min (Units.gridUnit * 20, root.parent.width * 0.8)
         horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
-        Behavior on implicitWidth {
-            NumberAnimation {
-                duration: Units.longDuration
-                easing.type: Easing.InOutQuad
-            }
-        }
+
         Flickable {
             id: mainFlickable
             contentWidth: width
