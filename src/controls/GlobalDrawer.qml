@@ -283,17 +283,28 @@ OverlayDrawer {
                     }
                     PrivateActionToolButton {
                         id: collapseButton
-                        x: root.collapsed || (root.title.length == 0 && root.titleIcon.length == 0) ? 0 : Units.smallSpacing
-                        y: root.collapsed || (root.title.length == 0 && root.titleIcon.length == 0) ? 0 : Units.smallSpacing + Units.iconSizes.large/2 - height/2
+                        anchors {
+                            top: parent.top
+                            left: parent.left
+                            topMargin: root.collapsed || (root.title.length == 0 && root.titleIcon.length == 0) ? 0 : Units.smallSpacing + Units.iconSizes.large/2 - height/2
+                            leftMargin: root.collapsed || (root.title.length == 0 && root.titleIcon.length == 0) ? 0 : Units.smallSpacing
+                            Behavior on leftMargin {
+                                NumberAnimation {
+                                    duration: Units.longDuration
+                                    easing.type: Easing.InOutQuad
+                                }
+                            }
+                            Behavior on topMargin {
+                                NumberAnimation {
+                                    duration: Units.longDuration
+                                    easing.type: Easing.InOutQuad
+                                }
+                            }
+                        }
 
                         width: Units.iconSizes.smallMedium + Units.largeSpacing * 2
                         height: width
-                        Behavior on x {
-                            XAnimator {
-                                duration: Units.longDuration
-                                easing.type: Easing.InOutQuad
-                            }
-                        }
+
                         Behavior on y {
                             YAnimator {
                                 duration: Units.longDuration
