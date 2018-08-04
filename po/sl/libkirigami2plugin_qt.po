@@ -1,0 +1,51 @@
+# Andrej Mernik <andrejm@ubuntu.si>, 2016, 2018.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2018-01-12 21:16+0100\n"
+"Last-Translator: Andrej Mernik <andrejm@ubuntu.si>\n"
+"Language-Team: Slovenian <lugos-slo@lugos.si>\n"
+"Language: sl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n"
+"%100==4 ? 3 : 0);\n"
+"X-Generator: Lokalize 2.0\n"
+
+#: controls/ContextDrawer.qml:77
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "Dejanja"
+
+#: controls/GlobalDrawer.qml:445
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "Nazaj"
+
+#: controls/private/ToolBarPageHeader.qml:111
+#, fuzzy
+#| msgctxt "ContextDrawer|"
+#| msgid "Actions"
+msgctxt "ToolBarPageHeader|"
+msgid "More Actions"
+msgstr "Dejanja"
+
+#: controls/templates/private/BackButton.qml:50
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "Krmari nazaj"
+
+#: controls/templates/private/ForwardButton.qml:46
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "Krmari naprej"
+
+#: controls/ToolBarApplicationHeader.qml:126
+#, fuzzy
+#| msgctxt "ContextDrawer|"
+#| msgid "Actions"
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "Dejanja"
