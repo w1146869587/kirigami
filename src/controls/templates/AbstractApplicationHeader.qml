@@ -43,7 +43,7 @@ Item {
     property int maximumHeight: Units.gridUnit * 3
     property PageRow pageRow: __appWindow.pageStack
     property Page page: pageRow.currentItem
-    default property alias contentItem: mainItem.data
+    default property Item contentItem
     readonly property int paintedHeight: headerItem.y + headerItem.height - 1
     LayoutMirroring.enabled: Qt.application.layoutDirection == Qt.RightToLeft 
     LayoutMirroring.childrenInherit: true
@@ -74,13 +74,15 @@ Item {
         background.anchors.fill = headerItem;
     }
 
+    onContentItemChanged: contentItem.parent = mainItem;
+
     onMinimumHeightChanged: implicitHeight = preferredHeight;
     onPreferredHeightChanged: implicitHeight = preferredHeight;
 
     opacity: height > 0 ? 1 : 0
 
     Behavior on implicitHeight {
-        enabled: root.page && root.page.flickable && !root.page.flickable.moving
+        enabled: false&& root.page && root.page.flickable && !root.page.flickable.moving
         NumberAnimation {
             duration: Units.longDuration
             easing.type: Easing.InOutQuad

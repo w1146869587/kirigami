@@ -652,12 +652,12 @@ T.Control {
                     page.anchors.top = container.top;
                     page.anchors.right = container.right;
                     page.anchors.bottom = container.bottom;
-                    page.anchors.topMargin = Qt.binding(function() {return globalToolBarUI.height});
+                    page.anchors.topMargin = Qt.binding(function() {return page.customGlobalToolBarItem ? page.customGlobalToolBarItem.height :  globalToolBarUI.height});
                 }
             }
             property Item owner
             drag.filterChildren: true
-            onClicked: {
+            onClicked: {print(page.customGlobalToolBarItem+page.customGlobalToolBarItem.height)
                 switch (mouse.button) {
                 case Qt.BackButton:
                     root.flickBack();

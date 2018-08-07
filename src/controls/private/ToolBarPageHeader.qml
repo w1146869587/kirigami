@@ -30,90 +30,94 @@ AbstractPageHeader {
     implicitWidth: titleTextMetrics.width/2 + buttonTextMetrics.collapsedButtonsWidth
     Layout.minimumWidth: ctxActionsButton.width*4
 
-    MouseArea {
-        anchors.fill: parent
-        onClicked: page.forceActiveFocus()
-    }
-    RowLayout {
-        id: titleLayout
-        anchors {
-            verticalCenter: parent.verticalCenter
-            left: parent.left
-            right: actionsLayout.left
+    Item {
+        anchors.fill:parent
+        implicitHeight: actionsLayout.height
+        MouseArea {
+            anchors.fill: parent
+            onClicked: page.forceActiveFocus()
+        }
+        RowLayout {
+            id: titleLayout
+            anchors {
+                verticalCenter: parent.verticalCenter
+                left: parent.left
+                right: actionsLayout.left
+            }
+
+            Heading {
+                id: title
+                Layout.fillWidth: true
+
+                Layout.preferredWidth: implicitWidth
+                Layout.minimumWidth: Math.min(titleTextMetrics.width, root.width - buttonTextMetrics.requiredWidth)
+                leftPadding: Units.largeSpacing
+                opacity: root.current ? 1 : 0.4
+                maximumLineCount: 1
+                color: Theme.textColor
+                elide: Text.ElideRight
+                text: page ? page.title : ""
+            }
         }
 
-        Heading {
-            id: title
-            Layout.fillWidth: true
-
-            Layout.preferredWidth: implicitWidth
-            Layout.minimumWidth: Math.min(titleTextMetrics.width, root.width - buttonTextMetrics.requiredWidth)
-            leftPadding: Units.largeSpacing
-            opacity: root.current ? 1 : 0.4
-            maximumLineCount: 1
-            color: Theme.textColor
-            elide: Text.ElideRight
+        TextMetrics {
+            id: titleTextMetrics
             text: page ? page.title : ""
+            font: title.font
         }
-    }
-
-    TextMetrics {
-        id: titleTextMetrics
-        text: page ? page.title : ""
-        font: title.font
-    }
-    TextMetrics {
-        id: buttonTextMetrics
-        text: (page.actions.left ? page.actions.left.text : "") + (page.actions.main ? page.actions.main.text : "") + (page.actions.right ? page.actions.right.text : "")
-        readonly property int collapsedButtonsWidth: ctxActionsButton.width + (page.actions.left ? ctxActionsButton.width + Units.gridUnit : 0) + (page.actions.main ? ctxActionsButton.width + Units.gridUnit : 0) + (page.actions.right ? ctxActionsButton.width + Units.gridUnit : 0)
-        readonly property int requiredWidth: width + collapsedButtonsWidth
-    }
-
-    RowLayout {
-        id: actionsLayout
-        anchors {
-            verticalCenter: parent.verticalCenter
-            right: ctxActionsButton.visible ? ctxActionsButton.left : parent.right
+        TextMetrics {
+            id: buttonTextMetrics
+            text: (page.actions.left ? page.actions.left.text : "") + (page.actions.main ? page.actions.main.text : "") + (page.actions.right ? page.actions.right.text : "")
+            readonly property int collapsedButtonsWidth: ctxActionsButton.width + (page.actions.left ? ctxActionsButton.width + Units.gridUnit : 0) + (page.actions.main ? ctxActionsButton.width + Units.gridUnit : 0) + (page.actions.right ? ctxActionsButton.width + Units.gridUnit : 0)
+            readonly property int requiredWidth: width + collapsedButtonsWidth
         }
 
-        readonly property bool toobig: root.width - root.leftPadding - root.rightPadding - titleTextMetrics.width - Units.gridUnit < buttonTextMetrics.requiredWidth
+        RowLayout {
+            id: actionsLayout
+            anchors {
+                verticalCenter: parent.verticalCenter
+                right: ctxActionsButton.visible ? ctxActionsButton.left : parent.right
+            }
+
+            readonly property bool toobig: root.width - root.leftPadding - root.rightPadding - titleTextMetrics.width - Units.gridUnit < buttonTextMetrics.requiredWidth
+
+            PrivateActionToolButton {
+                Layout.alignment: Qt.AlignVCenter
+                kirigamiAction: page && page.actions ? page.actions.left : null
+                showText: !parent.toobig
+            }
+            PrivateActionToolButton {
+                Layout.alignment: Qt.AlignVCenter
+                Layout.rightMargin: Units.smallSpacing
+                kirigamiAction: page && page.actions ? page.actions.main : null
+                showText: !parent.toobig
+                flat: false
+            }
+            PrivateActionToolButton {
+                Layout.alignment: Qt.AlignVCenter
+                kirigamiAction: page && page.actions ? page.actions.right : null
+                showText: !parent.toobig
+            }
+        }
 
         PrivateActionToolButton {
-            Layout.alignment: Qt.AlignVCenter
-            kirigamiAction: page && page.actions ? page.actions.left : null
-            showText: !parent.toobig
-        }
-        PrivateActionToolButton {
-            Layout.alignment: Qt.AlignVCenter
-            Layout.rightMargin: Units.smallSpacing
-            kirigamiAction: page && page.actions ? page.actions.main : null
-            showText: !parent.toobig
-            flat: false
-        }
-        PrivateActionToolButton {
-            Layout.alignment: Qt.AlignVCenter
-            kirigamiAction: page && page.actions ? page.actions.right : null
-            showText: !parent.toobig
-        }
-    }
+            id: ctxActionsButton
+            showMenuArrow: page.actions.contextualActions.length == 1
+            anchors {
+                right: parent.right
+                verticalCenter: parent.verticalCenter
+                rightMargin: Units.smallSpacing
+            }
+            Action {
+                id: overflowAction
+                icon.name: "overflow-menu"
+                tooltip: qsTr("More Actions")
+                visible: children.length > 0
+                children: page && page.actions.contextualActions ? page.actions.contextualActions : null
+            }
 
-    PrivateActionToolButton {
-        id: ctxActionsButton
-        showMenuArrow: page.actions.contextualActions.length == 1
-        anchors {
-            right: parent.right
-            verticalCenter: parent.verticalCenter
-            rightMargin: Units.smallSpacing
+            kirigamiAction: page && page.actions.contextualActions.length === 1 ? page.actions.contextualActions[0] : overflowAction
         }
-        Action {
-            id: overflowAction
-            icon.name: "overflow-menu"
-            tooltip: qsTr("More Actions")
-            visible: children.length > 0
-            children: page && page.actions.contextualActions ? page.actions.contextualActions : null
-        }
-
-        kirigamiAction: page && page.actions.contextualActions.length === 1 ? page.actions.contextualActions[0] : overflowAction
     }
 }
 

@@ -30,7 +30,7 @@ AbstractApplicationHeader {
 
     minimumHeight: pageRow.globalToolBar.minimumHeight
     maximumHeight: pageRow.globalToolBar.maximumHeight
-    preferredHeight: pageRow.globalToolBar.preferredHeight
+    preferredHeight: Math.max(contentItem ? contentItem.implicitHeight : 0, pageRow.globalToolBar.preferredHeight);
     implicitHeight: page.y
 
     leftPadding: Math.min(Qt.application.layoutDirection == Qt.LeftToRight

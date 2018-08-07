@@ -227,6 +227,12 @@ T2.Page {
      */
     signal backRequested(var event);
 
+    /**
+     * 
+     */
+    property Component customGlobalToolBar
+    readonly property Item customGlobalToolBarItem: globalToolBar.item 
+
     //NOTE: This exists just because control instances require it
     contentItem: Item {
         onChildrenChanged: {
@@ -290,11 +296,28 @@ T2.Page {
 
         function syncSource() {
             if (row && active) {
-                setSource(Qt.resolvedUrl(row.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar ? "private/ToolBarPageHeader.qml" : "private/TitlesPageHeader.qml"),
+                var toolbarFile
+                if (row.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar) {
+                    if (root.customGlobalToolBar) {
+                        toolbarFile = "private/AbstractPageHeader.qml";
+                    } else {
+                        toolbarFile = "private/ToolBarPageHeader.qml";
+                    }
+                } else {
+                    toolbarFile = "private/TitlesPageHeader.qml";
+                }
+                setSource(Qt.resolvedUrl(toolbarFile),
                 //TODO: find container reliably, remove assumption
                 {"pageRow": Qt.binding(function() {return row}),
                  "page": root,
                  "current": Qt.binding(function() {return stack || !root.parent ? true : row.currentIndex == root.parent.level})});
+
+                if (row.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar && root.customGlobalToolBar) {
+                    item.contentItem = root.customGlobalToolBar.createObject(item,
+                            {"pageRow": Qt.binding(function() {return row}),
+                             "page": root,
+                             "current": Qt.binding(function() {return stack || !root.parent ? true : row.currentIndex == root.parent.level})});
+                }
             }
         }
 
