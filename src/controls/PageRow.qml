@@ -659,7 +659,7 @@ T.Control {
             }
             property Item owner
             drag.filterChildren: true
-            onClicked: {print(page.customGlobalToolBarItem+page.customGlobalToolBarItem.height)
+            onClicked: {
                 switch (mouse.button) {
                 case Qt.BackButton:
                     root.flickBack();
@@ -679,9 +679,24 @@ T.Control {
             }
 
             Separator {
+                id: toolBarSeparator
                 z: 999
+                anchors.verticalCenter: globalToolBar.verticalCenter
+                y: pageSeparator.y/2 - height/2
+                height: pageSeparator.y * 0.6
+                visible: root.separatorVisible && mainView.contentX < container.x - globalToolBar.leftReservedSpace
+                Theme.textColor: globalToolBar.item ? globalToolBar.item.Theme.textColor : undefined
+            }
+            Separator {
+                id: pageSeparator
+                z: 999
+                property int pageHeight: page ? page.height + 1 : 0
+                property Item previousPageContainer: pagesLogic.get(container.level - 1)
+                height: previousPageContainer && previousPageContainer.page
+                    ? Math.max(previousPageContainer.page.height, pageHeight)
+                    : pageHeight
                 anchors {
-                    top: page ? page.top : parent.top
+                    //top: page ? page.top : parent.top
                     bottom: parent.bottom
                     left: parent.left
                     //ensure a sharp angle
