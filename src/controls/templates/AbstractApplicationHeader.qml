@@ -18,6 +18,7 @@
  */
 
 import QtQuick 2.5
+import QtQuick.Templates 2.0 as T
 import QtQuick.Layouts 1.2
 import "private"
 import org.kde.kirigami 2.4
@@ -53,6 +54,7 @@ Item {
     property int bottomPadding: 0
     property bool separatorVisible: true
 
+    property int position: root.y <= 0 ? T.ToolBar.Header : T.ToolBar.Footer
     //FIXME: remove
     property QtObject __appWindow: applicationWindow();
 

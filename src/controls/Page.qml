@@ -291,6 +291,7 @@ T2.Page {
         }
         property Kirigami.PageRow row
         property T2.StackView stack
+        property Loader customToolBarLoader: row && row.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar ? globalToolBar : actionButtons
 
         active: row && (row.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar || globalToolBar.row.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.Titles)
 
@@ -312,8 +313,20 @@ T2.Page {
                  "page": root,
                  "current": Qt.binding(function() {return stack || !root.parent ? true : row.currentIndex == root.parent.level})});
 
-                if (row.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar && root.customGlobalToolBar) {
-                    item.contentItem = root.customGlobalToolBar.createObject(item,
+            }
+            if (row && actionButtons.active) {
+                var toolbarFile = root.customGlobalToolBar ? Qt.resolvedUrl("./private/AbstractPageHeader.qml") : Qt.resolvedUrl("./private/ActionButton.qml")
+
+                actionButtons.setSource(Qt.resolvedUrl(toolbarFile),
+                //TODO: find container reliably, remove assumption
+                {"pageRow": Qt.binding(function() {return row}),
+                 "page": root,
+                 "position": T2.ToolBar.Footer,
+                 "current": Qt.binding(function() {return stack || !root.parent ? true : row.currentIndex == root.parent.level})});
+            }
+            if (row && customToolBarLoader.active) {
+                if (row.globalToolBar.actualStyle != Kirigami.ApplicationHeaderStyle.None && root.customGlobalToolBar) {
+                    customToolBarLoader.item.contentItem = root.customGlobalToolBar.createObject(customToolBarLoader.item,
                             {"pageRow": Qt.binding(function() {return row}),
                              "page": root,
                              "current": Qt.binding(function() {return stack || !root.parent ? true : row.currentIndex == root.parent.level})});
@@ -334,13 +347,12 @@ T2.Page {
         }
         //It should be T2.Page, Qt 5.7 doesn't like it
         property Item page: root
-        height: item ? item.height : 0
+        height: item ? item.implicitHeight : 0
         active: typeof applicationWindow !== "undefined" && (!globalToolBar.row || globalToolBar.row.globalToolBar.actualStyle != Kirigami.ApplicationHeaderStyle.ToolBar) &&
                //Legacy
                 (typeof applicationWindow === "undefined" ||
                  (!applicationWindow().header || applicationWindow().header.toString().indexOf("ToolBarApplicationHeader") === -1) &&
                  (!applicationWindow().footer || applicationWindow().footer.toString().indexOf("ToolBarApplicationHeader") === -1))
-        source: Qt.resolvedUrl("./private/ActionButton.qml")
     }
 
     Layout.fillWidth: true

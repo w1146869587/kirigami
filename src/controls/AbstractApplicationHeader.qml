@@ -18,6 +18,7 @@
  */
 
 import QtQuick 2.5
+import QtQuick.Templates 2.0 as T2
 import org.kde.kirigami 2.5
 
 import "private"
@@ -51,9 +52,10 @@ T.AbstractApplicationHeader {
             anchors {
                 right: parent.right
                 left: parent.left
-                top: parent.bottom
+                bottom: root.position == T2.ToolBar.Footer ? parent.top : undefined
+                top: root.position == T2.ToolBar.Footer ? undefined : parent.bottom
             }
-            edge: Qt.TopEdge
+            edge: root.position == T2.ToolBar.Footer ? Qt.BottomEdge : Qt.TopEdge
             opacity: (!root.page.header || root.page.header.toString().indexOf("ToolBar") === -1)
             Behavior on opacity {
                 OpacityAnimator {

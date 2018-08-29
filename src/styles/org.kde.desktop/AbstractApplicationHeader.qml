@@ -18,6 +18,7 @@
  */
 
 import QtQuick 2.5
+import QtQuick.Templates 2.0 as T2
 import org.kde.kirigami 2.4
 
 import "../../templates" as T
@@ -46,8 +47,8 @@ T.AbstractApplicationHeader {
             anchors {
                 left: parent.left
                 right: parent.right
-                bottom: root.y <= 0 ? parent.bottom : undefined
-                top: root.y <= 0 ? undefined :  parent.top 
+                bottom: root.position == T2.ToolBar.Footer ? undefined : parent.bottom 
+                top: root.position == T2.ToolBar.Footer ? parent.top : undefined
             }
         }
     }
