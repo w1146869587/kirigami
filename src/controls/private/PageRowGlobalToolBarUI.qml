@@ -35,7 +35,8 @@ Kirigami.AbstractApplicationHeader {
     minimumHeight: globalToolBar.minimumHeight
     preferredHeight: globalToolBar.preferredHeight
     maximumHeight: globalToolBar.maximumHeight
-    
+    separatorVisible: globalToolBar.separatorVisible
+
     RowLayout {
         anchors.fill: parent
         spacing: 0
@@ -46,7 +47,7 @@ Kirigami.AbstractApplicationHeader {
 
             Item {
                 id: leftHandleAnchor
-                visible: typeof applicationWindow() !== "undefined" && applicationWindow().globalDrawer.handleVisible &&
+                visible: typeof applicationWindow() !== "undefined" && applicationWindow().globalDrawer && applicationWindow().globalDrawer.handleVisible &&
                 (applicationWindow().globalDrawer.handle.handleAnchor == (Qt.application.layoutDirection == Qt.LeftToRight ? leftHandleAnchor : rightHandleAnchor))
                 Layout.preferredWidth: backButton.background.implicitHeight
                 Layout.preferredHeight: backButton.background.implicitHeight

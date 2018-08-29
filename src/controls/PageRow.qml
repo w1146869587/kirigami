@@ -488,7 +488,7 @@ T.Control {
         boundsBehavior: Flickable.StopAtBounds
         orientation: Qt.Horizontal
         snapMode: ListView.SnapToItem
-        currentIndex: root.currentIndex
+        currentIndex: 0
         property int marginForLast: count > 1 ? pagesLogic.get(count-1).page.width - pagesLogic.get(count-1).width : 0
         leftMargin: LayoutMirroring.enabled ? marginForLast : 0
         rightMargin: LayoutMirroring.enabled ? 0 : marginForLast
@@ -653,6 +653,8 @@ T.Control {
                     page.anchors.right = container.right;
                     page.anchors.bottom = container.bottom;
                     page.anchors.topMargin = Qt.binding(function() {return page.customGlobalToolBarItem ? page.customGlobalToolBarItem.height :  globalToolBarUI.height});
+                } else {
+                    pagesLogic.remove(level);
                 }
             }
             property Item owner

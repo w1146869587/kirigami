@@ -42,7 +42,7 @@ Item {
     readonly property Page page: root.parent.page
     //either Action or QAction should work here
 
-    function isActionAvailable(action) { return action && action.enabled && (action.visible === undefined || action.visible); }
+    function isActionAvailable(action) { return action && (action.visible === undefined || action.visible); }
 
     readonly property QtObject action: root.page && isActionAvailable(root.page.mainAction) ? root.page.mainAction : null
     readonly property QtObject leftAction: root.page && isActionAvailable(root.page.leftAction) ? root.page.leftAction : null
@@ -182,6 +182,24 @@ Item {
                     if (actionUnderMouse && actionUnderMouse.trigger) {
                         actionUnderMouse.trigger();
                     }
+                    
+                    if (actionUnderMouse.children.length > 0) {
+                        var subMenuUnderMouse;
+                        switch (actionUnderMouse) {
+                        case leftAction:
+                            subMenuUnderMouse = leftActionSubMenu;
+                            break;
+                        case mainAction:
+                            subMenuUnderMouse = mainActionSubMenu;
+                            break
+                        case rightAction:
+                            subMenuUnderMouse = rightActionSubMenu;
+                            break;
+                        }
+                        if (subMenuUnderMouse && !subMenuUnderMouse.visible) {
+                            subMenuUnderMouse.visible = true;
+                        }
+                    }
                 }
             }
 
@@ -228,11 +246,21 @@ Item {
                     anchors.centerIn: parent
                     height: parent.height - Units.smallSpacing*2
                     width: height
+                    enabled: root.action && root.action.enabled
                     visible: root.action
-                    readonly property bool pressed: root.action && ((root.action == mouseArea.actionUnderMouse && mouseArea.pressed) || root.action.checked)
+                    readonly property bool pressed: root.action && root.action.enabled && ((root.action == mouseArea.actionUnderMouse && mouseArea.pressed) || root.action.checked)
                     property color baseColor: root.action && root.action.icon && root.action.icon.color && root.action.icon.color != undefined && root.action.icon.color.a > 0 ? root.action.icon.color : Theme.highlightColor
                     color: pressed ? Qt.darker(baseColor, 1.3) : baseColor
 
+                    ActionsMenu {
+                        id: mainActionSubMenu
+                        y: -height
+                        x: -width/2 + parent.width/2
+                        actions: root.action ? root.action.children : ""
+                        submenuComponent: Component {
+                            ActionsMenu {}
+                        }
+                    }
                     Icon {
                         id: icon
                         anchors.centerIn: parent
@@ -264,18 +292,28 @@ Item {
                         bottom: parent.bottom
                         bottomMargin: Units.smallSpacing
                     }
+                    enabled: root.leftAction && root.leftAction.enabled
                     radius: Units.devicePixelRatio*2
                     height: Units.iconSizes.smallMedium + Units.smallSpacing * 2
                     width: height + (root.action ? Units.gridUnit*2 : 0)
                     visible: root.leftAction
 
-                    readonly property bool pressed: root.leftAction && ((mouseArea.actionUnderMouse == root.leftAction && mouseArea.pressed) || root.leftAction.checked)
+                    readonly property bool pressed: root.leftAction && root.leftAction.enabled && ((mouseArea.actionUnderMouse == root.leftAction && mouseArea.pressed) || root.leftAction.checked)
                     property color baseColor: root.leftAction && root.leftAction.icon && root.leftAction.icon.color && root.leftAction.icon.color != undefined && root.leftAction.icon.color.a > 0 ? root.leftAction.icon.color : Theme.highlightColor
                     color: pressed ? baseColor : Theme.backgroundColor
                     Behavior on color {
                         ColorAnimation {
                             duration: Units.longDuration
                             easing.type: Easing.InOutQuad
+                        }
+                    }
+                    ActionsMenu {
+                        id: leftActionSubMenu
+                        y: -height
+                        x: -width/2 + parent.width/2
+                        actions: root.leftAction ? root.leftAction.children : ""
+                        submenuComponent: Component {
+                            ActionsMenu {}
                         }
                     }
                     Icon {
@@ -300,17 +338,27 @@ Item {
                         bottom: parent.bottom
                         bottomMargin: Units.smallSpacing
                     }
+                    enabled: root.rightAction && root.rightAction.enabled
                     radius: Units.devicePixelRatio*2
                     height: Units.iconSizes.smallMedium + Units.smallSpacing * 2
                     width: height + (root.action ? Units.gridUnit*2 : 0)
                     visible: root.rightAction
-                    readonly property bool pressed: root.rightAction && ((mouseArea.actionUnderMouse == root.rightAction && mouseArea.pressed) || root.rightAction.checked)
+                    readonly property bool pressed: root.rightAction && root.rightAction.enabled && ((mouseArea.actionUnderMouse == root.rightAction && mouseArea.pressed) || root.rightAction.checked)
                     property color baseColor: root.rightAction && root.rightAction.icon && root.rightAction.icon.color && root.rightAction.icon.color != undefined && root.rightAction.icon.color.a > 0 ? root.rightAction.icon.color : Theme.highlightColor
                     color: pressed ? baseColor : Theme.backgroundColor
                     Behavior on color {
                         ColorAnimation {
                             duration: Units.longDuration
                             easing.type: Easing.InOutQuad
+                        }
+                    }
+                    ActionsMenu {
+                        id: rightActionSubMenu
+                        y: -height
+                        x: -width/2 + parent.width/2
+                        actions: root.rightAction ? root.rightAction.children : ""
+                        submenuComponent: Component {
+                            ActionsMenu {}
                         }
                     }
                     Icon {
@@ -426,26 +474,13 @@ Item {
                 contextMenu.visible = !contextMenu.visible;
             }
         }
-        Controls.Menu {
+        ActionsMenu {
             id: contextMenu
             x: parent.width - width
             y: -height
-            Repeater {
-                model: root.page.actions.contextualActions
-                delegate: BasicListItem {
-                    text: model.text
-                    icon: model.iconName
-                    backgroundColor: "transparent"
-                    visible: model.visible
-                    enabled: modelData.enabled
-                    checkable:  modelData.checkable
-                    checked: modelData.checked
-                    separatorVisible: false
-                    onClicked: {
-                        modelData.trigger();
-                        contextMenu.visible = false;
-                    }
-                }
+            actions: root.page.actions.contextualActions
+            submenuComponent: Component {
+                ActionsMenu {}
             }
         }
     }
