@@ -342,7 +342,7 @@ T2.Page {
                             return 0;
                         }
                         if (applicationWindow().globalDrawer && applicationWindow().globalDrawer.handleVisible) {
-                            return Math.min(Math.max(0, -(applicationWindow().width - applicationWindow().globalDrawer.handle.width) + (root.Kirigami.ScenePosition.x + root.width)),
+                            return Math.min(Math.max(0, (root.Kirigami.ScenePosition.x + root.width) - (applicationWindow().width - applicationWindow().globalDrawer.handle.width)),
                                             applicationWindow().globalDrawer.handle.width) + Kirigami.Units.smallSpacing;
                         }
                         return 0;
