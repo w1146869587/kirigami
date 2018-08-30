@@ -26,7 +26,10 @@ AbstractApplicationHeader {
     id: root
     anchors.fill: parent
     property Item container
-    property bool current
+    property Component contentComponent
+    onContentComponentChanged: {
+       contentItem = contentComponent.createObject(root);
+    }
 
     minimumHeight: pageRow.globalToolBar.minimumHeight
     maximumHeight: pageRow.globalToolBar.maximumHeight

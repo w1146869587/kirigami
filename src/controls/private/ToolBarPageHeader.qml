@@ -52,7 +52,7 @@ AbstractPageHeader {
                 Layout.preferredWidth: implicitWidth
                 Layout.minimumWidth: Math.min(titleTextMetrics.width, root.width - buttonTextMetrics.requiredWidth)
                 leftPadding: Units.largeSpacing
-                opacity: root.current ? 1 : 0.4
+                opacity: root.page.isCurrentPage ? 1 : 0.4
                 maximumLineCount: 1
                 color: Theme.textColor
                 elide: Text.ElideRight

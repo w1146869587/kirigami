@@ -25,7 +25,7 @@ import QtQuick.Templates 2.0 as T2
 
 /**
  * Page is a container for all the app pages: everything pushed to the
- * ApplicationWindow stackView should be a Page instabnce (or a subclass,
+ * ApplicationWindow pageStackView should be a Page instabnce (or a subclass,
  * such as ScrollablePage)
  * @see ScrollablePage
  * @inherit QtQuick.Templates.Page
@@ -55,7 +55,7 @@ T2.Page {
      * bottomPadding: int
      * default contents padding at bottom
      */
-    bottomPadding: actionButtons.item ? actionButtons.height : Kirigami.Units.gridUnit
+    bottomPadding: globalFooter.item ? globalFooter.height : Kirigami.Units.gridUnit
 
     /**
      * flickable: Flickable
@@ -203,15 +203,15 @@ T2.Page {
     /**
      * isCurrentPage: bool
      *
-     * Specifies if it's the currently selected page in the window's pages row.
+     * Specifies if it's the currently selected page in the window's pages pageRow.
      *
      * @since 2.1
      */
-    readonly property bool isCurrentPage: typeof applicationWindow === "undefined" || !globalToolBar.row
+    readonly property bool isCurrentPage: typeof applicationWindow === "undefined" || !globalHeader.pageRow
                 ? true
-                : (globalToolBar.row.layers.depth > 1
-                    ? globalToolBar.row.layers.currentItem == root
-                    : globalToolBar.row.currentItem == root)
+                : (globalHeader.pageRow.layers.depth > 1
+                    ? globalHeader.pageRow.layers.currentItem == root
+                    : globalHeader.pageRow.currentItem == root)
 
     PageActionPropertyGroup {
         id: actionsGroup
@@ -231,7 +231,7 @@ T2.Page {
      * 
      */
     property Component customGlobalToolBar
-    readonly property Item customGlobalToolBarItem: globalToolBar.item 
+    readonly property Item customGlobalToolBarItem: globalHeader.item 
 
     //NOTE: This exists just because control instances require it
     contentItem: Item {
@@ -258,29 +258,30 @@ T2.Page {
     Component.onCompleted: {
         parentChanged(root.parent);
     }
+    //FIXME: this would need attached properties but would need a c++ PageRow
     onParentChanged: {
         if (!parent) {
             return;
         }
-        globalToolBar.stack = null;
-        globalToolBar.row = null;
+        globalHeader.pageStack = null;
+        globalHeader.pageRow = null;
 
         if (root.parent.hasOwnProperty("__pageRow")) {
-            globalToolBar.row = root.parent.__pageRow;
+            globalHeader.pageRow = root.parent.__pageRow;
         }
         if (root.T2.StackView.view) {
-            globalToolBar.stack = root.T2.StackView.view;
-            globalToolBar.row = root.T2.StackView.view.parent;
+            globalHeader.pageStack = root.T2.StackView.view;
+            globalHeader.pageRow = root.T2.StackView.view.parent;
         }
-        if (globalToolBar.row) {
-            globalToolBar.row.globalToolBar.actualStyleChanged.connect(globalToolBar.syncSource);
-            globalToolBar.syncSource();
+        if (globalHeader.pageRow) {
+            globalHeader.pageRow.globalToolBar.actualStyleChanged.connect(globalHeader.syncToolBars);
+            globalHeader.syncToolBars();
         }
     }
 
-    //global top toolbar if we are in a PageRow (in the row or as a layer)
+    //global top toolbar if we are in a PageRow (in the pageRow or as a layer)
     Loader {
-        id: globalToolBar
+        id: globalHeader
         z: 9999
         parent: root.clip ? root.parent : root
         height: item ? item.implicitHeight : 0
@@ -289,16 +290,17 @@ T2.Page {
             right: parent ? root.right : undefined
             bottom: parent ? root.top : undefined
         }
-        property Kirigami.PageRow row
-        property T2.StackView stack
-        property Loader customToolBarLoader: row && row.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar ? globalToolBar : actionButtons
+        property Kirigami.PageRow pageRow
+        property T2.StackView pageStack
+        property Loader customToolBarLoader: pageRow && pageRow.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar ? globalHeader : globalFooter
 
-        active: row && (row.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar || globalToolBar.row.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.Titles)
+        active: pageRow && (pageRow.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar || globalHeader.pageRow.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.Titles)
 
-        function syncSource() {
-            if (row && active) {
+        function syncToolBars() {
+            //load/reload the top toolbar
+            if (pageRow && active) {
                 var toolbarFile
-                if (row.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar) {
+                if (pageRow.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar) {
                     if (root.customGlobalToolBar) {
                         toolbarFile = "private/AbstractPageHeader.qml";
                     } else {
@@ -307,37 +309,30 @@ T2.Page {
                 } else {
                     toolbarFile = "private/TitlesPageHeader.qml";
                 }
-                setSource(Qt.resolvedUrl(toolbarFile),
+                globalHeader.setSource(Qt.resolvedUrl(toolbarFile),
                 //TODO: find container reliably, remove assumption
-                {"pageRow": Qt.binding(function() {return row}),
+                {"pageRow": Qt.binding(function() {return pageRow}),
                  "page": root,
-                 "current": Qt.binding(function() {return stack || !root.parent ? true : row.currentIndex == root.parent.level})});
+                 "contentComponent": pageRow.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar ? customGlobalToolBar : null});
 
             }
-            if (row && actionButtons.active) {
+            //load/reload the bottom toolbar
+            if (pageRow && globalFooter.active) {
                 var toolbarFile = root.customGlobalToolBar ? Qt.resolvedUrl("./private/AbstractPageHeader.qml") : Qt.resolvedUrl("./private/ActionButton.qml")
 
-                actionButtons.setSource(Qt.resolvedUrl(toolbarFile),
+                globalFooter.setSource(Qt.resolvedUrl(toolbarFile),
                 //TODO: find container reliably, remove assumption
-                {"pageRow": Qt.binding(function() {return row}),
+                {"pageRow": Qt.binding(function() {return pageRow}),
                  "page": root,
                  "position": T2.ToolBar.Footer,
-                 "current": Qt.binding(function() {return stack || !root.parent ? true : row.currentIndex == root.parent.level})});
-            }
-            if (row && customToolBarLoader.active) {
-                if (row.globalToolBar.actualStyle != Kirigami.ApplicationHeaderStyle.None && root.customGlobalToolBar) {
-                    customToolBarLoader.item.contentItem = root.customGlobalToolBar.createObject(customToolBarLoader.item,
-                            {"pageRow": Qt.binding(function() {return row}),
-                             "page": root,
-                             "current": Qt.binding(function() {return stack || !root.parent ? true : row.currentIndex == root.parent.level})});
-                }
+                 "contentComponent": customGlobalToolBar});
             }
         }
     }
 
     //bottom action buttons
     Loader {
-        id: actionButtons
+        id: globalFooter
         z: 9999
         parent: root
         anchors {
@@ -348,8 +343,8 @@ T2.Page {
         //It should be T2.Page, Qt 5.7 doesn't like it
         property Item page: root
         height: item ? item.implicitHeight : 0
-        active: typeof applicationWindow !== "undefined" && (!globalToolBar.row || globalToolBar.row.globalToolBar.actualStyle != Kirigami.ApplicationHeaderStyle.ToolBar) &&
-               //Legacy
+        active: typeof applicationWindow !== "undefined" && (!globalHeader.pageRow || globalHeader.pageRow.globalToolBar.actualStyle != Kirigami.ApplicationHeaderStyle.ToolBar) &&
+               //Legacy, get eventually rid of it
                 (typeof applicationWindow === "undefined" ||
                  (!applicationWindow().header || applicationWindow().header.toString().indexOf("ToolBarApplicationHeader") === -1) &&
                  (!applicationWindow().footer || applicationWindow().footer.toString().indexOf("ToolBarApplicationHeader") === -1))
