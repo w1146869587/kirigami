@@ -40,7 +40,7 @@ Item {
     id: root
     z: 90
     property int minimumHeight: 0
-    property int preferredHeight: Units.gridUnit * 2
+    property int preferredHeight: contentItem ? contentItem.implicitHeight : Units.gridUnit * 2
     property int maximumHeight: Units.gridUnit * 3
     property PageRow pageRow: __appWindow.pageStack
     property Page page: pageRow.currentItem
@@ -103,7 +103,8 @@ Item {
         anchors {
             left: parent.left
             right: parent.right
-            bottom: parent.bottom
+            top: root.position == T.ToolBar.Footer ? parent.top : undefined
+            bottom: root.position == T.ToolBar.Footer ? undefined : parent.bottom
         }
 
         height: __appWindow.reachableMode && __appWindow.reachableModeEnabled ? root.maximumHeight : (root.minimumHeight > 0 ? Math.max(root.height, root.minimumHeight) : root.preferredHeight)
@@ -113,11 +114,10 @@ Item {
             target: root.page ? root.page.flickable : null
             property int oldContentY
             onContentYChanged: {
-                if (!Settings.isMobile ||
+                //don't make footer toolbars scroll away for now
+                if (!Settings.isMobile || root.position == T.ToolBar.Footer ||
                     !__appWindow.controlsVisible ||
-                    !root.page ||
-                    root.page.flickable.atYBeginning ||
-                    root.page.flickable.atYEnd) {
+                    !root.page) {
                     return;
                 //if moves but not dragging, just update oldContentY
                 } else if (!root.page.flickable.dragging) {
