@@ -19,7 +19,7 @@
 
 import QtQuick 2.1
 import QtQuick.Layouts 1.2
-import org.kde.kirigami 2.4 as Kirigami
+import org.kde.kirigami 2.5 as Kirigami
 import "private"
 import QtQuick.Templates 2.0 as T2
 
@@ -313,9 +313,10 @@ T2.Page {
                 //TODO: find container reliably, remove assumption
                 {"pageRow": Qt.binding(function() {return pageRow}),
                  "page": root,
-                 "contentComponent": pageRow.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar ? customGlobalToolBar : null});
-
+                 "contentComponent": pageRow.globalToolBar.actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar ? customGlobalToolBar : null
+                });
             }
+
             //load/reload the bottom toolbar
             if (pageRow && globalFooter.active) {
                 var toolbarFile = root.customGlobalToolBar ? Qt.resolvedUrl("./private/AbstractPageHeader.qml") : Qt.resolvedUrl("./private/ActionButton.qml")
@@ -325,7 +326,28 @@ T2.Page {
                 {"pageRow": Qt.binding(function() {return pageRow}),
                  "page": root,
                  "position": T2.ToolBar.Footer,
-                 "contentComponent": customGlobalToolBar});
+                 "contentComponent": customGlobalToolBar,
+                 "leftPadding": Qt.binding(function() {
+                        if (typeof applicationWindow == "undefined") {
+                            return 0;
+                        }
+                        if (applicationWindow().globalDrawer && applicationWindow().globalDrawer.handleVisible) {
+                            return Math.min(Math.max(0, applicationWindow().globalDrawer.handle.width - root.Kirigami.ScenePosition.x),
+                                            applicationWindow().globalDrawer.handle.width) + Kirigami.Units.smallSpacing;
+                        }
+                        return 0;
+                    }),
+                "rightPadding": Qt.binding(function() {
+                        if (typeof applicationWindow == "undefined") {
+                            return 0;
+                        }
+                        if (applicationWindow().globalDrawer && applicationWindow().globalDrawer.handleVisible) {
+                            return Math.min(Math.max(0, -(applicationWindow().width - applicationWindow().globalDrawer.handle.width) + (root.Kirigami.ScenePosition.x + root.width)),
+                                            applicationWindow().globalDrawer.handle.width) + Kirigami.Units.smallSpacing;
+                        }
+                        return 0;
+                    }),
+                });
             }
         }
     }

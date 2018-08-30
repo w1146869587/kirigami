@@ -37,12 +37,14 @@ AbstractApplicationHeader {
     implicitHeight: page.y
     separatorVisible: pageRow.globalToolBar.separatorVisible
 
+    topPadding: Units.smallSpacing
+    bottomPadding: Units.smallSpacing
     leftPadding: Math.min(Qt.application.layoutDirection == Qt.LeftToRight
                         ? Math.max(0, pageRow.ScenePosition.x - page.ScenePosition.x + pageRow.globalToolBar.leftReservedSpace)
                         : Math.max(0, -pageRow.width + pageRow.ScenePosition.x + page.ScenePosition.x + page.width + pageRow.globalToolBar.leftReservedSpace),
-                    root.width/2)
+                    root.width/2) + Units.smallSpacing
 
     rightPadding: Qt.application.layoutDirection == Qt.LeftToRight
             ? Math.min(-pageRow.width - pageRow.ScenePosition.x + page.ScenePosition.x + page.width + pageRow.globalToolBar.rightReservedSpace)
-            : Math.max(0, pageRow.ScenePosition.x - page.ScenePosition.x + pageRow.globalToolBar.rightReservedSpace)
+            : Math.max(0, pageRow.ScenePosition.x - page.ScenePosition.x + pageRow.globalToolBar.rightReservedSpace) + Units.smallSpacing
 }
