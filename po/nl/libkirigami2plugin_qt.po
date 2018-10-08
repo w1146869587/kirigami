@@ -1,0 +1,44 @@
+# Freek de Kruijf <freekdekruijf@kde.nl>, 2016, 2017, 2018.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2018-06-27 11:50+0100\n"
+"Last-Translator: Freek de Kruijf <freekdekruijf@kde.nl>\n"
+"Language-Team: Dutch <kde-i18n-nl@kde.org>\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 2.0\n"
+
+#: controls/ContextDrawer.qml:77
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "Acties"
+
+#: controls/GlobalDrawer.qml:445
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "Terug"
+
+#: controls/private/globaltoolbar/ToolBarPageHeader.qml:111
+msgctxt "ToolBarPageHeader|"
+msgid "More Actions"
+msgstr "Meer acties"
+
+#: controls/templates/private/BackButton.qml:50
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "Naar achteren navigeren"
+
+#: controls/templates/private/ForwardButton.qml:46
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "Naar voren navigeren"
+
+#: controls/ToolBarApplicationHeader.qml:126
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "Meer acties"

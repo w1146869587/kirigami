@@ -1,0 +1,50 @@
+# Kiszel Kristóf <kiszel.kristof@gmail.com>, 2017.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2017-02-06 22:35+0100\n"
+"Last-Translator: Kiszel Kristóf <kiszel.kristof@gmail.com>\n"
+"Language-Team: Hungarian <kde-l10n-hu@kde.org>\n"
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 2.0\n"
+
+#: controls/ContextDrawer.qml:77
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "Műveletek"
+
+#: controls/GlobalDrawer.qml:445
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "Vissza"
+
+#: controls/private/globaltoolbar/ToolBarPageHeader.qml:111
+#, fuzzy
+#| msgctxt "ContextDrawer|"
+#| msgid "Actions"
+msgctxt "ToolBarPageHeader|"
+msgid "More Actions"
+msgstr "Műveletek"
+
+#: controls/templates/private/BackButton.qml:50
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr ""
+
+#: controls/templates/private/ForwardButton.qml:46
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr ""
+
+#: controls/ToolBarApplicationHeader.qml:126
+#, fuzzy
+#| msgctxt "ContextDrawer|"
+#| msgid "Actions"
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "Műveletek"
