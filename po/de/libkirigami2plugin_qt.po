@@ -1,0 +1,45 @@
+# Frederik Schwarzer <schwarzer@kde.org>, 2016, 2018.
+# Burkhard Lück <lueck@hube-lueck.de>, 2017, 2018.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2018-07-02 09:44+0100\n"
+"Last-Translator: Burkhard Lück <lueck@hube-lueck.de>\n"
+"Language-Team: German <kde-i18n-de@kde.org>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 2.0\n"
+
+#: controls/ContextDrawer.qml:77
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "Aktionen"
+
+#: controls/GlobalDrawer.qml:446
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "Zurück"
+
+#: controls/private/globaltoolbar/ToolBarPageHeader.qml:111
+msgctxt "ToolBarPageHeader|"
+msgid "More Actions"
+msgstr "Weitere Aktionen"
+
+#: controls/templates/private/BackButton.qml:50
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "Zurück gehen"
+
+#: controls/templates/private/ForwardButton.qml:46
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "Vorwärts gehen"
+
+#: controls/ToolBarApplicationHeader.qml:126
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "Weitere Aktionen"
