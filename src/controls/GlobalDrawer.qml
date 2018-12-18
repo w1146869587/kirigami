@@ -127,7 +127,6 @@ OverlayDrawer {
      */
     property list<QtObject> actions
 
-
     /**
      * content: list<Item> default property
      * Any random Item can be instantiated inside the drawer and
@@ -242,6 +241,20 @@ OverlayDrawer {
             id: mainFlickable
             contentWidth: width
             contentHeight: mainColumn.Layout.minimumHeight
+            
+            property var expandedActions: {
+                var expanded = [];
+                var action;
+                for (var i in actions) {
+                    action = actions[i];
+                    expanded.push(action);
+                    if (action.children.length > 0 && action.hasOwnProperty("expandible") && action.expandible) {
+                        expanded.push.apply(expanded, action.children)
+                    }
+                }
+                return expanded;
+            }
+
             ColumnLayout {
                 id: mainColumn
                 width: mainFlickable.width
@@ -455,13 +468,14 @@ OverlayDrawer {
 
                         Repeater {
                             id: actionsRepeater
-                            model: actions
+                            model: mainFlickable.expandedActions
                             delegate:
                             BasicListItem {
                                 id: listItem
                                 supportsMouseEvents: true
                                 readonly property bool wideMode: width > height * 2
                                 readonly property bool isSeparator: modelData.hasOwnProperty("separator") && modelData.separator
+                                readonly property bool isExpandible: modelData.hasOwnProperty("expandible") && modelData.expandible
                                 reserveSpaceForIcon: !isSeparator
                                 reserveSpaceForLabel: !isSeparator
                                 checked: modelData.checked || (actionsMenu && actionsMenu.visible)
@@ -499,8 +513,8 @@ OverlayDrawer {
                                         easing.type: Easing.InOutQuad
                                     }
                                 }
-                                enabled: !isSeparator && ( (model && model.enabled != undefined) ? model.enabled : modelData.enabled)
-                                opacity: enabled ? 1.0 : 0.3
+                                enabled: (!isExpandible || root.collapsed) && !isSeparator && ( (model && model.enabled != undefined) ? model.enabled : modelData.enabled)
+                                opacity: (model && model.enabled != undefined) ? model.enabled : modelData.enabled ? 1.0 : 0.3
 
                                 Separator {
                                     id: separatorAction
@@ -522,7 +536,7 @@ OverlayDrawer {
                                     selected: listItem.checked || listItem.pressed
                                     Layout.preferredWidth: Layout.preferredHeight
                                     source: (LayoutMirroring.enabled ? "go-next-symbolic-rtl" : "go-next-symbolic")
-                                    visible: !listItem.isSeparator && modelData.children!==undefined && modelData.children.length > 0
+                                    visible: (!isExpandible || root.collapsed) && !listItem.isSeparator && modelData.children!==undefined && modelData.children.length > 0
                                 }
                                 data: [
                                     QQC2.ToolTip {

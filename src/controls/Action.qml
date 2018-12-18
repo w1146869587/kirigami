@@ -147,6 +147,9 @@ QtObject {
      */
     property bool separator: false
 
+    
+    property bool expandible: false
+
     default property alias children: root.__children
     property list<QtObject> __children
     property Shortcut __shortcut: Shortcut {
