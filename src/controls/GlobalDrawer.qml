@@ -472,7 +472,7 @@ OverlayDrawer {
                             delegate:
                             BasicListItem {
                                 id: listItem
-                                supportsMouseEvents: true
+                                supportsMouseEvents: (!isExpandible || root.collapsed)
                                 readonly property bool wideMode: width > height * 2
                                 readonly property bool isSeparator: modelData.hasOwnProperty("separator") && modelData.separator
                                 readonly property bool isExpandible: modelData.hasOwnProperty("expandible") && modelData.expandible
@@ -513,8 +513,14 @@ OverlayDrawer {
                                         easing.type: Easing.InOutQuad
                                     }
                                 }
-                                enabled: (!isExpandible || root.collapsed) && !isSeparator && ( (model && model.enabled != undefined) ? model.enabled : modelData.enabled)
-                                opacity: (model && model.enabled != undefined) ? model.enabled : modelData.enabled ? 1.0 : 0.3
+                                enabled: !isSeparator && ( (model && model.enabled != undefined) ? model.enabled : modelData.enabled)
+                                opacity: ((model && model.enabled != undefined) ? model.enabled : modelData.enabled) ? 1.0 : 0.3
+                                
+                                hoverEnabled: (!isExpandible || root.collapsed) && !Settings.tabletMode
+                                sectionDelegate: isExpandible
+                                font.pointSize: isExpandible ? Theme.defaultFont.pointSize * 1.30 : Theme.defaultFont.pointSize
+                                font.weight: isExpandible ? Font.Light : Font.Normal
+                                font.styleName: isExpandible ? "Light" : "Regular"
 
                                 Separator {
                                     id: separatorAction
@@ -566,6 +572,9 @@ OverlayDrawer {
                                     }
                                 }
                                 onClicked: {
+                                    if (!supportsMouseEvents) {
+                                        return;
+                                    }
                                     modelData.trigger();
                                     if (modelData.children!==undefined && modelData.children.length > 0) {
                                         if (root.collapsed) {
