@@ -475,7 +475,12 @@ OverlayDrawer {
                                 supportsMouseEvents: (!isExpandible || root.collapsed)
                                 readonly property bool wideMode: width > height * 2
                                 readonly property bool isSeparator: modelData.hasOwnProperty("separator") && modelData.separator
-                                readonly property bool isExpandible: modelData.hasOwnProperty("expandible") && modelData.expandible
+
+                                readonly property bool isExpandible: modelData && modelData.hasOwnProperty("expandible") && modelData.expandible
+                                readonly property bool parentIsExpandible: modelData && modelData.parent && modelData.parent.hasOwnProperty("expandible") && modelData.parent.expandible
+
+                                leftPadding: parentIsExpandible ? Units.largeSpacing*2 : Units.largeSpacing
+
                                 reserveSpaceForIcon: !isSeparator
                                 reserveSpaceForLabel: !isSeparator
                                 checked: modelData.checked || (actionsMenu && actionsMenu.visible)
@@ -506,7 +511,7 @@ OverlayDrawer {
                                 separatorVisible: false
                                 //TODO: animate the hide by collapse
                                 visible: (model ? model.visible || model.visible===undefined : modelData.visible) && opacity > 0
-                                opacity: (!root.collapsed || icon.length > 0)
+                                opacity: (!parentIsExpandible || !root.collapsed) && (!root.collapsed || icon.length > 0)
                                 Behavior on opacity {
                                     OpacityAnimator {
                                         duration: Units.longDuration/2
