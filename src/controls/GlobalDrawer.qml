@@ -466,13 +466,7 @@ OverlayDrawer {
                                     delegate: GlobalDrawerActionItem {
                                         width: parent.width
                                         leftPadding: Units.largeSpacing * 2
-                                        scale: !root.collapsed
-                                        Behavior on scale {
-                                            NumberAnimation {
-                                                duration: Units.longDuration
-                                                easing.type: Easing.InOutQuad
-                                            }
-                                        }
+                                        opacity: !root.collapsed
                                     }
                                 }
                             }

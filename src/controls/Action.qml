@@ -151,11 +151,11 @@ QtObject {
     property bool expandible: false
 
     property QtObject parent
+
     default property alias children: root.__children
     property list<QtObject> __children
     onChildrenChanged: {
         for (var i in children) {
-            print("WWWWW"+children[i]+children[i].parent)
             children[i].parent = root
         }
     }
