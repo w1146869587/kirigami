@@ -242,19 +242,6 @@ OverlayDrawer {
             contentWidth: width
             contentHeight: mainColumn.Layout.minimumHeight
             
-            property var expandedActions: {
-                var expanded = [];
-                var action;
-                for (var i in actions) {
-                    action = actions[i];
-                    expanded.push(action);
-                    if (action.children.length > 0 && action.hasOwnProperty("expandible") && action.expandible) {
-                        expanded.push.apply(expanded, action.children)
-                    }
-                }
-                return expanded;
-            }
-
             ColumnLayout {
                 id: mainColumn
                 width: mainFlickable.width
@@ -468,137 +455,25 @@ OverlayDrawer {
 
                         Repeater {
                             id: actionsRepeater
-                            model: mainFlickable.expandedActions
-                            delegate:
-                            BasicListItem {
-                                id: listItem
-                                supportsMouseEvents: (!isExpandible || root.collapsed)
-                                readonly property bool wideMode: width > height * 2
-                                readonly property bool isSeparator: modelData.hasOwnProperty("separator") && modelData.separator
-
-                                readonly property bool isExpandible: modelData && modelData.hasOwnProperty("expandible") && modelData.expandible
-                                readonly property bool parentIsExpandible: modelData && modelData.parent && modelData.parent.hasOwnProperty("expandible") && modelData.parent.expandible
-
-                                leftPadding: parentIsExpandible ? Units.largeSpacing*2 : Units.largeSpacing
-
-                                reserveSpaceForIcon: !isSeparator
-                                reserveSpaceForLabel: !isSeparator
-                                checked: modelData.checked || (actionsMenu && actionsMenu.visible)
+                            model: root.actions
+                            delegate: Column {
                                 width: parent.width
-
-                                icon: modelData.iconName
-
-                                label: width > height * 2 ? MnemonicData.richTextLabel : ""
-
-                                MnemonicData.enabled: listItem.enabled && listItem.visible
-                                MnemonicData.controlType: MnemonicData.MenuItem
-                                MnemonicData.label: modelData.text
-                                property ActionsMenu actionsMenu: ActionsMenu {
-                                    x: Qt.application.layoutDirection == Qt.RightToLeft ? -width : listItem.width
-                                    actions: modelData.children
-                                    submenuComponent: Component {
-                                        ActionsMenu {}
-                                    }
-                                    onVisibleChanged: {
-                                        if (visible) {
-                                            stackView.openSubMenu = listItem.actionsMenu;
-                                        } else if (stackView.openSubMenu == listItem.actionsMenu) {
-                                            stackView.openSubMenu = null;
-                                        }
-                                    }
+                                GlobalDrawerActionItem {
+                                    width: parent.width
                                 }
-
-                                separatorVisible: false
-                                //TODO: animate the hide by collapse
-                                visible: (model ? model.visible || model.visible===undefined : modelData.visible) && opacity > 0
-                                opacity: (!parentIsExpandible || !root.collapsed) && (!root.collapsed || icon.length > 0)
-                                Behavior on opacity {
-                                    OpacityAnimator {
-                                        duration: Units.longDuration/2
-                                        easing.type: Easing.InOutQuad
-                                    }
-                                }
-                                enabled: !isSeparator && ( (model && model.enabled != undefined) ? model.enabled : modelData.enabled)
-                                opacity: ((model && model.enabled != undefined) ? model.enabled : modelData.enabled) ? 1.0 : 0.3
-                                
-                                hoverEnabled: (!isExpandible || root.collapsed) && !Settings.tabletMode
-                                sectionDelegate: isExpandible
-                                font.pointSize: isExpandible ? Theme.defaultFont.pointSize * 1.30 : Theme.defaultFont.pointSize
-                                font.weight: isExpandible ? Font.Light : Font.Normal
-                                font.styleName: isExpandible ? "Light" : "Regular"
-
-                                Separator {
-                                    id: separatorAction
-
-                                    visible: listItem.isSeparator
-                                    Layout.fillWidth: true
-                                }
-
-                                Icon {
-                                    Shortcut {
-                                        sequence: listItem.MnemonicData.sequence
-                                        onActivated: listItem.clicked()
-                                    }
-                                    isMask: true
-                                    Layout.alignment: Qt.AlignVCenter
-                                    Layout.rightMargin: !Settings.isMobile && mainFlickable.contentHeight > mainFlickable.height ? Units.gridUnit : 0
-                                    Layout.leftMargin: !root.collapsed ? 0 : parent.width - listItem.width
-                                    Layout.preferredHeight: !root.collapsed ? Units.iconSizes.smallMedium : Units.iconSizes.small/2
-                                    selected: listItem.checked || listItem.pressed
-                                    Layout.preferredWidth: Layout.preferredHeight
-                                    source: (LayoutMirroring.enabled ? "go-next-symbolic-rtl" : "go-next-symbolic")
-                                    visible: (!isExpandible || root.collapsed) && !listItem.isSeparator && modelData.children!==undefined && modelData.children.length > 0
-                                }
-                                data: [
-                                    QQC2.ToolTip {
-                                        visible: !listItem.isSeparator && (modelData.tooltip.length || root.collapsed) && (!actionsMenu || !actionsMenu.visible) &&  listItem.hovered && text.length > 0
-                                        text: modelData.tooltip.length ? modelData.tooltip : modelData.text
-                                        delay: 1000
-                                        timeout: 5000
-                                        y: listItem.height/2 - height/2
-                                        x: Qt.application.layoutDirection == Qt.RightToLeft ? -width : listItem.width
-                                    }
-                                ]
-
-                                onHoveredChanged: {
-                                    if (!hovered) {
-                                        return;
-                                    }
-                                    if (stackView.openSubMenu) {
-                                        stackView.openSubMenu.visible = false;
-
-                                        if (!listItem.actionsMenu.hasOwnProperty("count") || listItem.actionsMenu.count>0) {
-                                            if (listItem.actionsMenu.hasOwnProperty("popup")) {
-                                                listItem.actionsMenu.popup(listItem, listItem.width, 0)
-                                            } else {
-                                                listItem.actionsMenu.visible = true;
+                                Repeater {
+                                    model: modelData.hasOwnProperty("expandible") && modelData.expandible ? modelData.children : null
+                                    delegate: GlobalDrawerActionItem {
+                                        width: parent.width
+                                        leftPadding: Units.largeSpacing * 2
+                                        scale: !root.collapsed
+                                        Behavior on scale {
+                                            NumberAnimation {
+                                                duration: Units.longDuration
+                                                easing.type: Easing.InOutQuad
                                             }
                                         }
                                     }
-                                }
-                                onClicked: {
-                                    if (!supportsMouseEvents) {
-                                        return;
-                                    }
-                                    modelData.trigger();
-                                    if (modelData.children!==undefined && modelData.children.length > 0) {
-                                        if (root.collapsed) {
-                                            //fallbacks needed for Qt 5.9
-                                            if ((!listItem.actionsMenu.hasOwnProperty("count") || listItem.actionsMenu.count>0) && !listItem.actionsMenu.visible) {
-                                                stackView.openSubMenu = listItem.actionsMenu;
-                                                if (listItem.actionsMenu.hasOwnProperty("popup")) {
-                                                    listItem.actionsMenu.popup(listItem, listItem.width, 0)
-                                                } else {
-                                                    listItem.actionsMenu.visible = true;
-                                                }
-                                            }
-                                        } else {
-                                            stackView.push(menuComponent, {model: modelData.children, level: level + 1, current: modelData });
-                                        }
-                                    } else if (root.resetMenuOnTriggered) {
-                                        root.resetMenu();
-                                    }
-                                    checked = Qt.binding(function() { return modelData.checked || (actionsMenu && actionsMenu.visible) });
                                 }
                             }
                         }
