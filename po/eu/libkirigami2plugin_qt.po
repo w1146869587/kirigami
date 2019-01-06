@@ -1,0 +1,96 @@
+# Translation of libkirigami2plugin_qt.po to Euskara/Basque (eu).
+# Copyright (C) 2017-2018, Free Software Foundation.
+# This file is distributed under the same license as the frameworks package.
+# KDE Euskaratzeko proiektuaren arduraduna <xalba@euskalnet.net>.
+#
+# Translators:
+# Iñigo Salvador Azurmendi <xalba@euskalnet.net>, 2017, 2018.
+msgid ""
+msgstr ""
+"Project-Id-Version: libkirigami2plugin_qt\n"
+"PO-Revision-Date: 2018-06-30 02:00+0100\n"
+"Last-Translator: Iñigo Salvador Azurmendi <xalba@euskalnet.net>\n"
+"Language-Team: Basque <kde-i18n-doc@kde.org>\n"
+"Language: eu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 2.0\n"
+
+#: controls/AboutPage.qml:79
+msgctxt "AboutPage|"
+msgid "About"
+msgstr ""
+
+#: controls/AboutPage.qml:107
+#, qt-format
+msgctxt "AboutPage|"
+msgid "%1 <%2>"
+msgstr ""
+
+#: controls/AboutPage.qml:142
+msgctxt "AboutPage|"
+msgid "Copyright"
+msgstr ""
+
+#: controls/AboutPage.qml:164
+msgctxt "AboutPage|"
+msgid "License:"
+msgstr ""
+
+#: controls/AboutPage.qml:173
+msgctxt "AboutPage|"
+msgid "Libraries in use"
+msgstr ""
+
+#: controls/AboutPage.qml:186
+msgctxt "AboutPage|"
+msgid "Authors"
+msgstr ""
+
+#: controls/AboutPage.qml:194
+msgctxt "AboutPage|"
+msgid "Credits"
+msgstr ""
+
+#: controls/AboutPage.qml:203
+msgctxt "AboutPage|"
+msgid "Translators"
+msgstr ""
+
+#: controls/ContextDrawer.qml:77
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "Ekintzak"
+
+#: controls/GlobalDrawer.qml:446
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "Atzera"
+
+#: controls/private/globaltoolbar/ToolBarPageHeader.qml:112
+msgctxt "ToolBarPageHeader|"
+msgid "More Actions"
+msgstr "Ekintza gehiago"
+
+#: controls/templates/private/BackButton.qml:50
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "Nabigatu atzera"
+
+#: controls/templates/private/ForwardButton.qml:46
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "Nabigatu aurrera"
+
+#: controls/ToolBarApplicationHeader.qml:126
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "Ekintza gehiago"
+
+#: controls/UrlButton.qml:51
+msgctxt "UrlButton|"
+msgid "Copy link address"
+msgstr ""
