@@ -68,7 +68,9 @@ BasicListItem {
         }
     }
     enabled: !isSeparator && ( (model && model.enabled != undefined) ? model.enabled : modelData.enabled)
-    
+Component.onCompleted: {
+    print(MnemonicData.richTextLabel+"MOOD "+ model+" MD  "+modelData+modelData.visible+opacity)
+}
     hoverEnabled: (!isExpandible || root.collapsed) && !Settings.tabletMode
     sectionDelegate: isExpandible
     font.pointSize: isExpandible ? Theme.defaultFont.pointSize * 1.30 : Theme.defaultFont.pointSize

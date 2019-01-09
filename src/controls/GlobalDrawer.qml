@@ -459,10 +459,11 @@ OverlayDrawer {
                             delegate: Column {
                                 width: parent.width
                                 GlobalDrawerActionItem {
+                                    id: drawerItem
                                     width: parent.width
                                 }
                                 Repeater {
-                                    model: modelData.hasOwnProperty("expandible") && modelData.expandible ? modelData.children : null
+                                    model: drawerItem.visible && modelData.hasOwnProperty("expandible") && modelData.expandible ? modelData.children : null
                                     delegate: GlobalDrawerActionItem {
                                         width: parent.width
                                         leftPadding: Units.largeSpacing * 2
