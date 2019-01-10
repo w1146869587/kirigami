@@ -39,8 +39,6 @@ BasicListItem {
     hoverEnabled: (!isExpandible || root.collapsed) && !Settings.tabletMode
     sectionDelegate: isExpandible
     font.pointSize: isExpandible ? Theme.defaultFont.pointSize * 1.30 : Theme.defaultFont.pointSize
-    font.weight: isExpandible ? Font.Light : Font.Normal
-    font.styleName: isExpandible ? "Light" : "Regular"
 
     enabled: !isExpandible && !isSeparator && (model ? model.enabled : modelData.enabled)
     visible: model ? model.visible : modelData.visible
