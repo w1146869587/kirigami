@@ -147,7 +147,11 @@ QtObject {
      */
     property bool separator: false
 
-    
+    /**
+     * expandible: bool
+     * When true, actions in globalDrawers and contextDrawers will become titles displaying te child actions as sub items
+     * @since 2.6
+     */
     property bool expandible: false
 
     property QtObject parent
