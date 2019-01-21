@@ -47,6 +47,7 @@ AbstractListItem {
      */
     property var icon
 
+    property alias iconSize: iconItem.size
     /**
      * reserveSpaceForIcon: bool
      * If true, even when there is no icon the space will be reserved for it
@@ -66,22 +67,23 @@ AbstractListItem {
 
     contentItem: RowLayout {
         id: layout
-        spacing: Units.smallSpacing*2
+        spacing: LayoutMirroring.enabled ? listItem.rightPadding : listItem.leftPadding
         property bool indicateActiveFocus: listItem.pressed || Settings.tabletMode || listItem.activeFocus || (listItem.ListView.view ? listItem.ListView.view.activeFocus : false)
         Icon {
             id: iconItem
             source: {
                 if (listItem.icon && listItem.icon.hasOwnProperty) {
-                    if (listItem.icon.hasOwnProperty("name") && listItem.icon.name != "")
+                    if (listItem.icon.hasOwnProperty("name") && listItem.icon.name !== "")
                         return listItem.icon.name;
                     if (listItem.icon.hasOwnProperty("source"))
                         return listItem.icon.source;
                 }
                 return listItem.icon;
             }
-            Layout.minimumHeight: Units.iconSizes.smallMedium
-            Layout.maximumHeight: Layout.minimumHeight
-            Layout.minimumWidth: height
+            property int size: Units.iconSizes.smallMedium
+            Layout.minimumHeight: size
+            Layout.maximumHeight: size
+            Layout.minimumWidth: size
             selected: layout.indicateActiveFocus && (listItem.highlighted || listItem.checked || (listItem.pressed && listItem.supportsMouseEvents))
             color: listItem.icon && listItem.icon.color && listItem.icon.color.a > 0 ? listItem.icon.color : (selected ? Theme.highlightedTextColor : Theme.textColor)
             opacity: 1
