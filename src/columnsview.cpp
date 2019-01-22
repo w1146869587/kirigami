@@ -62,7 +62,7 @@ qreal ContentItem::childWidth(QQuickItem *child)
 void ContentItem::layoutItems()
 {
     qreal partialWidth = 0;
-    for (QQuickItem *child : childItems()) {
+    for (QQuickItem *child : m_items) {
         child->setSize(QSizeF(childWidth(child), height()));
         child->setPosition(QPointF(partialWidth, 0.0));
         partialWidth += child->width();
@@ -111,6 +111,34 @@ QQuickItem *ColumnsView::contentItem() const
 {
     return m_contentItem;
 }
+
+void ColumnsView::appendItem(QQuickItem *item)
+{
+    m_contentItem->m_items.append(item);
+    item->setParentItem(m_contentItem);
+    emit contentChildrenChanged();
+}
+
+void ColumnsView::insertItem(int pos, QQuickItem *item)
+{
+    m_contentItem->m_items.insert(qBound(0, pos, m_contentItem->m_items.length()-1), item);
+    item->setParentItem(m_contentItem);
+    emit contentChildrenChanged();
+}
+
+void ColumnsView::clear()
+{
+    for (QQuickItem *item : m_contentItem->m_items) {
+        if (QQmlEngine::objectOwnership(item) == QQmlEngine::JavaScriptOwnership) {
+            item->deleteLater();
+        } else {
+            item->setParentItem(nullptr);
+        }
+    }
+    m_contentItem->m_items.clear();
+    emit contentChildrenChanged();
+}
+
 
 void ColumnsView::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
 {

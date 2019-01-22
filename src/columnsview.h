@@ -31,7 +31,7 @@ class ColumnsView : public QQuickItem
 
     Q_PROPERTY(QQuickItem *contentItem READ contentItem CONSTANT)
 
-    Q_PROPERTY(QQmlListProperty<QQuickItem> contentChildren READ contentChildren FINAL)
+    Q_PROPERTY(QQmlListProperty<QQuickItem> contentChildren READ contentChildren NOTIFY contentChildrenChanged FINAL)
     Q_CLASSINFO("DefaultProperty", "contentChildren")
 
     Q_ENUMS(ChildResizeMode)
@@ -48,6 +48,11 @@ public:
 
     QQmlListProperty<QQuickItem> contentChildren();
 
+public Q_SLOTS:
+    void appendItem(QQuickItem *item);
+    void insertItem(int pos, QQuickItem *item);
+    void clear();
+
 protected:
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
     void mousePressEvent(QMouseEvent *event) override;
@@ -55,7 +60,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
 
 Q_SIGNALS:
-
+    void contentChildrenChanged();
 
 private:
     static void contentChildren_append(QQmlListProperty<QQuickItem> *prop, QQuickItem *object);
