@@ -35,10 +35,13 @@ public:
     qreal childWidth(QQuickItem *child);
     void layoutItems();
 
+    void setBoundedX(qreal x);
+
 protected:
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
 
 private:
+    QList<QQuickItem *> m_items;
     QPointer<QQuickItem> m_firstVisibleItem;
     QPointer<QQuickItem> m_expandedItem;
 

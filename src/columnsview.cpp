@@ -32,6 +32,11 @@ ContentItem::ContentItem(QQuickItem *parent)
 ContentItem::~ContentItem()
 {}
 
+void ContentItem::setBoundedX(qreal x)
+{
+    setX(qBound(qMin(0.0, -width()+parentItem()->width()), x, 0.0));
+}
+
 qreal ContentItem::childWidth(QQuickItem *child)
 {
     if (m_resizeMode == ColumnsView::SingleColumn
@@ -63,8 +68,9 @@ void ContentItem::layoutItems()
         partialWidth += child->width();
     }
     setWidth(partialWidth);
-    
-    setPosition(QPointF(m_firstVisibleItem ? -m_firstVisibleItem->x() : 0.0, 0.0));
+
+    setBoundedX((m_firstVisibleItem ? -m_firstVisibleItem->x() : 0.0));
+    setY(0);
 }
 
 void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
@@ -94,6 +100,7 @@ ColumnsView::ColumnsView(QQuickItem *parent)
     : QQuickItem(parent)
 {
     m_contentItem = new ContentItem(this);
+    setAcceptedMouseButtons(Qt::LeftButton);
 }
 
 ColumnsView::~ColumnsView()
@@ -121,7 +128,7 @@ void ColumnsView::mousePressEvent(QMouseEvent *event)
 
 void ColumnsView::mouseMoveEvent(QMouseEvent *event)
 {
-    m_contentItem->setX(m_contentItem->x() + event->pos().x() - m_oldMouseX);
+    m_contentItem->setBoundedX(m_contentItem->x() + event->pos().x() - m_oldMouseX);
     m_oldMouseX = event->pos().x();
     event->accept();
 }
@@ -135,15 +142,76 @@ void ColumnsView::mouseReleaseEvent(QMouseEvent *event)
     }
     QQuickItem *nextItem = m_contentItem->childAt(firstItem->x() + firstItem->width() + 1, 0);
 
-    if (-m_contentItem->x() <= firstItem->x() + firstItem->width()/2 || !nextItem) {
-        m_contentItem->m_expandedItem = firstItem;
-        m_contentItem->setX(-firstItem->x());
+    //need to make the last item visible?
+    if (m_contentItem->width() - (-m_contentItem->x() + width()) < -m_contentItem->x() - firstItem->x()) {
+        m_contentItem->m_firstVisibleItem = nextItem;
+        m_contentItem->setBoundedX(-nextItem->x());
+
+    //The first one found?
+    } else if (-m_contentItem->x() <= firstItem->x() + firstItem->width()/2 || !nextItem) {
+        m_contentItem->m_firstVisibleItem = firstItem;
+        m_contentItem->setBoundedX(-firstItem->x());
+
+    //the second?
     } else {
-        m_contentItem->m_expandedItem = nextItem;
-        m_contentItem->setX(-nextItem->x());
+        m_contentItem->m_firstVisibleItem = nextItem;
+        m_contentItem->setBoundedX(-nextItem->x());
     }
 
     event->accept();
+}
+
+void ColumnsView::contentChildren_append(QQmlListProperty<QQuickItem> *prop, QQuickItem *item)
+{
+    ColumnsView *view = static_cast<ColumnsView *>(prop->object);
+    if (!view) {
+        return;
+    }
+
+    view->m_contentItem->m_items.append(item);
+    item->setParentItem(view->m_contentItem);
+}
+
+int ColumnsView::contentChildren_count(QQmlListProperty<QQuickItem> *prop)
+{
+    ColumnsView *view = static_cast<ColumnsView *>(prop->object);
+    if (!view) {
+        return 0;
+    }
+
+    return view->m_contentItem->m_items.count();
+}
+
+QQuickItem *ColumnsView::contentChildren_at(QQmlListProperty<QQuickItem> *prop, int index)
+{
+    ColumnsView *view = static_cast<ColumnsView *>(prop->object);
+    if (!view) {
+        return nullptr;
+    }
+
+    if (index < 0 || index >= view->m_contentItem->m_items.count()) {
+        return nullptr;
+    }
+    return view->m_contentItem->m_items.value(index);
+}
+
+void ColumnsView::contentChildren_clear(QQmlListProperty<QQuickItem> *prop)
+{
+    ColumnsView *view = static_cast<ColumnsView *>(prop->object);
+    if (!view) {
+        return;
+    }
+
+    return view->m_contentItem->m_items.clear();
+}
+
+QQmlListProperty<QQuickItem> ColumnsView::contentChildren()
+{
+    return QQmlListProperty<QQuickItem>(this, nullptr,
+                                     contentChildren_append,
+                                     contentChildren_count,
+                                     contentChildren_at,
+                                     contentChildren_clear);
 }
 
 
