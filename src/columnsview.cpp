@@ -112,18 +112,65 @@ QQuickItem *ColumnsView::contentItem() const
     return m_contentItem;
 }
 
-void ColumnsView::appendItem(QQuickItem *item)
+void ColumnsView::addItem(QQuickItem *item)
 {
-    m_contentItem->m_items.append(item);
-    item->setParentItem(m_contentItem);
-    emit contentChildrenChanged();
+    insertItem(m_contentItem->m_items.length(), item);
 }
 
 void ColumnsView::insertItem(int pos, QQuickItem *item)
 {
-    m_contentItem->m_items.insert(qBound(0, pos, m_contentItem->m_items.length()-1), item);
+    if (m_contentItem->m_items.contains(item)) {
+        return;
+    }
+    m_contentItem->m_items.insert(qBound(0, pos, m_contentItem->m_items.length()), item);
     item->setParentItem(m_contentItem);
     emit contentChildrenChanged();
+}
+
+void ColumnsView::moveItem(int from, int to)
+{
+    if (m_contentItem->m_items.isEmpty()
+        || from < 0 || from >= m_contentItem->m_items.length()
+        || to < 0 || to >= m_contentItem->m_items.length()) {
+        return;
+    }
+
+    m_contentItem->m_items.move(from, to);
+    m_contentItem->layoutItems();
+}
+
+void ColumnsView::removeItem(const QVariant &item)
+{
+    if (item.canConvert<QQuickItem *>()) {
+        removeItem(item.value<QQuickItem *>());
+    } else if (item.canConvert<int>()) {
+        removeItem(item.toInt());
+    }
+}
+
+void ColumnsView::removeItem(QQuickItem *item)
+{
+    if (m_contentItem->m_items.isEmpty() || !m_contentItem->m_items.contains(item)) {
+        return;
+    }
+
+    m_contentItem->m_items.removeAll(item);
+
+    if (QQmlEngine::objectOwnership(item) == QQmlEngine::JavaScriptOwnership) {
+        item->deleteLater();
+    } else {
+        item->setParentItem(nullptr);
+    }
+}
+
+void ColumnsView::removeItem(int pos)
+{
+    if (m_contentItem->m_items.isEmpty()
+        || pos < 0 || pos >= m_contentItem->m_items.length()) {
+        return;
+    }
+
+    removeItem(m_contentItem->m_items[pos]); 
 }
 
 void ColumnsView::clear()

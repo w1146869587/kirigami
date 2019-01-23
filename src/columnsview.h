@@ -48,9 +48,15 @@ public:
 
     QQmlListProperty<QQuickItem> contentChildren();
 
+    //can't do overloads in QML
+    void removeItem(QQuickItem *item);
+    void removeItem(int item);
+
 public Q_SLOTS:
-    void appendItem(QQuickItem *item);
+    void addItem(QQuickItem *item);
     void insertItem(int pos, QQuickItem *item);
+    void moveItem(int from, int to);
+    void removeItem(const QVariant &item);
     void clear();
 
 protected:
