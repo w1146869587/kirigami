@@ -84,11 +84,14 @@ void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
     switch (change) {
     case QQuickItem::ItemChildAddedChange:
         connect(value.item, &QQuickItem::widthChanged, this, &ContentItem::layoutItems);
+        if (!m_items.contains(value.item)) {
+            m_items << value.item;
+        }
         layoutItems();
         break;
     case QQuickItem::ItemChildRemovedChange:
-        
         disconnect(value.item, nullptr, this, nullptr);
+        m_items.removeAll(value.item);
         layoutItems();
         break;
     default:
