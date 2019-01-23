@@ -34,11 +34,17 @@ ContentItem::~ContentItem()
 
 void ContentItem::setBoundedX(qreal x)
 {
+    if (!parentItem()) {
+        return;
+    }
     setX(qBound(qMin(0.0, -width()+parentItem()->width()), x, 0.0));
 }
 
 qreal ContentItem::childWidth(QQuickItem *child)
 {
+    if (!parentItem()) {
+        return 0.0;
+    }
     if (m_resizeMode == ColumnsView::SingleColumn
         || parentItem()->width() < m_columnWidth * 2) {
         return parentItem()->width();
@@ -81,6 +87,7 @@ void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
         layoutItems();
         break;
     case QQuickItem::ItemChildRemovedChange:
+        
         disconnect(value.item, nullptr, this, nullptr);
         layoutItems();
         break;
@@ -97,7 +104,8 @@ void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
 
 
 ColumnsView::ColumnsView(QQuickItem *parent)
-    : QQuickItem(parent)
+    : QQuickItem(parent),
+      m_contentItem(nullptr)
 {
     m_contentItem = new ContentItem(this);
     setAcceptedMouseButtons(Qt::LeftButton);
@@ -236,6 +244,20 @@ void ColumnsView::mouseReleaseEvent(QMouseEvent *event)
     event->accept();
 }
 
+void ColumnsView::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
+{
+    switch (change) {
+    case QQuickItem::ItemChildAddedChange:
+        if (m_contentItem && value.item != m_contentItem && !value.item->inherits("QQuickRepeater")) {
+            addItem(value.item);
+        }
+        break;
+    default:
+        break;
+    }
+    QQuickItem::itemChange(change, value);
+}
+
 void ColumnsView::contentChildren_append(QQmlListProperty<QQuickItem> *prop, QQuickItem *item)
 {
     ColumnsView *view = static_cast<ColumnsView *>(prop->object);
@@ -289,5 +311,65 @@ QQmlListProperty<QQuickItem> ColumnsView::contentChildren()
                                      contentChildren_clear);
 }
 
+void ColumnsView::contentData_append(QQmlListProperty<QObject> *prop, QObject *object)
+{
+    ColumnsView *view = static_cast<ColumnsView *>(prop->object);
+    if (!view) {
+        return;
+    }
+
+    view->m_contentData.append(object);
+    QQuickItem *item = qobject_cast<QQuickItem *>(object);
+    //exclude repeaters from layout
+    if (item && item->inherits("QQuickRepeater")) {
+        item->setParentItem(view);
+    } else if (item) {
+        view->addItem(item);
+    } else {
+        object->setParent(view);
+    }
+}
+
+int ColumnsView::contentData_count(QQmlListProperty<QObject> *prop)
+{
+    ColumnsView *view = static_cast<ColumnsView *>(prop->object);
+    if (!view) {
+        return 0;
+    }
+
+    return view->m_contentData.count();
+}
+
+QObject *ColumnsView::contentData_at(QQmlListProperty<QObject> *prop, int index)
+{
+    ColumnsView *view = static_cast<ColumnsView *>(prop->object);
+    if (!view) {
+        return nullptr;
+    }
+
+    if (index < 0 || index >= view->m_contentData.count()) {
+        return nullptr;
+    }
+    return view->m_contentData.value(index);
+}
+
+void ColumnsView::contentData_clear(QQmlListProperty<QObject> *prop)
+{
+    ColumnsView *view = static_cast<ColumnsView *>(prop->object);
+    if (!view) {
+        return;
+    }
+
+    return view->m_contentData.clear();
+}
+
+QQmlListProperty<QObject> ColumnsView::contentData()
+{
+    return QQmlListProperty<QObject>(this, nullptr,
+                                     contentData_append,
+                                     contentData_count,
+                                     contentData_at,
+                                     contentData_clear);
+}
 
 #include "moc_columnsview.cpp"

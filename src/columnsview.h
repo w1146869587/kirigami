@@ -32,7 +32,8 @@ class ColumnsView : public QQuickItem
     Q_PROPERTY(QQuickItem *contentItem READ contentItem CONSTANT)
 
     Q_PROPERTY(QQmlListProperty<QQuickItem> contentChildren READ contentChildren NOTIFY contentChildrenChanged FINAL)
-    Q_CLASSINFO("DefaultProperty", "contentChildren")
+    Q_PROPERTY(QQmlListProperty<QObject> contentData READ contentData  FINAL)
+    Q_CLASSINFO("DefaultProperty", "contentData")
 
     Q_ENUMS(ChildResizeMode)
 public:
@@ -47,6 +48,7 @@ public:
     QQuickItem *contentItem() const;
 
     QQmlListProperty<QQuickItem> contentChildren();
+    QQmlListProperty<QObject> contentData();
 
     //can't do overloads in QML
     void removeItem(QQuickItem *item);
@@ -60,6 +62,7 @@ public Q_SLOTS:
     void clear();
 
 protected:
+    void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
@@ -73,6 +76,14 @@ private:
     static int contentChildren_count(QQmlListProperty<QQuickItem> *prop);
     static QQuickItem *contentChildren_at(QQmlListProperty<QQuickItem> *prop, int index);
     static void contentChildren_clear(QQmlListProperty<QQuickItem> *prop);
+
+    static void contentData_append(QQmlListProperty<QObject> *prop, QObject *object);
+    static int contentData_count(QQmlListProperty<QObject> *prop);
+    static QObject *contentData_at(QQmlListProperty<QObject> *prop, int index);
+    static void contentData_clear(QQmlListProperty<QObject> *prop);
+
+
+    QList<QObject *> m_contentData;
 
     ContentItem *m_contentItem;
     QPointer<QQuickItem> m_currentItem;
