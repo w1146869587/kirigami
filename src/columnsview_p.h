@@ -24,30 +24,34 @@
 #include <QQuickItem>
 #include <QPointer>
 
+class QPropertyAnimation;
 
 class ContentItem : public QQuickItem {
     Q_OBJECT
 
 public:
-    ContentItem(QQuickItem *parent = nullptr);
+    ContentItem(ColumnsView *parent = nullptr);
     ~ContentItem();
 
     qreal childWidth(QQuickItem *child);
     void layoutItems();
 
     void setBoundedX(qreal x);
+    void animateX(qreal x);
 
 protected:
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
 
 private:
+    ColumnsView *m_view;
+    QPropertyAnimation *m_slideAnim;
     QList<QQuickItem *> m_items;
     QPointer<QQuickItem> m_firstVisibleItem;
-    QPointer<QQuickItem> m_expandedItem;
+    QPointer<QQuickItem> m_stretchableItem;
 
     qreal m_columnWidth = 200;
     int m_reservedColumns = 1;
-    ColumnsView::ChildResizeMode m_resizeMode = ColumnsView::Fixed;
+    ColumnsView::ColumnResizeMode m_columnResizeMode = ColumnsView::FixedColumns;
     friend class ColumnsView;
 };
 

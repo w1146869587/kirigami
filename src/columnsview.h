@@ -29,21 +29,49 @@ class ColumnsView : public QQuickItem
 {
     Q_OBJECT
 
+    Q_PROPERTY(ColumnResizeMode columnResizeMode READ columnResizeMode WRITE setColumnResizeMode NOTIFY columnResizeModeChanged)
+    Q_PROPERTY(QQuickItem *stretchableItem READ stretchableItem WRITE setStretchableItem NOTIFY stretchableItemChanged)
+    Q_PROPERTY(qreal columnWidth READ columnWidth WRITE setColumnWidth NOTIFY columnWidthChanged)
+    Q_PROPERTY(int reservedColumns READ reservedColumns WRITE setReservedColumns NOTIFY reservedColumnsChanged)
+
+    Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentIndexChanged)
+    Q_PROPERTY(QQuickItem *currentItem READ currentItem NOTIFY currentItemChanged)
+
     Q_PROPERTY(QQuickItem *contentItem READ contentItem CONSTANT)
 
     Q_PROPERTY(QQmlListProperty<QQuickItem> contentChildren READ contentChildren NOTIFY contentChildrenChanged FINAL)
     Q_PROPERTY(QQmlListProperty<QObject> contentData READ contentData  FINAL)
     Q_CLASSINFO("DefaultProperty", "contentData")
 
-    Q_ENUMS(ChildResizeMode)
+    Q_ENUMS(ColumnResizeMode)
+
 public:
-    enum ChildResizeMode{
-        Fixed = 0,
-        Dynamic,
+    enum ColumnResizeMode {
+        FixedColumns = 0,
+        DynamicColumns,
         SingleColumn
     };
     ColumnsView(QQuickItem *parent = nullptr);
     ~ColumnsView();
+
+    ColumnResizeMode columnResizeMode() const;
+    void setColumnResizeMode(ColumnResizeMode mode);
+
+    QQuickItem *stretchableItem() const;
+    void setStretchableItem(QQuickItem *item);
+
+    qreal columnWidth() const;
+    void setColumnWidth(qreal width);
+
+    int reservedColumns() const;
+    void setReservedColumns(int columns);
+
+    int currentIndex() const;
+    void setCurrentIndex(int index);
+
+    QQuickItem *currentItem();
+
+
 
     QQuickItem *contentItem() const;
 
@@ -70,6 +98,12 @@ protected:
 
 Q_SIGNALS:
     void contentChildrenChanged();
+    void columnResizeModeChanged();
+    void stretchableItemChanged();
+    void columnWidthChanged();
+    void reservedColumnsChanged();
+    void currentIndexChanged();
+    void currentItemChanged();
 
 private:
     static void contentChildren_append(QQmlListProperty<QQuickItem> *prop, QQuickItem *object);
