@@ -24,6 +24,35 @@
 #include <QPointer>
 
 class ContentItem;
+class ColumnsView;
+
+class ColumnsViewAttached : public QObject
+{
+    Q_OBJECT
+
+    Q_PROPERTY(int level READ level WRITE setLevel NOTIFY levelChanged)
+    Q_PROPERTY(bool fillWidth MEMBER m_fillWidth NOTIFY fillWidthChanged)
+    Q_PROPERTY(ColumnsView *view READ view NOTIFY viewChanged)
+
+public:
+    ColumnsViewAttached(QObject *parent = nullptr);
+    ~ColumnsViewAttached();
+
+    void setLevel(int level);
+    int  level() const;
+
+    ColumnsView *view();
+
+Q_SIGNALS:
+    void levelChanged();
+    void fillWidthChanged();
+    void viewChanged();
+
+private:
+    int m_level = -1;
+    bool m_fillWidth = false;
+    
+};
 
 class ColumnsView : public QQuickItem
 {
@@ -38,6 +67,8 @@ class ColumnsView : public QQuickItem
     Q_PROPERTY(QQuickItem *currentItem READ currentItem NOTIFY currentItemChanged)
 
     Q_PROPERTY(QQuickItem *contentItem READ contentItem CONSTANT)
+
+    Q_PROPERTY(QList<QQuickItem *> visibleItems READ visibleItems NOTIFY visibleItemsChanged)
 
     Q_PROPERTY(QQmlListProperty<QQuickItem> contentChildren READ contentChildren NOTIFY contentChildrenChanged FINAL)
     Q_PROPERTY(QQmlListProperty<QObject> contentData READ contentData  FINAL)
@@ -71,6 +102,7 @@ public:
 
     QQuickItem *currentItem();
 
+    QList<QQuickItem *>visibleItems() const;
 
 
     QQuickItem *contentItem() const;
@@ -81,6 +113,9 @@ public:
     //can't do overloads in QML
     void removeItem(QQuickItem *item);
     void removeItem(int item);
+
+    //QML attached property
+    static ColumnsViewAttached *qmlAttachedProperties(QObject *object);
 
 public Q_SLOTS:
     void addItem(QQuickItem *item);
@@ -104,6 +139,7 @@ Q_SIGNALS:
     void reservedColumnsChanged();
     void currentIndexChanged();
     void currentItemChanged();
+    void visibleItemsChanged();
 
 private:
     static void contentChildren_append(QQmlListProperty<QQuickItem> *prop, QQuickItem *object);
@@ -122,7 +158,9 @@ private:
     ContentItem *m_contentItem;
     QPointer<QQuickItem> m_currentItem;
 
+    static QHash<QObject *, ColumnsViewAttached *> m_attachedObjects;
     qreal m_oldMouseX;
     int m_currentIndex = -1;
 };
 
+QML_DECLARE_TYPEINFO(ColumnsView, QML_HAS_ATTACHED_PROPERTIES)

@@ -35,18 +35,21 @@ public:
 
     qreal childWidth(QQuickItem *child);
     void layoutItems();
+    void updateVisibleItems();
 
     void setBoundedX(qreal x);
     void animateX(qreal x);
 
 protected:
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
+    void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
 
 private:
     ColumnsView *m_view;
     QPropertyAnimation *m_slideAnim;
     QList<QQuickItem *> m_items;
-    QPointer<QQuickItem> m_firstVisibleItem;
+    QList<QQuickItem *> m_visibleItems;
+    QPointer<QQuickItem> m_viewAnchorItem;
     QPointer<QQuickItem> m_stretchableItem;
 
     qreal m_columnWidth = 200;

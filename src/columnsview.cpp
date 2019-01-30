@@ -26,6 +26,39 @@
 #include <QDebug>
 #include <QPropertyAnimation>
 
+
+QHash<QObject *, ColumnsViewAttached *> ColumnsView::m_attachedObjects = QHash<QObject *, ColumnsViewAttached *>();
+
+ColumnsViewAttached::ColumnsViewAttached(QObject *parent)
+    : QObject(parent)
+{
+    
+}
+
+ColumnsViewAttached::~ColumnsViewAttached()
+{}
+
+void ColumnsViewAttached::setLevel(int level)
+{
+    if (level == m_level) {
+        return;
+    }
+
+    m_level = level;
+    emit levelChanged();
+}
+
+int ColumnsViewAttached::level() const
+{
+    return m_level;
+}
+
+ColumnsView *ColumnsViewAttached::view()
+{
+    return nullptr;
+}
+
+
 ContentItem::ContentItem(ColumnsView *parent)
     : QQuickItem(parent),
       m_view(parent)
@@ -38,12 +71,12 @@ ContentItem::ContentItem(ColumnsView *parent)
     m_slideAnim->setEasingCurve(QEasingCurve(QEasingCurve::InOutQuad));
     connect(m_slideAnim, &QPropertyAnimation::finished, this, [this] () {
         if (!m_view->currentItem()) {
-            m_view->setCurrentIndex(m_items.indexOf(m_firstVisibleItem));
+            m_view->setCurrentIndex(m_items.indexOf(m_viewAnchorItem));
         }
         // If the current item is not on view, change it
         QRectF mapped = m_view->currentItem()->mapRectToItem(parentItem(), QRectF(m_view->currentItem()->position(), m_view->currentItem()->size()));
         if (!QRectF(QPointF(0, 0), size()).intersects(mapped)) {
-            m_view->setCurrentIndex(m_items.indexOf(m_firstVisibleItem));
+            m_view->setCurrentIndex(m_items.indexOf(m_viewAnchorItem));
         }
     });
 }
@@ -100,23 +133,45 @@ qreal ContentItem::childWidth(QQuickItem *child)
 void ContentItem::layoutItems()
 {
     qreal partialWidth = 0;
+    int i = 0;
     for (QQuickItem *child : m_items) {
-        child->setSize(QSizeF(childWidth(child), height()));
-        child->setPosition(QPointF(partialWidth, 0.0));
-        partialWidth += child->width();
+        if (child->isVisible()) {
+            child->setSize(QSizeF(childWidth(child), height()));
+            child->setPosition(QPointF(partialWidth, 0.0));
+            partialWidth += child->width();
+        }
+        ColumnsViewAttached *attached = ColumnsView::qmlAttachedProperties(child);
+        attached->setLevel(i++);
     }
     setWidth(partialWidth);
 
-    setBoundedX((m_firstVisibleItem ? -m_firstVisibleItem->x() : 0.0));
+    setBoundedX((m_viewAnchorItem ? -m_viewAnchorItem->x() : 0.0));
     setY(0);
+    updateVisibleItems();
+}
+
+void ContentItem::updateVisibleItems()
+{
+    QList <QQuickItem *> newItems;
+
+    for (auto *item : m_items) {
+        if (item->isVisible() && item->x() + x() < width() && item->x() + item->width() + x() > 0) {
+            newItems << item;
+        }
+    }
+
+    if (newItems != m_visibleItems) {
+        m_visibleItems = newItems;
+        emit m_view->visibleItemsChanged();
+    }
 }
 
 void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
 {
     switch (change) {
     case QQuickItem::ItemChildAddedChange:
-        connect(value.item, &QQuickItem::widthChanged, this, &ContentItem::layoutItems);
         if (!m_items.contains(value.item)) {
+            connect(value.item, &QQuickItem::widthChanged, this, &ContentItem::layoutItems);
             m_items << value.item;
         }
         layoutItems();
@@ -131,10 +186,19 @@ void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
         }
         break;
     }
+    case QQuickItem::ItemVisibleHasChanged:
+        updateVisibleItems();
+        break;
     default:
         break;
     }
     QQuickItem::itemChange(change, value);
+}
+
+void ContentItem::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
+{
+    updateVisibleItems();
+    QQuickItem::geometryChanged(newGeometry, oldGeometry);
 }
 
 
@@ -243,7 +307,7 @@ void ColumnsView::setCurrentIndex(int index)
         // If the current item is not on view, scroll
         QRectF mapped = m_currentItem->mapRectToItem(parentItem(), QRectF(m_currentItem->position(), m_currentItem->size()));
         if (!QRectF(QPointF(0, 0), parentItem()->size()).intersects(mapped)) {
-            m_contentItem->m_firstVisibleItem = m_contentItem;
+            m_contentItem->m_viewAnchorItem = m_contentItem;
             m_contentItem->animateX(-m_contentItem->x());
         }
     }
@@ -256,6 +320,12 @@ QQuickItem *ColumnsView::currentItem()
 {
     return m_currentItem;
 }
+
+QList<QQuickItem *>ColumnsView::visibleItems() const
+{
+    return m_contentItem->m_visibleItems;
+}
+
 
 
 
@@ -275,7 +345,7 @@ void ColumnsView::insertItem(int pos, QQuickItem *item)
         return;
     }
     m_contentItem->m_items.insert(qBound(0, pos, m_contentItem->m_items.length()), item);
-    m_contentItem->m_firstVisibleItem = item;
+    m_contentItem->m_viewAnchorItem = item;
     setCurrentIndex(pos);
     item->setParentItem(m_contentItem);
     item->forceActiveFocus();
@@ -341,12 +411,25 @@ void ColumnsView::clear()
     emit contentChildrenChanged();
 }
 
+ColumnsViewAttached *ColumnsView::qmlAttachedProperties(QObject *object)
+{
+    ColumnsViewAttached *attached = ColumnsView::m_attachedObjects.value(object);
+    if (!attached) {
+        attached = new ColumnsViewAttached(object);
+        m_attachedObjects[object] = attached;
+        connect(object, &QObject::destroyed, object, [object] () {
+            ColumnsView::m_attachedObjects.remove(object);
+        });
+    }
+    return attached;
+}
 
 void ColumnsView::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
 {
     m_contentItem->layoutItems();
     m_contentItem->setHeight(newGeometry.height());
 
+    m_contentItem->updateVisibleItems();
     QQuickItem::geometryChanged(newGeometry, oldGeometry);
 }
 
@@ -365,7 +448,6 @@ void ColumnsView::mouseMoveEvent(QMouseEvent *event)
 
 void ColumnsView::mouseReleaseEvent(QMouseEvent *event)
 {
-    //TODO: animate
     QQuickItem *firstItem = m_contentItem->childAt(-m_contentItem->x(), 0);
     if (!firstItem) {
         return;
@@ -374,17 +456,17 @@ void ColumnsView::mouseReleaseEvent(QMouseEvent *event)
 
     //need to make the last item visible?
     if (nextItem && m_contentItem->width() - (-m_contentItem->x() + width()) < -m_contentItem->x() - firstItem->x()) {
-        m_contentItem->m_firstVisibleItem = nextItem;
+        m_contentItem->m_viewAnchorItem = nextItem;
         m_contentItem->animateX(-nextItem->x());
 
     //The first one found?
     } else if (-m_contentItem->x() <= firstItem->x() + firstItem->width()/2 || !nextItem) {
-        m_contentItem->m_firstVisibleItem = firstItem;
+        m_contentItem->m_viewAnchorItem = firstItem;
         m_contentItem->animateX(-firstItem->x());
 
     //the second?
     } else {
-        m_contentItem->m_firstVisibleItem = nextItem;
+        m_contentItem->m_viewAnchorItem = nextItem;
         m_contentItem->animateX(-nextItem->x());
     }
 
