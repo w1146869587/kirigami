@@ -135,6 +135,7 @@ protected:
     void updatePolish() override;
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
+    bool childMouseEventFilter(QQuickItem *item, QEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
@@ -167,6 +168,7 @@ private:
 
     static QHash<QObject *, ColumnsViewAttached *> m_attachedObjects;
     qreal m_oldMouseX;
+    qreal m_startMouseX;
     int m_currentIndex = -1;
 };
 

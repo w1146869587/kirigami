@@ -39,6 +39,7 @@ public:
 
     void setBoundedX(qreal x);
     void animateX(qreal x);
+    void snapToItem();
 
 protected:
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;

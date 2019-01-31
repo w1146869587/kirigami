@@ -20,6 +20,8 @@
 #include "columnsview.h"
 #include "columnsview_p.h"
 
+#include <QGuiApplication>
+#include <QStyleHints>
 #include <QQmlComponent>
 #include <QQmlContext>
 #include <QQmlEngine>
@@ -178,6 +180,31 @@ void ContentItem::animateX(qreal newX)
     m_slideAnim->start();
 }
 
+void ContentItem::snapToItem()
+{
+    QQuickItem *firstItem = childAt(-x(), 0);
+    if (!firstItem) {
+        return;
+    }
+    QQuickItem *nextItem = childAt(firstItem->x() + firstItem->width() + 1, 0);
+
+    //need to make the last item visible?
+    if (nextItem && width() - (-x() + m_view->width()) < -x() - firstItem->x()) {
+        m_viewAnchorItem = nextItem;
+        animateX(-nextItem->x());
+
+    //The first one found?
+    } else if (-x() <= firstItem->x() + firstItem->width()/2 || !nextItem) {
+        m_viewAnchorItem = firstItem;
+        animateX(-firstItem->x());
+
+    //the second?
+    } else {
+        m_viewAnchorItem = nextItem;
+        animateX(-nextItem->x());
+    }
+}
+
 qreal ContentItem::childWidth(QQuickItem *child)
 {
     if (!parentItem()) {
@@ -303,6 +330,7 @@ ColumnsView::ColumnsView(QQuickItem *parent)
     //NOTE: this is to *not* trigger itemChange
     m_contentItem = new ContentItem(this);
     setAcceptedMouseButtons(Qt::LeftButton);
+    setFiltersChildMouseEvents(true);
 }
 
 ColumnsView::~ColumnsView()
@@ -486,9 +514,45 @@ void ColumnsView::geometryChanged(const QRectF &newGeometry, const QRectF &oldGe
     QQuickItem::geometryChanged(newGeometry, oldGeometry);
 }
 
+bool ColumnsView::childMouseEventFilter(QQuickItem *item, QEvent *event)
+{
+    if (item == m_contentItem) {
+        return QQuickItem::childMouseEventFilter(item, event);
+    }
+
+    switch (event->type()) {
+    case QEvent::MouseButtonPress: {
+        QMouseEvent *me = static_cast<QMouseEvent *>(event);
+        m_oldMouseX = m_startMouseX = mapFromItem(item, me->localPos()).x();
+        event->accept();
+        break;
+    }
+    case QEvent::MouseMove: {
+        QMouseEvent *me = static_cast<QMouseEvent *>(event);
+        const QPointF pos = mapFromItem(item, me->localPos());
+        m_contentItem->setBoundedX(m_contentItem->x() + pos.x() - m_oldMouseX);
+        m_oldMouseX = pos.x();
+        event->accept();
+        break;
+    }
+    case QEvent::MouseButtonRelease: {
+        QMouseEvent *me = static_cast<QMouseEvent *>(event);
+        m_contentItem->snapToItem();
+        event->accept();
+        return qAbs(mapFromItem(item, me->localPos()).x() - m_startMouseX) > qApp->styleHints()->startDragDistance();
+        break;
+    }
+    default:
+        break;
+    }
+
+    return QQuickItem::childMouseEventFilter(item, event);
+}
+
 void ColumnsView::mousePressEvent(QMouseEvent *event)
 {
     m_oldMouseX = event->localPos().x();
+    m_startMouseX = event->localPos().x();
     event->accept();
 }
 
@@ -501,28 +565,7 @@ void ColumnsView::mouseMoveEvent(QMouseEvent *event)
 
 void ColumnsView::mouseReleaseEvent(QMouseEvent *event)
 {
-    QQuickItem *firstItem = m_contentItem->childAt(-m_contentItem->x(), 0);
-    if (!firstItem) {
-        return;
-    }
-    QQuickItem *nextItem = m_contentItem->childAt(firstItem->x() + firstItem->width() + 1, 0);
-
-    //need to make the last item visible?
-    if (nextItem && m_contentItem->width() - (-m_contentItem->x() + width()) < -m_contentItem->x() - firstItem->x()) {
-        m_contentItem->m_viewAnchorItem = nextItem;
-        m_contentItem->animateX(-nextItem->x());
-
-    //The first one found?
-    } else if (-m_contentItem->x() <= firstItem->x() + firstItem->width()/2 || !nextItem) {
-        m_contentItem->m_viewAnchorItem = firstItem;
-        m_contentItem->animateX(-firstItem->x());
-
-    //the second?
-    } else {
-        m_contentItem->m_viewAnchorItem = nextItem;
-        m_contentItem->animateX(-nextItem->x());
-    }
-
+    m_contentItem->snapToItem();
     event->accept();
 }
 
