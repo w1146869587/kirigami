@@ -31,7 +31,7 @@ class ColumnsViewAttached : public QObject
     Q_OBJECT
 
     Q_PROPERTY(int level READ level WRITE setLevel NOTIFY levelChanged)
-    Q_PROPERTY(bool fillWidth MEMBER m_fillWidth NOTIFY fillWidthChanged)
+    Q_PROPERTY(bool fillWidth READ fillWidth WRITE setFillWidth NOTIFY fillWidthChanged)
     Q_PROPERTY(ColumnsView *view READ view NOTIFY viewChanged)
 
 public:
@@ -41,7 +41,11 @@ public:
     void setLevel(int level);
     int  level() const;
 
+    void setFillWidth(bool fill);
+    bool fillWidth() const;
+
     ColumnsView *view();
+    void setView(ColumnsView *view);
 
 Q_SIGNALS:
     void levelChanged();
@@ -51,7 +55,7 @@ Q_SIGNALS:
 private:
     int m_level = -1;
     bool m_fillWidth = false;
-    
+    QPointer<ColumnsView> m_view;
 };
 
 class ColumnsView : public QQuickItem

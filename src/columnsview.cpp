@@ -53,10 +53,36 @@ int ColumnsViewAttached::level() const
     return m_level;
 }
 
+void ColumnsViewAttached::setFillWidth(bool fill)
+{
+    if (fill == m_fillWidth) {
+        return;
+    }
+
+    m_fillWidth = fill;
+    emit fillWidthChanged();
+}
+
+bool ColumnsViewAttached::fillWidth() const
+{
+    return m_fillWidth;
+}
+
 ColumnsView *ColumnsViewAttached::view()
 {
-    return nullptr;
+    return m_view;
 }
+
+void ColumnsViewAttached::setView(ColumnsView *view)
+{
+    if (view == m_view) {
+        return;
+    }
+
+    m_view = view;
+    emit viewChanged();
+}
+
 
 
 ContentItem::ContentItem(ColumnsView *parent)
@@ -140,7 +166,7 @@ void ContentItem::layoutItems()
             child->setPosition(QPointF(partialWidth, 0.0));
             partialWidth += child->width();
         }
-        ColumnsViewAttached *attached = ColumnsView::qmlAttachedProperties(child);
+        ColumnsViewAttached *attached = qobject_cast<ColumnsViewAttached *>(qmlAttachedPropertiesObject<ColumnsView>(child, true));
         attached->setLevel(i++);
     }
     setWidth(partialWidth);
@@ -169,14 +195,20 @@ void ContentItem::updateVisibleItems()
 void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
 {
     switch (change) {
-    case QQuickItem::ItemChildAddedChange:
+    case QQuickItem::ItemChildAddedChange: {
+        ColumnsViewAttached *attached = qobject_cast<ColumnsViewAttached *>(qmlAttachedPropertiesObject<ColumnsView>(value.item, true));
+        attached->setView(m_view);
         if (!m_items.contains(value.item)) {
             connect(value.item, &QQuickItem::widthChanged, this, &ContentItem::layoutItems);
             m_items << value.item;
         }
         layoutItems();
         break;
+    }
     case QQuickItem::ItemChildRemovedChange: {
+        ColumnsViewAttached *attached = qobject_cast<ColumnsViewAttached *>(qmlAttachedPropertiesObject<ColumnsView>(value.item, true));
+        attached->setView(nullptr);
+        attached->setLevel(-1);
         disconnect(value.item, nullptr, this, nullptr);
         const int index = m_items.indexOf(value.item);
         m_items.removeAll(value.item);
@@ -413,15 +445,7 @@ void ColumnsView::clear()
 
 ColumnsViewAttached *ColumnsView::qmlAttachedProperties(QObject *object)
 {
-    ColumnsViewAttached *attached = ColumnsView::m_attachedObjects.value(object);
-    if (!attached) {
-        attached = new ColumnsViewAttached(object);
-        m_attachedObjects[object] = attached;
-        connect(object, &QObject::destroyed, object, [object] () {
-            ColumnsView::m_attachedObjects.remove(object);
-        });
-    }
-    return attached;
+    return new ColumnsViewAttached(object);
 }
 
 void ColumnsView::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
