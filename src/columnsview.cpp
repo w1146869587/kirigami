@@ -68,6 +68,21 @@ bool ColumnsViewAttached::fillWidth() const
     return m_fillWidth;
 }
 
+qreal ColumnsViewAttached::reservedSpace() const
+{
+    return m_reservedSpace;
+}
+
+void ColumnsViewAttached::setReservedSpace(qreal space)
+{
+    if (qFuzzyCompare(space, m_reservedSpace)) {
+        return;
+    }
+
+    m_reservedSpace = space;
+    emit reservedSpaceChanged();
+}
+
 ColumnsView *ColumnsViewAttached::view()
 {
     return m_view;
@@ -141,7 +156,10 @@ qreal ContentItem::childWidth(QQuickItem *child)
         return parentItem()->width();
 
     } else if (m_columnResizeMode == ColumnsView::FixedColumns) {
-        if (child == m_stretchableItem) {
+        ColumnsViewAttached *attached = qobject_cast<ColumnsViewAttached *>(qmlAttachedPropertiesObject<ColumnsView>(child, true));
+        if (attached->fillWidth()) {
+            return qBound(m_columnWidth, (parentItem()->width() - attached->reservedSpace()), parentItem()->width());
+        } else if (0&&child == m_stretchableItem) {
             return qBound(m_columnWidth, (parentItem()->width() - m_columnWidth * m_reservedColumns), parentItem()->width());
         } else {
             return qMin(parentItem()->width(), m_columnWidth);

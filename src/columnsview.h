@@ -32,6 +32,7 @@ class ColumnsViewAttached : public QObject
 
     Q_PROPERTY(int level READ level WRITE setLevel NOTIFY levelChanged)
     Q_PROPERTY(bool fillWidth READ fillWidth WRITE setFillWidth NOTIFY fillWidthChanged)
+    Q_PROPERTY(qreal reservedSpace READ reservedSpace WRITE setReservedSpace NOTIFY reservedSpaceChanged)
     Q_PROPERTY(ColumnsView *view READ view NOTIFY viewChanged)
 
 public:
@@ -44,17 +45,22 @@ public:
     void setFillWidth(bool fill);
     bool fillWidth() const;
 
+    qreal reservedSpace() const;
+    void setReservedSpace(qreal space);
+
     ColumnsView *view();
     void setView(ColumnsView *view);
 
 Q_SIGNALS:
     void levelChanged();
     void fillWidthChanged();
+    void reservedSpaceChanged();
     void viewChanged();
 
 private:
     int m_level = -1;
     bool m_fillWidth = false;
+    qreal m_reservedSpace = 0;
     QPointer<ColumnsView> m_view;
 };
 
