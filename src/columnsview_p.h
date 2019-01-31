@@ -50,10 +50,8 @@ private:
     QList<QQuickItem *> m_items;
     QList<QQuickItem *> m_visibleItems;
     QPointer<QQuickItem> m_viewAnchorItem;
-    QPointer<QQuickItem> m_stretchableItem;
 
     qreal m_columnWidth = 200;
-    int m_reservedColumns = 1;
     ColumnsView::ColumnResizeMode m_columnResizeMode = ColumnsView::FixedColumns;
     friend class ColumnsView;
 };

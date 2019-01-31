@@ -62,6 +62,8 @@ private:
     bool m_fillWidth = false;
     qreal m_reservedSpace = 0;
     QPointer<ColumnsView> m_view;
+    bool m_customFillWidth = false;
+    bool m_customReservedSpace = false;
 };
 
 class ColumnsView : public QQuickItem
@@ -69,9 +71,8 @@ class ColumnsView : public QQuickItem
     Q_OBJECT
 
     Q_PROPERTY(ColumnResizeMode columnResizeMode READ columnResizeMode WRITE setColumnResizeMode NOTIFY columnResizeModeChanged)
-    Q_PROPERTY(QQuickItem *stretchableItem READ stretchableItem WRITE setStretchableItem NOTIFY stretchableItemChanged)
     Q_PROPERTY(qreal columnWidth READ columnWidth WRITE setColumnWidth NOTIFY columnWidthChanged)
-    Q_PROPERTY(int reservedColumns READ reservedColumns WRITE setReservedColumns NOTIFY reservedColumnsChanged)
+    Q_PROPERTY(int depth READ depth NOTIFY depthChanged)
 
     Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentIndexChanged)
     Q_PROPERTY(QQuickItem *currentItem READ currentItem NOTIFY currentItemChanged)
@@ -98,17 +99,13 @@ public:
     ColumnResizeMode columnResizeMode() const;
     void setColumnResizeMode(ColumnResizeMode mode);
 
-    QQuickItem *stretchableItem() const;
-    void setStretchableItem(QQuickItem *item);
-
     qreal columnWidth() const;
     void setColumnWidth(qreal width);
 
-    int reservedColumns() const;
-    void setReservedColumns(int columns);
-
     int currentIndex() const;
     void setCurrentIndex(int index);
+
+    int depth() const;
 
     QQuickItem *currentItem();
 
@@ -135,6 +132,7 @@ public Q_SLOTS:
     void clear();
 
 protected:
+    void updatePolish() override;
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
     void mousePressEvent(QMouseEvent *event) override;
@@ -144,12 +142,11 @@ protected:
 Q_SIGNALS:
     void contentChildrenChanged();
     void columnResizeModeChanged();
-    void stretchableItemChanged();
     void columnWidthChanged();
-    void reservedColumnsChanged();
     void currentIndexChanged();
     void currentItemChanged();
     void visibleItemsChanged();
+    void depthChanged();
 
 private:
     static void contentChildren_append(QQmlListProperty<QQuickItem> *prop, QQuickItem *object);

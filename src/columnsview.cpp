@@ -31,15 +31,17 @@ QHash<QObject *, ColumnsViewAttached *> ColumnsView::m_attachedObjects = QHash<Q
 
 ColumnsViewAttached::ColumnsViewAttached(QObject *parent)
     : QObject(parent)
-{
-    
-}
+{}
 
 ColumnsViewAttached::~ColumnsViewAttached()
 {}
 
 void ColumnsViewAttached::setLevel(int level)
 {
+    if (!m_customFillWidth && m_view) {
+        m_fillWidth = level == m_view->depth() - 1;
+    }
+
     if (level == m_level) {
         return;
     }
@@ -55,6 +57,11 @@ int ColumnsViewAttached::level() const
 
 void ColumnsViewAttached::setFillWidth(bool fill)
 {
+    if (m_view) {
+        disconnect(m_view.data(), &ColumnsView::depthChanged, this, nullptr);
+    }
+    m_customFillWidth = true;
+
     if (fill == m_fillWidth) {
         return;
     }
@@ -75,6 +82,11 @@ qreal ColumnsViewAttached::reservedSpace() const
 
 void ColumnsViewAttached::setReservedSpace(qreal space)
 {
+    if (m_view) {
+        disconnect(m_view.data(), &ColumnsView::columnWidthChanged, this, nullptr);
+    }
+    m_customReservedSpace = true;
+
     if (qFuzzyCompare(space, m_reservedSpace)) {
         return;
     }
@@ -94,7 +106,26 @@ void ColumnsViewAttached::setView(ColumnsView *view)
         return;
     }
 
+    if (m_view) {
+        disconnect(m_view.data(), nullptr, this, nullptr);
+    }
     m_view = view;
+
+    if (!m_customFillWidth && m_view) {
+        m_fillWidth = m_level == m_view->depth() - 1;
+        connect(m_view.data(), &ColumnsView::depthChanged, this, [this]() {
+            m_fillWidth = m_level == m_view->depth() - 1;
+            emit fillWidthChanged();
+        });
+    }
+    if (!m_customReservedSpace && m_view) {
+        m_reservedSpace = m_view->columnWidth();
+        connect(m_view.data(), &ColumnsView::columnWidthChanged, this, [this]() {
+            m_reservedSpace = m_view->columnWidth();
+            emit reservedSpaceChanged();
+        });
+    }
+
     emit viewChanged();
 }
 
@@ -141,6 +172,7 @@ void ContentItem::animateX(qreal newX)
     }
 
     const qreal to = qBound(qMin(0.0, -width()+parentItem()->width()), newX, 0.0);
+
     m_slideAnim->setStartValue(x());
     m_slideAnim->setEndValue(to);
     m_slideAnim->start();
@@ -159,8 +191,6 @@ qreal ContentItem::childWidth(QQuickItem *child)
         ColumnsViewAttached *attached = qobject_cast<ColumnsViewAttached *>(qmlAttachedPropertiesObject<ColumnsView>(child, true));
         if (attached->fillWidth()) {
             return qBound(m_columnWidth, (parentItem()->width() - attached->reservedSpace()), parentItem()->width());
-        } else if (0&&child == m_stretchableItem) {
-            return qBound(m_columnWidth, (parentItem()->width() - m_columnWidth * m_reservedColumns), parentItem()->width());
         } else {
             return qMin(parentItem()->width(), m_columnWidth);
         }
@@ -216,24 +246,33 @@ void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
     case QQuickItem::ItemChildAddedChange: {
         ColumnsViewAttached *attached = qobject_cast<ColumnsViewAttached *>(qmlAttachedPropertiesObject<ColumnsView>(value.item, true));
         attached->setView(m_view);
+
+        connect(attached, &ColumnsViewAttached::fillWidthChanged, this, &ContentItem::layoutItems);
+        connect(attached, &ColumnsViewAttached::reservedSpaceChanged, this, &ContentItem::layoutItems);
+
         if (!m_items.contains(value.item)) {
             connect(value.item, &QQuickItem::widthChanged, this, &ContentItem::layoutItems);
             m_items << value.item;
         }
-        layoutItems();
+        m_view->polish();
+        emit m_view->depthChanged();
         break;
     }
     case QQuickItem::ItemChildRemovedChange: {
         ColumnsViewAttached *attached = qobject_cast<ColumnsViewAttached *>(qmlAttachedPropertiesObject<ColumnsView>(value.item, true));
         attached->setView(nullptr);
         attached->setLevel(-1);
+
+        disconnect(attached, nullptr, this, nullptr);
         disconnect(value.item, nullptr, this, nullptr);
+
         const int index = m_items.indexOf(value.item);
         m_items.removeAll(value.item);
-        layoutItems();
+        m_view->polish();
         if (index < m_view->currentIndex()) {
             m_view->setCurrentIndex(qBound(0, index - 1, m_items.count() - 1));
         }
+        emit m_view->depthChanged();
         break;
     }
     case QQuickItem::ItemVisibleHasChanged:
@@ -282,24 +321,8 @@ void ColumnsView::setColumnResizeMode(ColumnResizeMode mode)
     }
 
     m_contentItem->m_columnResizeMode = mode;
-    m_contentItem->layoutItems();
+    polish();
     emit columnResizeModeChanged();
-}
-
-QQuickItem *ColumnsView::stretchableItem() const
-{
-    return m_contentItem->m_stretchableItem;
-}
-
-void ColumnsView::setStretchableItem(QQuickItem *item)
-{
-    if (m_contentItem->m_stretchableItem == item) {
-        return;
-    }
-
-    m_contentItem->m_stretchableItem = item;
-    m_contentItem->layoutItems();
-    emit stretchableItemChanged();
 }
 
 qreal ColumnsView::columnWidth() const
@@ -314,24 +337,8 @@ void ColumnsView::setColumnWidth(qreal width)
     }
 
     m_contentItem->m_columnWidth = width;
-    m_contentItem->layoutItems();
+    polish();
     emit columnWidthChanged();
-}
-
-int ColumnsView::reservedColumns() const
-{
-    return m_contentItem->m_reservedColumns;
-}
-
-void ColumnsView::setReservedColumns(int columns)
-{
-    if (m_contentItem->m_reservedColumns == columns) {
-        return;
-    }
-
-    m_contentItem->m_reservedColumns = columns;
-    m_contentItem->layoutItems();
-    emit reservedColumnsChanged();
 }
 
 int ColumnsView::currentIndex() const
@@ -357,8 +364,8 @@ void ColumnsView::setCurrentIndex(int index)
         // If the current item is not on view, scroll
         QRectF mapped = m_currentItem->mapRectToItem(parentItem(), QRectF(m_currentItem->position(), m_currentItem->size()));
         if (!QRectF(QPointF(0, 0), parentItem()->size()).intersects(mapped)) {
-            m_contentItem->m_viewAnchorItem = m_contentItem;
-            m_contentItem->animateX(-m_contentItem->x());
+            m_contentItem->m_viewAnchorItem = m_currentItem;
+            m_contentItem->animateX(-m_currentItem->x());
         }
     }
 
@@ -376,6 +383,10 @@ QList<QQuickItem *>ColumnsView::visibleItems() const
     return m_contentItem->m_visibleItems;
 }
 
+int ColumnsView::depth() const
+{
+    return m_contentItem->m_items.count();
+}
 
 
 
@@ -411,7 +422,7 @@ void ColumnsView::moveItem(int from, int to)
     }
 
     m_contentItem->m_items.move(from, to);
-    m_contentItem->layoutItems();
+    polish();
 }
 
 void ColumnsView::removeItem(const QVariant &item)
@@ -468,8 +479,8 @@ ColumnsViewAttached *ColumnsView::qmlAttachedProperties(QObject *object)
 
 void ColumnsView::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
 {
-    m_contentItem->layoutItems();
     m_contentItem->setHeight(newGeometry.height());
+    polish();
 
     m_contentItem->updateVisibleItems();
     QQuickItem::geometryChanged(newGeometry, oldGeometry);
@@ -513,6 +524,11 @@ void ColumnsView::mouseReleaseEvent(QMouseEvent *event)
     }
 
     event->accept();
+}
+
+void ColumnsView::updatePolish()
+{
+    m_contentItem->layoutItems();
 }
 
 void ColumnsView::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
