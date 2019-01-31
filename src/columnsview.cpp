@@ -522,12 +522,18 @@ bool ColumnsView::childMouseEventFilter(QQuickItem *item, QEvent *event)
 
     switch (event->type()) {
     case QEvent::MouseButtonPress: {
+        if (item->property("preventStealing").toBool()) {
+            return false;
+        }
         QMouseEvent *me = static_cast<QMouseEvent *>(event);
         m_oldMouseX = m_startMouseX = mapFromItem(item, me->localPos()).x();
         event->accept();
         break;
     }
     case QEvent::MouseMove: {
+        if (item->property("preventStealing").toBool()) {
+            return false;
+        }
         QMouseEvent *me = static_cast<QMouseEvent *>(event);
         const QPointF pos = mapFromItem(item, me->localPos());
         m_contentItem->setBoundedX(m_contentItem->x() + pos.x() - m_oldMouseX);
@@ -536,6 +542,9 @@ bool ColumnsView::childMouseEventFilter(QQuickItem *item, QEvent *event)
         break;
     }
     case QEvent::MouseButtonRelease: {
+        if (item->property("preventStealing").toBool()) {
+            return false;
+        }
         QMouseEvent *me = static_cast<QMouseEvent *>(event);
         m_contentItem->snapToItem();
         event->accept();
