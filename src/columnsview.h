@@ -81,6 +81,10 @@ class ColumnsView : public QQuickItem
 
     Q_PROPERTY(QList<QQuickItem *> visibleItems READ visibleItems NOTIFY visibleItemsChanged)
 
+    // Properties to make it similar to Flickable
+    Q_PROPERTY(bool dragging READ dragging NOTIFY draggingChanged)
+
+    // Default properties
     Q_PROPERTY(QQmlListProperty<QQuickItem> contentChildren READ contentChildren NOTIFY contentChildrenChanged FINAL)
     Q_PROPERTY(QQmlListProperty<QObject> contentData READ contentData  FINAL)
     Q_CLASSINFO("DefaultProperty", "contentData")
@@ -96,6 +100,7 @@ public:
     ColumnsView(QQuickItem *parent = nullptr);
     ~ColumnsView();
 
+    // QML property accessors
     ColumnResizeMode columnResizeMode() const;
     void setColumnResizeMode(ColumnResizeMode mode);
 
@@ -117,11 +122,14 @@ public:
     QQmlListProperty<QQuickItem> contentChildren();
     QQmlListProperty<QObject> contentData();
 
+    bool dragging() const;
+
+    // Api not intended for QML use
     //can't do overloads in QML
     void removeItem(QQuickItem *item);
     void removeItem(int item);
 
-    //QML attached property
+    // QML attached property
     static ColumnsViewAttached *qmlAttachedProperties(QObject *object);
 
 public Q_SLOTS:
@@ -139,6 +147,7 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseUngrabEvent() override;
 
 Q_SIGNALS:
     void contentChildrenChanged();
@@ -148,6 +157,7 @@ Q_SIGNALS:
     void currentItemChanged();
     void visibleItemsChanged();
     void depthChanged();
+    void draggingChanged();
 
 private:
     static void contentChildren_append(QQmlListProperty<QQuickItem> *prop, QQuickItem *object);
@@ -167,9 +177,11 @@ private:
     QPointer<QQuickItem> m_currentItem;
 
     static QHash<QObject *, ColumnsViewAttached *> m_attachedObjects;
-    qreal m_oldMouseX;
-    qreal m_startMouseX;
+    qreal m_oldMouseX = -1.0;
+    qreal m_startMouseX = -1.0;
     int m_currentIndex = -1;
+
+    bool m_dragging = false;
 };
 
 QML_DECLARE_TYPEINFO(ColumnsView, QML_HAS_ATTACHED_PROPERTIES)

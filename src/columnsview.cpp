@@ -416,11 +416,14 @@ int ColumnsView::depth() const
     return m_contentItem->m_items.count();
 }
 
-
-
 QQuickItem *ColumnsView::contentItem() const
 {
     return m_contentItem;
+}
+
+bool ColumnsView::dragging() const
+{
+    return m_dragging;
 }
 
 void ColumnsView::addItem(QQuickItem *item)
@@ -541,23 +544,32 @@ bool ColumnsView::childMouseEventFilter(QQuickItem *item, QEvent *event)
         }
         QMouseEvent *me = static_cast<QMouseEvent *>(event);
         const QPointF pos = mapFromItem(item, me->localPos());
-        
+
+        const bool wasDragging = m_dragging;
         // If a drag happened, start to steal all events, use startDragDistance * 2 to give time to widgets to take the mouse grab by themselves
-        const bool isDragging = keepMouseGrab() || qAbs(mapFromItem(item, me->localPos()).x() - m_startMouseX) > qApp->styleHints()->startDragDistance()*2;
-        
-        if (isDragging) {
+        m_dragging = keepMouseGrab() || qAbs(mapFromItem(item, me->localPos()).x() - m_startMouseX) > qApp->styleHints()->startDragDistance() * 2;
+
+        if (m_dragging != wasDragging) {
+            emit draggingChanged();
+        }
+
+        if (m_dragging) {
             m_contentItem->setBoundedX(m_contentItem->x() + pos.x() - m_oldMouseX);
         }
 
         m_oldMouseX = pos.x();
 
-        setKeepMouseGrab(isDragging);
-        me->setAccepted(isDragging);
-        return isDragging;
+        setKeepMouseGrab(m_dragging);
+        me->setAccepted(m_dragging);
+        return m_dragging;
         break;
     }
     case QEvent::MouseButtonRelease: {
         m_contentItem->snapToItem();
+        if (m_dragging) {
+            m_dragging = false;
+            emit draggingChanged();
+        }
 
         if (item->property("preventStealing").toBool()) {
             return false;
@@ -591,12 +603,16 @@ void ColumnsView::mousePressEvent(QMouseEvent *event)
 
 void ColumnsView::mouseMoveEvent(QMouseEvent *event)
 {
+    const bool wasDragging = m_dragging;
     // Same startDragDistance * 2 as the event filter
-    const bool isDragging = keepMouseGrab() || qAbs(event->localPos().x() - m_startMouseX) > qApp->styleHints()->startDragDistance() * 2;
+    m_dragging = keepMouseGrab() || qAbs(event->localPos().x() - m_startMouseX) > qApp->styleHints()->startDragDistance() * 2;
+    if (m_dragging != wasDragging) {
+        emit draggingChanged();
+    }
 
-    setKeepMouseGrab(isDragging);
+    setKeepMouseGrab(m_dragging);
 
-    if (isDragging) {
+    if (m_dragging) {
         m_contentItem->setBoundedX(m_contentItem->x() + event->pos().x() - m_oldMouseX);
     }
 
@@ -606,9 +622,25 @@ void ColumnsView::mouseMoveEvent(QMouseEvent *event)
 
 void ColumnsView::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (m_dragging) {
+        m_dragging = false;
+        emit draggingChanged();
+    }
+
     m_contentItem->snapToItem();
     setKeepMouseGrab(false);
     event->accept();
+}
+
+void ColumnsView::mouseUngrabEvent()
+{
+    if (m_dragging) {
+        m_dragging = false;
+        emit draggingChanged();
+    }
+
+    m_contentItem->snapToItem();
+    setKeepMouseGrab(false);
 }
 
 void ColumnsView::updatePolish()
