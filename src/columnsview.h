@@ -78,11 +78,14 @@ class ColumnsView : public QQuickItem
     Q_PROPERTY(QQuickItem *currentItem READ currentItem NOTIFY currentItemChanged)
 
     Q_PROPERTY(QQuickItem *contentItem READ contentItem CONSTANT)
+    Q_PROPERTY(qreal contentX READ contentX WRITE setContentX NOTIFY contentXChanged)
+    Q_PROPERTY(qreal contentWidth READ contentWidth NOTIFY contentWidthChanged)
 
     Q_PROPERTY(QList<QQuickItem *> visibleItems READ visibleItems NOTIFY visibleItemsChanged)
 
     // Properties to make it similar to Flickable
     Q_PROPERTY(bool dragging READ dragging NOTIFY draggingChanged)
+    Q_PROPERTY(bool moving READ moving NOTIFY movingChanged)
 
     // Default properties
     Q_PROPERTY(QQmlListProperty<QQuickItem> contentChildren READ contentChildren NOTIFY contentChildrenChanged FINAL)
@@ -123,6 +126,11 @@ public:
     QQmlListProperty<QObject> contentData();
 
     bool dragging() const;
+    bool moving() const;
+    qreal contentWidth() const;
+
+    qreal contentX() const;
+    void setContentX(qreal x) const;
 
     // Api not intended for QML use
     //can't do overloads in QML
@@ -158,6 +166,9 @@ Q_SIGNALS:
     void visibleItemsChanged();
     void depthChanged();
     void draggingChanged();
+    void movingChanged();
+    void contentXChanged();
+    void contentWidthChanged();
 
 private:
     static void contentChildren_append(QQmlListProperty<QQuickItem> *prop, QQuickItem *object);
@@ -182,6 +193,7 @@ private:
     int m_currentIndex = -1;
 
     bool m_dragging = false;
+    bool m_moving = false;
 };
 
 QML_DECLARE_TYPEINFO(ColumnsView, QML_HAS_ATTACHED_PROPERTIES)

@@ -164,7 +164,7 @@ void ContentItem::setBoundedX(qreal x)
         return;
     }
     m_slideAnim->stop();
-    setX(qBound(qMin(0.0, -width()+parentItem()->width()), x, 0.0));
+    setX(qRound(qBound(qMin(0.0, -width()+parentItem()->width()), x, 0.0)));
 }
 
 void ContentItem::animateX(qreal newX)
@@ -173,7 +173,7 @@ void ContentItem::animateX(qreal newX)
         return;
     }
 
-    const qreal to = qBound(qMin(0.0, -width()+parentItem()->width()), newX, 0.0);
+    const qreal to = qRound(qBound(qMin(0.0, -width()+parentItem()->width()), newX, 0.0));
 
     m_slideAnim->setStartValue(x());
     m_slideAnim->setEndValue(to);
@@ -212,22 +212,22 @@ qreal ContentItem::childWidth(QQuickItem *child)
     }
 
     if (m_columnResizeMode == ColumnsView::SingleColumn) {
-        return parentItem()->width();
+        return qRound(parentItem()->width());
 
     } else if (m_columnResizeMode == ColumnsView::FixedColumns) {
         ColumnsViewAttached *attached = qobject_cast<ColumnsViewAttached *>(qmlAttachedPropertiesObject<ColumnsView>(child, true));
         if (attached->fillWidth()) {
-            return qBound(m_columnWidth, (parentItem()->width() - attached->reservedSpace()), parentItem()->width());
+            return qRound(qBound(m_columnWidth, (parentItem()->width() - attached->reservedSpace()), parentItem()->width()));
         } else {
-            return qMin(parentItem()->width(), m_columnWidth);
+            return qRound(qMin(parentItem()->width(), m_columnWidth));
         }
 
     } else {
         //TODO:look for Layout size hints
         if (child->implicitWidth() > 0) {
-            return qMin(parentItem()->width(), child->implicitWidth());
+            return qRound(qMin(parentItem()->width(), child->implicitWidth()));
         }
-        return qMin(parentItem()->width(), child->width());
+        return qRound(qMin(parentItem()->width(), child->width()));
     }
 }
 
@@ -331,6 +331,12 @@ ColumnsView::ColumnsView(QQuickItem *parent)
     m_contentItem = new ContentItem(this);
     setAcceptedMouseButtons(Qt::LeftButton);
     setFiltersChildMouseEvents(true);
+    connect(m_contentItem->m_slideAnim, &QPropertyAnimation::finished, this, [this] () {
+        m_moving = false;
+        emit movingChanged();
+    });
+    connect(m_contentItem, &ContentItem::widthChanged, this, &ColumnsView::contentWidthChanged);
+    connect(m_contentItem, &ContentItem::xChanged, this, &ColumnsView::contentXChanged);
 }
 
 ColumnsView::~ColumnsView()
@@ -424,6 +430,26 @@ QQuickItem *ColumnsView::contentItem() const
 bool ColumnsView::dragging() const
 {
     return m_dragging;
+}
+
+bool ColumnsView::moving() const
+{
+    return m_moving;
+}
+
+qreal ColumnsView::contentWidth() const
+{
+    return m_contentItem->width();
+}
+
+qreal ColumnsView::contentX() const
+{
+    return -m_contentItem->x();
+}
+
+void ColumnsView::setContentX(qreal x) const
+{
+    m_contentItem->setX(qRound(-x));
 }
 
 void ColumnsView::addItem(QQuickItem *item)
@@ -550,6 +576,8 @@ bool ColumnsView::childMouseEventFilter(QQuickItem *item, QEvent *event)
         m_dragging = keepMouseGrab() || qAbs(mapFromItem(item, me->localPos()).x() - m_startMouseX) > qApp->styleHints()->startDragDistance() * 2;
 
         if (m_dragging != wasDragging) {
+            m_moving = true;
+            emit movingChanged();
             emit draggingChanged();
         }
 
@@ -607,6 +635,8 @@ void ColumnsView::mouseMoveEvent(QMouseEvent *event)
     // Same startDragDistance * 2 as the event filter
     m_dragging = keepMouseGrab() || qAbs(event->localPos().x() - m_startMouseX) > qApp->styleHints()->startDragDistance() * 2;
     if (m_dragging != wasDragging) {
+        m_moving = true;
+        emit movingChanged();
         emit draggingChanged();
     }
 
