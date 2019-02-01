@@ -522,33 +522,55 @@ bool ColumnsView::childMouseEventFilter(QQuickItem *item, QEvent *event)
 
     switch (event->type()) {
     case QEvent::MouseButtonPress: {
+        m_contentItem->m_slideAnim->stop();
         if (item->property("preventStealing").toBool()) {
+            m_contentItem->snapToItem();
             return false;
         }
         QMouseEvent *me = static_cast<QMouseEvent *>(event);
         m_oldMouseX = m_startMouseX = mapFromItem(item, me->localPos()).x();
-        event->accept();
+
+        me->setAccepted(false);
+        setKeepMouseGrab(false);
         break;
     }
     case QEvent::MouseMove: {
-        if (item->property("preventStealing").toBool()) {
+        if ((!keepMouseGrab() && item->keepMouseGrab()) || item->property("preventStealing").toBool()) {
+            m_contentItem->snapToItem();
             return false;
         }
         QMouseEvent *me = static_cast<QMouseEvent *>(event);
         const QPointF pos = mapFromItem(item, me->localPos());
-        m_contentItem->setBoundedX(m_contentItem->x() + pos.x() - m_oldMouseX);
+        
+        // If a drag happened, start to steal all events, use startDragDistance * 2 to give time to widgets to take the mouse grab by themselves
+        const bool isDragging = keepMouseGrab() || qAbs(mapFromItem(item, me->localPos()).x() - m_startMouseX) > qApp->styleHints()->startDragDistance()*2;
+        
+        if (isDragging) {
+            m_contentItem->setBoundedX(m_contentItem->x() + pos.x() - m_oldMouseX);
+        }
+
         m_oldMouseX = pos.x();
-        event->accept();
+
+        setKeepMouseGrab(isDragging);
+        me->setAccepted(isDragging);
+        return isDragging;
         break;
     }
     case QEvent::MouseButtonRelease: {
+        m_contentItem->snapToItem();
+
         if (item->property("preventStealing").toBool()) {
             return false;
         }
         QMouseEvent *me = static_cast<QMouseEvent *>(event);
-        m_contentItem->snapToItem();
         event->accept();
-        return qAbs(mapFromItem(item, me->localPos()).x() - m_startMouseX) > qApp->styleHints()->startDragDistance();
+
+        //if a drag happened, don't pass the event
+        const bool block = keepMouseGrab();
+        setKeepMouseGrab(false);
+
+        me->setAccepted(block);
+        return block;
         break;
     }
     default:
@@ -560,14 +582,24 @@ bool ColumnsView::childMouseEventFilter(QQuickItem *item, QEvent *event)
 
 void ColumnsView::mousePressEvent(QMouseEvent *event)
 {
+    m_contentItem->snapToItem();
     m_oldMouseX = event->localPos().x();
     m_startMouseX = event->localPos().x();
+    setKeepMouseGrab(false);
     event->accept();
 }
 
 void ColumnsView::mouseMoveEvent(QMouseEvent *event)
 {
-    m_contentItem->setBoundedX(m_contentItem->x() + event->pos().x() - m_oldMouseX);
+    // Same startDragDistance * 2 as the event filter
+    const bool isDragging = keepMouseGrab() || qAbs(event->localPos().x() - m_startMouseX) > qApp->styleHints()->startDragDistance() * 2;
+
+    setKeepMouseGrab(isDragging);
+
+    if (isDragging) {
+        m_contentItem->setBoundedX(m_contentItem->x() + event->pos().x() - m_oldMouseX);
+    }
+
     m_oldMouseX = event->pos().x();
     event->accept();
 }
@@ -575,6 +607,7 @@ void ColumnsView::mouseMoveEvent(QMouseEvent *event)
 void ColumnsView::mouseReleaseEvent(QMouseEvent *event)
 {
     m_contentItem->snapToItem();
+    setKeepMouseGrab(false);
     event->accept();
 }
 
