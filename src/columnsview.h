@@ -86,6 +86,7 @@ class ColumnsView : public QQuickItem
     // Properties to make it similar to Flickable
     Q_PROPERTY(bool dragging READ dragging NOTIFY draggingChanged)
     Q_PROPERTY(bool moving READ moving NOTIFY movingChanged)
+    Q_PROPERTY(bool interactive READ interactive WRITE setInteractive NOTIFY interactiveChanged)
 
     // Default properties
     Q_PROPERTY(QQmlListProperty<QQuickItem> contentChildren READ contentChildren NOTIFY contentChildrenChanged FINAL)
@@ -132,6 +133,9 @@ public:
     qreal contentX() const;
     void setContentX(qreal x) const;
 
+    bool interactive() const;
+    void setInteractive(bool interactive);
+
     // Api not intended for QML use
     //can't do overloads in QML
     void removeItem(QQuickItem *item);
@@ -169,6 +173,7 @@ Q_SIGNALS:
     void movingChanged();
     void contentXChanged();
     void contentWidthChanged();
+    void interactiveChanged();
 
 private:
     static void contentChildren_append(QQmlListProperty<QQuickItem> *prop, QQuickItem *object);
@@ -192,6 +197,7 @@ private:
     qreal m_startMouseX = -1.0;
     int m_currentIndex = -1;
 
+    bool m_interactive = true;
     bool m_dragging = false;
     bool m_moving = false;
 };

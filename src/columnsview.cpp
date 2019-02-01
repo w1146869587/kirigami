@@ -452,6 +452,32 @@ void ColumnsView::setContentX(qreal x) const
     m_contentItem->setX(qRound(-x));
 }
 
+bool ColumnsView::interactive() const
+{
+    return m_interactive;
+}
+
+void ColumnsView::setInteractive(bool interactive)
+{
+    if (m_interactive != interactive) {
+        return;
+    }
+
+    m_interactive = interactive;
+
+    if (!m_interactive) {
+        if (m_dragging) {
+            m_dragging = false;
+            emit draggingChanged();
+        }
+
+        m_contentItem->snapToItem();
+        setKeepMouseGrab(false);
+    }
+
+    emit interactiveChanged();
+}
+
 void ColumnsView::addItem(QQuickItem *item)
 {
     insertItem(m_contentItem->m_items.length(), item);
@@ -545,7 +571,7 @@ void ColumnsView::geometryChanged(const QRectF &newGeometry, const QRectF &oldGe
 
 bool ColumnsView::childMouseEventFilter(QQuickItem *item, QEvent *event)
 {
-    if (item == m_contentItem) {
+    if (!m_interactive || item == m_contentItem) {
         return QQuickItem::childMouseEventFilter(item, event);
     }
 
@@ -622,6 +648,10 @@ bool ColumnsView::childMouseEventFilter(QQuickItem *item, QEvent *event)
 
 void ColumnsView::mousePressEvent(QMouseEvent *event)
 {
+    if (!m_interactive) {
+        return;
+    }
+
     m_contentItem->snapToItem();
     m_oldMouseX = event->localPos().x();
     m_startMouseX = event->localPos().x();
@@ -631,6 +661,10 @@ void ColumnsView::mousePressEvent(QMouseEvent *event)
 
 void ColumnsView::mouseMoveEvent(QMouseEvent *event)
 {
+    if (!m_interactive) {
+        return;
+    }
+
     const bool wasDragging = m_dragging;
     // Same startDragDistance * 2 as the event filter
     m_dragging = keepMouseGrab() || qAbs(event->localPos().x() - m_startMouseX) > qApp->styleHints()->startDragDistance() * 2;
@@ -652,6 +686,10 @@ void ColumnsView::mouseMoveEvent(QMouseEvent *event)
 
 void ColumnsView::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (!m_interactive) {
+        return;
+    }
+
     if (m_dragging) {
         m_dragging = false;
         emit draggingChanged();
