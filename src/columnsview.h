@@ -80,6 +80,7 @@ class ColumnsView : public QQuickItem
     Q_PROPERTY(QQuickItem *contentItem READ contentItem CONSTANT)
     Q_PROPERTY(qreal contentX READ contentX WRITE setContentX NOTIFY contentXChanged)
     Q_PROPERTY(qreal contentWidth READ contentWidth NOTIFY contentWidthChanged)
+    Q_PROPERTY(int scrollDuration READ scrollDuration WRITE setScrollDuration NOTIFY scrollDurationChanged)
 
     Q_PROPERTY(QList<QQuickItem *> visibleItems READ visibleItems NOTIFY visibleItemsChanged)
 
@@ -113,6 +114,9 @@ public:
 
     int currentIndex() const;
     void setCurrentIndex(int index);
+
+    int scrollDuration() const;
+    void setScrollDuration(int duration);
 
     int depth() const;
 
@@ -174,6 +178,7 @@ Q_SIGNALS:
     void contentXChanged();
     void contentWidthChanged();
     void interactiveChanged();
+    void scrollDurationChanged();
 
 private:
     static void contentChildren_append(QQmlListProperty<QQuickItem> *prop, QQuickItem *object);

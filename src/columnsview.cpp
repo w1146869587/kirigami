@@ -427,6 +427,21 @@ QQuickItem *ColumnsView::contentItem() const
     return m_contentItem;
 }
 
+int ColumnsView::scrollDuration() const
+{
+    return m_contentItem->m_slideAnim->duration();
+}
+
+void ColumnsView::setScrollDuration(int duration)
+{
+    if (m_contentItem->m_slideAnim->duration() == duration) {
+        return;
+    }
+
+    m_contentItem->m_slideAnim->setDuration(duration);
+    emit scrollDurationChanged();
+}
+
 bool ColumnsView::dragging() const
 {
     return m_dragging;
