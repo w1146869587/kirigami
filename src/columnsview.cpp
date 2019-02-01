@@ -228,10 +228,7 @@ qreal ContentItem::childWidth(QQuickItem *child)
         //TODO:look for Layout size hints
         qreal width = child->implicitWidth();
 
-        if (width < 1) {
-            width = child->width();
-        }
-        if (width < 1) {
+        if (width < 1.0) {
             width = m_columnWidth;
         }
         
@@ -363,6 +360,9 @@ void ColumnsView::setColumnResizeMode(ColumnResizeMode mode)
     }
 
     m_contentItem->m_columnResizeMode = mode;
+    if (mode == SingleColumn && m_currentItem) {
+        m_contentItem->m_viewAnchorItem = m_currentItem;
+    }
     polish();
     emit columnResizeModeChanged();
 }
