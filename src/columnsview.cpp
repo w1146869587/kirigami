@@ -211,23 +211,31 @@ qreal ContentItem::childWidth(QQuickItem *child)
         return 0.0;
     }
 
+    ColumnsViewAttached *attached = qobject_cast<ColumnsViewAttached *>(qmlAttachedPropertiesObject<ColumnsView>(child, true));
+
     if (m_columnResizeMode == ColumnsView::SingleColumn) {
         return qRound(parentItem()->width());
 
-    } else if (m_columnResizeMode == ColumnsView::FixedColumns) {
-        ColumnsViewAttached *attached = qobject_cast<ColumnsViewAttached *>(qmlAttachedPropertiesObject<ColumnsView>(child, true));
-        if (attached->fillWidth()) {
-            return qRound(qBound(m_columnWidth, (parentItem()->width() - attached->reservedSpace()), parentItem()->width()));
-        } else {
-            return qRound(qMin(parentItem()->width(), m_columnWidth));
-        }
+    } else if (attached->fillWidth()) {
+        
+        return qRound(qBound(m_columnWidth, (parentItem()->width() - attached->reservedSpace()), parentItem()->width()));
 
+    } else if (m_columnResizeMode == ColumnsView::FixedColumns) {
+        return qRound(qMin(parentItem()->width(), m_columnWidth));
+
+    // DynamicColumns
     } else {
         //TODO:look for Layout size hints
-        if (child->implicitWidth() > 0) {
-            return qRound(qMin(parentItem()->width(), child->implicitWidth()));
+        qreal width = child->implicitWidth();
+
+        if (width < 1) {
+            width = child->width();
         }
-        return qRound(qMin(parentItem()->width(), child->width()));
+        if (width < 1) {
+            width = m_columnWidth;
+        }
+        
+        return qRound(qMin(m_view->width(), width));
     }
 }
 
