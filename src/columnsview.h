@@ -156,6 +156,7 @@ public Q_SLOTS:
     void clear();
 
 protected:
+    void classBegin() override;
     void updatePolish() override;
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;

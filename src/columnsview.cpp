@@ -31,6 +31,53 @@
 
 QHash<QObject *, ColumnsViewAttached *> ColumnsView::m_attachedObjects = QHash<QObject *, ColumnsViewAttached *>();
 
+class QmlComponentsPoolSingleton
+{
+public:
+    QmlComponentsPoolSingleton()
+    {}
+
+    QmlComponentsPool self;
+};
+
+Q_GLOBAL_STATIC(QmlComponentsPoolSingleton, privateQmlComponentsPoolSelf)
+
+
+QmlComponentsPool::QmlComponentsPool(QObject *parent)
+    : QObject(parent)
+{}
+
+void QmlComponentsPool::initialize(QQmlEngine *engine)
+{
+    if (!engine || m_instance) {
+        return;
+    }
+
+    QQmlComponent *component = new QQmlComponent(engine, this);
+
+    component->setData(QByteArrayLiteral("import QtQuick 2.7\n"
+        "import org.kde.kirigami 2.6 as Kirigami\n"
+        "QtObject {\n"
+            "readonly property Kirigami.Units units: Kirigami.Units\n"
+            "readonly property Component separator: Kirigami.Separator{anchors.top:parent.top;anchors.bottom:parent.bottom}"
+        "}"), QUrl());
+
+    m_instance = component->create();
+
+    Q_ASSERT(m_instance);
+
+    m_separatorComponent = m_instance->property("separator").value<QQmlComponent *>();
+    Q_ASSERT(m_separatorComponent);
+    m_units = m_instance->property("units").value<QObject *>();
+    Q_ASSERT(m_units);
+}
+
+QmlComponentsPool::~QmlComponentsPool()
+{}
+
+
+/////////
+
 ColumnsViewAttached::ColumnsViewAttached(QObject *parent)
     : QObject(parent)
 {}
@@ -140,8 +187,8 @@ ContentItem::ContentItem(ColumnsView *parent)
     m_slideAnim = new QPropertyAnimation(this);
     m_slideAnim->setTargetObject(this);
     m_slideAnim->setPropertyName("x");
-    //TODO: from Units
-    m_slideAnim->setDuration(250);
+    //NOTE: the duration will be taked from kirigami units upon classBegin
+    m_slideAnim->setDuration(0);
     m_slideAnim->setEasingCurve(QEasingCurve(QEasingCurve::InOutQuad));
     connect(m_slideAnim, &QPropertyAnimation::finished, this, [this] () {
         if (!m_view->currentItem()) {
@@ -336,6 +383,7 @@ ColumnsView::ColumnsView(QQuickItem *parent)
     m_contentItem = new ContentItem(this);
     setAcceptedMouseButtons(Qt::LeftButton);
     setFiltersChildMouseEvents(true);
+
     connect(m_contentItem->m_slideAnim, &QPropertyAnimation::finished, this, [this] () {
         m_moving = false;
         emit movingChanged();
@@ -732,6 +780,15 @@ void ColumnsView::mouseUngrabEvent()
 
     m_contentItem->snapToItem();
     setKeepMouseGrab(false);
+}
+
+void ColumnsView::classBegin()
+{
+    privateQmlComponentsPoolSelf->self.initialize(qmlEngine(this));
+    //TODO: connect to changes
+    
+    m_contentItem->m_slideAnim->setDuration(privateQmlComponentsPoolSelf->self.m_units->property("longDuration").toInt());
+    qWarning()<<privateQmlComponentsPoolSelf->self.m_units->property("longDuration")<<m_contentItem->m_slideAnim->duration();
 }
 
 void ColumnsView::updatePolish()

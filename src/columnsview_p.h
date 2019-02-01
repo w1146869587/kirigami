@@ -25,6 +25,23 @@
 #include <QPointer>
 
 class QPropertyAnimation;
+class QQmlComponent;
+
+class QmlComponentsPool: public QObject {
+    Q_OBJECT
+
+public:
+    QmlComponentsPool(QObject *parent = nullptr);
+    ~QmlComponentsPool();
+
+    void initialize(QQmlEngine *engine);
+
+    QQmlComponent *m_separatorComponent = nullptr;
+    QObject *m_units = nullptr;
+
+private:
+    QObject *m_instance = nullptr;
+};
 
 class ContentItem : public QQuickItem {
     Q_OBJECT
