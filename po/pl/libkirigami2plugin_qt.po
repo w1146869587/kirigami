@@ -1,0 +1,91 @@
+# Łukasz Wojniłowicz <lukasz.wojnilowicz@gmail.com>, 2016, 2017, 2018, 2019.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2019-01-13 09:50+0100\n"
+"Last-Translator: Łukasz Wojniłowicz <lukasz.wojnilowicz@gmail.com>\n"
+"Language-Team: Polish <kde-i18n-doc@kde.org>\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+"X-Generator: Lokalize 19.03.70\n"
+
+#: controls/AboutPage.qml:79
+msgctxt "AboutPage|"
+msgid "About"
+msgstr "O programie"
+
+#: controls/AboutPage.qml:107
+#, qt-format
+msgctxt "AboutPage|"
+msgid "%1 <%2>"
+msgstr "%1 <%2>"
+
+#: controls/AboutPage.qml:142
+msgctxt "AboutPage|"
+msgid "Copyright"
+msgstr "Prawa autorskie"
+
+#: controls/AboutPage.qml:164
+msgctxt "AboutPage|"
+msgid "License:"
+msgstr "Licencja:"
+
+#: controls/AboutPage.qml:173
+msgctxt "AboutPage|"
+msgid "Libraries in use"
+msgstr "Biblioteki w użyciu"
+
+#: controls/AboutPage.qml:186
+msgctxt "AboutPage|"
+msgid "Authors"
+msgstr "Autorzy"
+
+#: controls/AboutPage.qml:194
+msgctxt "AboutPage|"
+msgid "Credits"
+msgstr "Zasługi"
+
+#: controls/AboutPage.qml:203
+msgctxt "AboutPage|"
+msgid "Translators"
+msgstr "Tłumacze"
+
+#: controls/ContextDrawer.qml:78
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "Działania"
+
+#: controls/GlobalDrawer.qml:446
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "Wstecz"
+
+#: controls/private/globaltoolbar/ToolBarPageHeader.qml:111
+msgctxt "ToolBarPageHeader|"
+msgid "More Actions"
+msgstr "Więcej działań"
+
+#: controls/templates/private/BackButton.qml:50
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "Przejdź wstecz"
+
+#: controls/templates/private/ForwardButton.qml:46
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "Przejdź naprzód"
+
+#: controls/ToolBarApplicationHeader.qml:126
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "Więcej działań"
+
+#: controls/UrlButton.qml:51
+msgctxt "UrlButton|"
+msgid "Copy link address"
+msgstr "Skopiuj adres odnośnika"
