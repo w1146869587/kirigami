@@ -22,7 +22,7 @@ import QtQuick.Layouts 1.2
 import QtQml.Models 2.2
 import QtQuick.Templates 2.0 as T
 import QtQuick.Controls 2.0 as QQC2
-import org.kde.kirigami 2.4
+import org.kde.kirigami 2.7
 import "private/globaltoolbar" as GlobalToolBar
 import "templates" as KT
 
@@ -42,7 +42,7 @@ T.Control {
     /**
      * This property holds the number of items currently pushed onto the view
      */
-    readonly property int depth: popScrollAnim.running && popScrollAnim.pendingDepth > -1 ? popScrollAnim.pendingDepth : pagesLogic.count
+    property alias depth: columnsView.depth
 
     /**
      * The last Page in the Row
@@ -149,17 +149,12 @@ T.Control {
      */
     function push(page, properties) {
         //don't push again things already there
-        if (page.createObject === undefined && typeof page != "string" && pagesLogic.containsPage(page)) {
+        if (page.createObject === undefined && typeof page != "string" && columnsView.items.indexOf(page) !== -1) {
             print("The item " + page + " is already in the PageRow");
             return;
         }
 
-        if (popScrollAnim.running) {
-            popScrollAnim.running = false;
-            popScrollAnim.popPageCleanup(popScrollAnim.pendingPage);
-        }
-
-        popScrollAnim.popPageCleanup(currentItem);
+        columnsView.pop(columnsView.currentItem);
 
         // figure out if more than one page is being pushed
         var pages;
@@ -193,11 +188,8 @@ T.Control {
         }
 
         // initialize the page
-        var container = pagesLogic.initPage(page, properties);
-        pagesLogic.append(container);
-        container.visible = container.page.visible = true;
+        pagesLogic.initPage(page, properties);
 
-        mainView.currentIndex = container.level;
         pagePushed(container.page);
         return container.page
     }
@@ -214,25 +206,8 @@ T.Control {
             return;
         }
 
-        //if a pop was animating, stop it
-        if (popScrollAnim.running) {
-            popScrollAnim.running = false;
-            popScrollAnim.popPageCleanup(popScrollAnim.pendingPage);
-        //if a push was animating, stop it
-        } else {
-            mainView.positionViewAtIndex(mainView.currentIndex, ListView.Beginning);
-        }
-
-        popScrollAnim.from = mainView.contentX
-
-        if ((!page || !page.parent) && pagesLogic.count > 1) {
-            page = pagesLogic.get(pagesLogic.count - 2).page;
-        }
-        popScrollAnim.to = page && page.parent ? page.parent.x : 0;
-        popScrollAnim.pendingPage = page;
-        popScrollAnim.pendingDepth = page && page.parent ? page.parent.level + 1 : 0;
-
-        popScrollAnim.running = true;
+        columnsView.pop(page)
+        pageRemoved(page)
     }
 
     /**
@@ -249,7 +224,13 @@ T.Control {
      * @since 2.5
      */
     signal pageRemoved(Item page)
-
+ColumnsView {
+    id: columnsView
+    anchors.fill: parent
+    z: 999999
+    columnResizeMode: depth < 2 || width < columnWidth * 2 ? ColumnsView.SingleColumn : ColumnsView.FixedColumns
+    columnWidth: root.defaultColumnWidth
+}
     SequentialAnimation {
         id: popScrollAnim
         property real from
@@ -582,10 +563,6 @@ T.Control {
                 }
             }
             function initPage(page, properties) {
-                var container = containerComponent.createObject(mainView, {
-                    "level": pagesLogic.count,
-                    "page": page
-                });
 
                 var pageComp;
                 if (page.createObject) {
@@ -600,7 +577,8 @@ T.Control {
                 }
                 if (pageComp) {
                     // instantiate page from component
-                    page = pageComp.createObject(container.pageParent, properties || {});
+                    // FIXME: parent directly to columnsview or root?
+                    page = pageComp.createObject(columnsView, properties || {});
 
                     if (pageComp.status === Component.Error) {
                         throw new Error("Error while loading page: " + pageComp.errorString());
@@ -613,18 +591,8 @@ T.Control {
                         }
                     }
                 }
-
-                container.page = page;
-                if (page.parent === null || page.parent === container.pageParent) {
-                    container.owner = null;
-                }
-
-                // the page has to be reparented
-                if (page.parent !== container) {
-                    page.parent = container;
-                }
-
-                return container;
+                columnsView.currentIndex = page.ColumnsView.level;
+                return page;
             }
             function containsPage(page) {
                 for (var i = 0; i < pagesLogic.count; ++i) {

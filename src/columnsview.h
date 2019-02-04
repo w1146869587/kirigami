@@ -153,6 +153,7 @@ public Q_SLOTS:
     void insertItem(int pos, QQuickItem *item);
     void moveItem(int from, int to);
     void removeItem(const QVariant &item);
+    void pop(QQuickItem *item);
     void clear();
 
 protected:

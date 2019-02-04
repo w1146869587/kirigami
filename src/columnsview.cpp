@@ -193,11 +193,11 @@ ContentItem::ContentItem(ColumnsView *parent)
     connect(m_slideAnim, &QPropertyAnimation::finished, this, [this] () {
         if (!m_view->currentItem()) {
             m_view->setCurrentIndex(m_items.indexOf(m_viewAnchorItem));
-        }
-        // If the current item is not on view, change it
-        QRectF mapped = m_view->currentItem()->mapRectToItem(parentItem(), QRectF(m_view->currentItem()->position(), m_view->currentItem()->size()));
-        if (!QRectF(QPointF(0, 0), size()).intersects(mapped)) {
-            m_view->setCurrentIndex(m_items.indexOf(m_viewAnchorItem));
+        } else {
+            QRectF mapped = m_view->currentItem()->mapRectToItem(parentItem(), QRectF(m_view->currentItem()->position(), m_view->currentItem()->size()));
+            if (!QRectF(QPointF(0, 0), size()).intersects(mapped)) {
+                m_view->setCurrentIndex(m_items.indexOf(m_viewAnchorItem));
+            }
         }
     });
 }
@@ -611,6 +611,13 @@ void ColumnsView::removeItem(int pos)
     }
 
     removeItem(m_contentItem->m_items[pos]); 
+}
+
+void ColumnsView::pop(QQuickItem *item)
+{
+    while (!m_contentItem->m_items.isEmpty() && m_contentItem->m_items.last() != item) {
+        removeItem(m_contentItem->m_items.last());
+    }
 }
 
 void ColumnsView::clear()
