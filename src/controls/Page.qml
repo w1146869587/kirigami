@@ -287,7 +287,7 @@ T2.Page {
         }
         globalToolBar.stack = null;
         globalToolBar.row = null;
-print("AAAAAA"+root.Kirigami.ColumnsView.view.__pageRow)
+
         if (root.Kirigami.ColumnsView.view) {
             globalToolBar.row = root.Kirigami.ColumnsView.view.__pageRow;
         }
