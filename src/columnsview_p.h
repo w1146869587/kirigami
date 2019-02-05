@@ -72,6 +72,7 @@ private:
 
     qreal m_columnWidth = 200;
     ColumnsView::ColumnResizeMode m_columnResizeMode = ColumnsView::FixedColumns;
+    bool m_shouldAnimate = false;
     friend class ColumnsView;
 };
 

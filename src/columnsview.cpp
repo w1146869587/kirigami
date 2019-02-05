@@ -298,7 +298,12 @@ void ContentItem::layoutItems()
     }
     setWidth(partialWidth);
 
-    setBoundedX((m_viewAnchorItem ? -m_viewAnchorItem->x() : 0.0));
+    const qreal newContentX = m_viewAnchorItem ? -m_viewAnchorItem->x() : 0.0;
+    if (m_shouldAnimate) {
+        animateX(newContentX);
+    } else {
+        setBoundedX(newContentX);
+    }
     setY(0);
     updateVisibleItems();
 }
@@ -334,6 +339,7 @@ void ContentItem::forgetItem(QQuickItem *item)
 
     const int index = m_items.indexOf(item);
     m_items.removeAll(item);
+    m_shouldAnimate = true;
     m_view->polish();
 
     if (index <= m_view->currentIndex()) {
@@ -356,6 +362,7 @@ void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
             connect(value.item, &QQuickItem::widthChanged, this, &ContentItem::layoutItems);
             m_items << value.item;
         }
+        m_shouldAnimate = true;
         m_view->polish();
         emit m_view->depthChanged();
         break;
@@ -421,6 +428,7 @@ void ColumnsView::setColumnResizeMode(ColumnResizeMode mode)
     if (mode == SingleColumn && m_currentItem) {
         m_contentItem->m_viewAnchorItem = m_currentItem;
     }
+    m_contentItem->m_shouldAnimate = false;
     polish();
     emit columnResizeModeChanged();
 }
@@ -437,6 +445,7 @@ void ColumnsView::setColumnWidth(qreal width)
     }
 
     m_contentItem->m_columnWidth = width;
+    m_contentItem->m_shouldAnimate = false;
     polish();
     emit columnWidthChanged();
 }
@@ -586,6 +595,7 @@ void ColumnsView::moveItem(int from, int to)
     }
 
     m_contentItem->m_items.move(from, to);
+    m_contentItem->m_shouldAnimate = true;
     polish();
 }
 
@@ -655,6 +665,7 @@ ColumnsViewAttached *ColumnsView::qmlAttachedProperties(QObject *object)
 void ColumnsView::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
 {
     m_contentItem->setHeight(newGeometry.height());
+    m_contentItem->m_shouldAnimate = false;
     polish();
 
     m_contentItem->updateVisibleItems();
