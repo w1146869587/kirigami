@@ -52,7 +52,7 @@ T.Control {
     /**
      * The currently visible Item
      */
-    readonly property Item currentItem: columnsView.currentItem
+    property alias currentItem: columnsView.currentItem
 
     /**
      * the index of the currently visible Item
@@ -225,47 +225,6 @@ T.Control {
      */
     signal pageRemoved(Item page)
 
-    SequentialAnimation {
-        id: popScrollAnim
-        property real from
-        property real to
-        property var pendingPage
-        property int pendingDepth: -1
-        function popPageCleanup(page) {
-            if (pagesLogic.count == 0) {
-                return;
-            }
-            if (popScrollAnim.running) {
-                popScrollAnim.running = false;
-            }
-
-            var oldPage = pagesLogic.get(pagesLogic.count-1).page;
-            if (page !== undefined) {
-                // an unwind target has been specified - pop until we find it
-                while (page !== oldPage && pagesLogic.count > 1) {
-                    pagesLogic.removePage(oldPage.parent.level);
-
-                    oldPage = pagesLogic.get(pagesLogic.count-1).page;
-                }
-            } else {
-                pagesLogic.removePage(pagesLogic.count-1);
-            }
-        }
-        NumberAnimation {
-            target: mainView
-            properties: "contentX"
-            duration: Units.shortDuration
-            from: popScrollAnim.from
-            to: popScrollAnim.to
-        }
-        ScriptAction {
-            script: {
-                //snap
-                mainView.flick(100, 0)
-                popScrollAnim.popPageCleanup(popScrollAnim.pendingPage);
-            }
-        }
-    }
     /**
      * Replaces a page on the stack.
      * @param page The page can also be given as an array of pages.
@@ -315,20 +274,6 @@ T.Control {
         if (depth > 1) {
             currentIndex = Math.max(0, currentIndex - 1);
         }
-
-        if (LayoutMirroring.enabled) {
-            if (!mainView.atEnd) {
-                mainViewScrollAnim.from = mainView.contentX
-                mainViewScrollAnim.to =  Math.min(mainView.contentWidth - mainView.width, mainView.contentX + defaultColumnWidth)
-                mainViewScrollAnim.running = true;
-            }
-        } else {
-            if (mainView.contentX - mainView.originX > 0) {
-                mainViewScrollAnim.from = mainView.contentX
-                mainViewScrollAnim.to =  Math.max(mainView.originX, mainView.contentX - defaultColumnWidth)
-                mainViewScrollAnim.running = true;
-            }
-        }
     }
 
     /**
@@ -349,22 +294,6 @@ T.Control {
     }
 
     Keys.forwardTo: [currentItem]
-
-    SequentialAnimation {
-        id: mainViewScrollAnim
-        property real from
-        property real to
-        NumberAnimation {
-            target: mainView
-            properties: "contentX"
-            duration: Units.longDuration
-            from: mainViewScrollAnim.from
-            to: mainViewScrollAnim.to
-        }
-        ScriptAction {
-            script: mainView.flick(100, 0)
-        }
-    }
 
     GlobalToolBar.PageRowGlobalToolBarStyleGroup {
         id: globalToolBar
@@ -495,142 +424,86 @@ T.Control {
         source: Qt.resolvedUrl("private/globaltoolbar/PageRowGlobalToolBarUI.qml");
     }
 
-    ListView {
-        id: mainView
-        boundsBehavior: Flickable.StopAtBounds
-        orientation: Qt.Horizontal
-        snapMode: ListView.SnapToItem
-        currentIndex: 0
-        property int marginForLast: count > 1 ? pagesLogic.get(count-1).page.width - pagesLogic.get(count-1).width : 0
-        leftMargin: LayoutMirroring.enabled ? marginForLast : 0
-        rightMargin: LayoutMirroring.enabled ? 0 : marginForLast
-        preferredHighlightBegin: 0
-        preferredHighlightEnd: 0
-        highlightMoveDuration: Units.longDuration
-        highlightFollowsCurrentItem: true
-        onMovementEnded: currentIndex = Math.max(0, indexAt(contentX, 0))
-        onFlickEnded: onMovementEnded();
-        onCurrentIndexChanged: {
-            if (currentItem) {
-                currentItem.page.forceActiveFocus();
-            }
-        }
-        opacity: layersStack.depth < 2
-        Behavior on opacity {
-            OpacityAnimator {
-                duration: Units.longDuration
-                easing.type: Easing.InOutQuad
-            }
-        }
-        
 
-        model: ObjectModel {
-            id: pagesLogic
-            readonly property var componentCache: new Array()
-            readonly property int roundedDefaultColumnWidth: root.width < root.defaultColumnWidth*2 ? root.width : root.defaultColumnWidth
 
-            function removePage(id) {
-                if (id < 0 || id >= count) {
-                    print("Tried to remove an invalid page index:" + id);
+    QtObject {
+        id: pagesLogic
+        readonly property var componentCache: new Array()
+        readonly property int roundedDefaultColumnWidth: root.width < root.defaultColumnWidth*2 ? root.width : root.defaultColumnWidth
+
+        function initPage(page, properties) {
+
+            var pageComp;
+            if (page.createObject) {
+                // page defined as component
+                pageComp = page;
+            } else if (typeof page == "string") {
+                // page defined as string (a url)
+                pageComp = pagesLogic.componentCache[page];
+                if (!pageComp) {
+                    pageComp = pagesLogic.componentCache[page] = Qt.createComponent(page);
+                }
+            }
+            if (pageComp) {
+                // instantiate page from component
+                // FIXME: parent directly to columnsview or root?
+                page = pageComp.createObject(columnsView, properties || {});
+
+                if (pageComp.status === Component.Error) {
+                    throw new Error("Error while loading page: " + pageComp.errorString());
+                } 
+            } else {
+                // copy properties to the page
+                for (var prop in properties) {
+                    if (properties.hasOwnProperty(prop)) {
+                        page[prop] = properties[prop];
+                    }
+                }
+            }
+            columnsView.currentIndex = page.ColumnsView.level;
+            return page;
+        }
+        function containsPage(page) {
+            for (var i = 0; i < pagesLogic.count; ++i) {
+                var candidate = pagesLogic.get(i);
+                if (candidate.page === page) {
+                    print("The item " + page + " is already in the PageRow");
                     return;
                 }
-
-                var item = pagesLogic.get(id);
-                if (item.owner) {
-                    item.page.visible = false;
-                    item.page.parent = item.owner;
-                }
-                //FIXME: why reparent ing is necessary?
-                //is destroy just an async deleteLater() that isn't executed immediately or it actually leaks?
-                pagesLogic.remove(id);
-                item.parent = root;
-                root.pageRemoved(item.page);
-                if (item.page.parent===item) {
-                    item.page.destroy(1)
-                }
-                item.destroy();
-            }
-            function clearPages () {
-                popScrollAnim.running = false;
-                popScrollAnim.pendingDepth = -1;
-                while (count > 0) {
-                    removePage(count-1);
-                }
-            }
-            function initPage(page, properties) {
-
-                var pageComp;
-                if (page.createObject) {
-                    // page defined as component
-                    pageComp = page;
-                } else if (typeof page == "string") {
-                    // page defined as string (a url)
-                    pageComp = pagesLogic.componentCache[page];
-                    if (!pageComp) {
-                        pageComp = pagesLogic.componentCache[page] = Qt.createComponent(page);
-                    }
-                }
-                if (pageComp) {
-                    // instantiate page from component
-                    // FIXME: parent directly to columnsview or root?
-                    page = pageComp.createObject(columnsView, properties || {});
-
-                    if (pageComp.status === Component.Error) {
-                        throw new Error("Error while loading page: " + pageComp.errorString());
-                    } 
-                } else {
-                    // copy properties to the page
-                    for (var prop in properties) {
-                        if (properties.hasOwnProperty(prop)) {
-                            page[prop] = properties[prop];
-                        }
-                    }
-                }
-                columnsView.currentIndex = page.ColumnsView.level;
-                return page;
-            }
-            function containsPage(page) {
-                for (var i = 0; i < pagesLogic.count; ++i) {
-                    var candidate = pagesLogic.get(i);
-                    if (candidate.page === page) {
-                        print("The item " + page + " is already in the PageRow");
-                        return;
-                    }
-                }
             }
         }
-        T.ScrollIndicator.horizontal: T.ScrollIndicator {
-            anchors {
-                left: parent.left
-                right: parent.right
-                bottom: parent.bottom
-            }
-            height: Units.smallSpacing
-            contentItem: Rectangle {
-                height: Units.smallSpacing
-                width: Units.smallSpacing
-                color: Theme.textColor
-                opacity: 0
-                onXChanged: {
-                    opacity = 0.3
-                    scrollIndicatorTimer.restart();
-                }
-                Behavior on opacity {
-                    OpacityAnimator {
-                        duration: Units.longDuration
-                        easing.type: Easing.InOutQuad
-                    }
-                }
-                Timer {
-                    id: scrollIndicatorTimer
-                    interval: Units.longDuration * 4
-                    onTriggered: parent.opacity = 0;
-                }
-            }
-        }
-
-        onContentWidthChanged: mainView.positionViewAtIndex(root.currentIndex, ListView.Contain)
     }
+
+    T.ScrollIndicator {
+        anchors {
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
+        }
+        height: Units.smallSpacing
+        contentItem: Rectangle {
+            height: Units.smallSpacing
+            width: Units.smallSpacing
+            color: Theme.textColor
+            opacity: 0
+            onXChanged: {
+                opacity = 0.3
+                scrollIndicatorTimer.restart();
+            }
+            Behavior on opacity {
+                OpacityAnimator {
+                    duration: Units.longDuration
+                    easing.type: Easing.InOutQuad
+                }
+            }
+            Timer {
+                id: scrollIndicatorTimer
+                interval: Units.longDuration * 4
+                onTriggered: parent.opacity = 0;
+            }
+        }
+    }
+
 
     ColumnsView {
         id: columnsView
@@ -644,120 +517,6 @@ T.Control {
                 duration: Units.longDuration
                 easing.type: Easing.InOutQuad
             }
-        }
-    }
-    Component {
-        id: containerComponent
-
-        MouseArea {
-            id: container
-            height: mainView.height
-            width: root.width
-            state: page
-                    ? (page.visible ? (!root.wideMode ? "vertical" : (container.level >= pagesLogic.count - 1 ? "last" : "middle")) : "hidden")
-                    : "";
-            acceptedButtons: Qt.LeftButton | Qt.BackButton | Qt.ForwardButton
-
-            property int level
-
-            readonly property int hint: page && page.implicitWidth ? page.implicitWidth : root.defaultColumnWidth
-            readonly property int roundedHint: Math.floor(root.width/hint) > 0 ? root.width/Math.floor(root.width/hint) : root.width
-            property T.Control __pageRow: root
-
-            property Item footer
-
-            property Item page
-            onPageChanged: {
-                if (page) {
-                    owner = page.parent;
-                    page.parent = container;
-                    page.anchors.left = container.left;
-                    page.anchors.top = container.top;
-                    page.anchors.right = container.right;
-                    page.anchors.bottom = container.bottom;
-                    page.anchors.topMargin = Qt.binding(function() {return globalToolBar.actualStyle == ApplicationHeaderStyle.TabBar || globalToolBar.actualStyle == ApplicationHeaderStyle.Breadcrumb ? globalToolBarUI.height : 0});
-                } else {
-                    pagesLogic.remove(level);
-                }
-            }
-            property Item owner
-            drag.filterChildren: true
-            onPressed: {
-                switch (mouse.button) {
-                case Qt.BackButton:
-                    root.flickBack();
-                    break;
-                case Qt.ForwardButton:
-                    root.currentIndex = Math.min(root.depth, root.currentIndex + 1);
-                    break;
-                default:
-                    root.currentIndex = level;
-                    break;
-                }
-                mouse.accepted = false;
-            }
-            onFocusChanged: {
-                if (focus) {
-                    root.currentIndex = level;
-                }
-            }
-
-            //TODO: move in Page itself?
-            Separator {
-                z: 999
-                anchors {
-                    top: page ? page.top : parent.top
-                    bottom: parent.bottom
-                    left: parent.left
-                    //ensure a sharp angle
-                    topMargin: -width + (globalToolBar.actualStyle == ApplicationHeaderStyle.ToolBar || globalToolBar.actualStyle == ApplicationHeaderStyle.Titles ? globalToolBarUI.height : 0)
-                }
-                visible: root.separatorVisible && mainView.contentX < container.x
-            }
-            states: [
-                State {
-                    name: "vertical"
-                    PropertyChanges {
-                        target: container
-                        width: root.width
-                    }
-                    PropertyChanges {
-                        target: container.page ? container.page.anchors : null
-                        rightMargin: 0
-                    }
-                },
-                State {
-                    name: "last"
-                    PropertyChanges {
-                        target: container
-                        width: pagesLogic.roundedDefaultColumnWidth
-                    }
-                    PropertyChanges {
-                        target: container.page.anchors
-                        rightMargin: {
-                            return -(root.width - pagesLogic.roundedDefaultColumnWidth*2);
-                        }
-                    }
-                },
-                State {
-                    name: "middle"
-                    PropertyChanges {
-                        target: container
-                        width: pagesLogic.roundedDefaultColumnWidth
-                    }
-                    PropertyChanges {
-                        target: container.page.anchors
-                        rightMargin: 0
-                    }
-                },
-                State {
-                    name: "hidden"
-                    PropertyChanges {
-                        target: container
-                        width: 0
-                    }
-                }
-            ]
         }
     }
 }
