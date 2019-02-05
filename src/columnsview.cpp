@@ -348,7 +348,8 @@ void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
         const int index = m_items.indexOf(value.item);
         m_items.removeAll(value.item);
         m_view->polish();
-        if (index < m_view->currentIndex()) {
+        qWarning()<<"FFFFF"<<value.item<<index<<m_view->currentIndex();
+        if (index <= m_view->currentIndex()) {
             m_view->setCurrentIndex(qBound(0, index - 1, m_items.count() - 1));
         }
         emit m_view->depthChanged();
@@ -594,7 +595,7 @@ void ColumnsView::removeItem(QQuickItem *item)
         return;
     }
 
-    m_contentItem->m_items.removeAll(item);
+    // Don't remove the item from m_items: it will be taken care by from ContentItem::itemChange
 
     if (QQmlEngine::objectOwnership(item) == QQmlEngine::JavaScriptOwnership) {
         item->deleteLater();
@@ -617,6 +618,10 @@ void ColumnsView::pop(QQuickItem *item)
 {
     while (!m_contentItem->m_items.isEmpty() && m_contentItem->m_items.last() != item) {
         removeItem(m_contentItem->m_items.last());
+        // if no item has been passed, just pop one
+        if (!item) {
+            break;
+        }
     }
 }
 
@@ -665,6 +670,15 @@ bool ColumnsView::childMouseEventFilter(QQuickItem *item, QEvent *event)
 
         me->setAccepted(false);
         setKeepMouseGrab(false);
+
+        // On press, we set the current index of the view to the root item 
+        QQuickItem *candidateItem = item;
+        while (candidateItem->parentItem() && candidateItem->parentItem() != m_contentItem) {
+            candidateItem = candidateItem->parentItem();
+        }
+        if (candidateItem->parentItem() == m_contentItem) {
+            setCurrentIndex(m_contentItem->m_items.indexOf(candidateItem));
+        }
         break;
     }
     case QEvent::MouseMove: {
