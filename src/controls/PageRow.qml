@@ -47,17 +47,17 @@ T.Control {
     /**
      * The last Page in the Row
      */
-    readonly property Item lastItem: pagesLogic.count ? pagesLogic.get(pagesLogic.count - 1).page : null
+    readonly property Item lastItem: columnsView.contentChildren[columnsView.contentChildren.length - 1]
 
     /**
      * The currently visible Item
      */
-    readonly property Item currentItem: mainView.currentItem ? mainView.currentItem.page : null
+    readonly property Item currentItem: columnsView.currentItem
 
     /**
      * the index of the currently visible Item
      */
-    property alias currentIndex: mainView.currentIndex
+    property alias currentIndex: columnsView.currentIndex
 
     /**
      * The initial item when this PageRow is created
@@ -67,7 +67,7 @@ T.Control {
     /**
      * The main flickable of this Row
      */
-    contentItem: mainView
+    contentItem: columnsView
 
     /**
      * The default width for a column
@@ -84,14 +84,14 @@ T.Control {
      * Otherwise the only way to go back will be programmatically
      * default: true
      */
-    property alias interactive: mainView.interactive
+    property alias interactive: columnsView.interactive
 
     /**
      * wideMode: bool
      * If true, the PageRow is wide enough that willshow more than one column at once
      * @since 5.37
      */
-    readonly property bool wideMode: root.width >= root.defaultColumnWidth*2 && pagesLogic.count >= 2
+    readonly property bool wideMode: root.width >= root.defaultColumnWidth*2 && depth >= 2
 
     /**
      * separatorVisible: bool
@@ -149,7 +149,7 @@ T.Control {
      */
     function push(page, properties) {
         //don't push again things already there
-        if (page.createObject === undefined && typeof page != "string" && columnsView.items.indexOf(page) !== -1) {
+        if (page.createObject === undefined && typeof page != "string" && columnsView.contentChildren.indexOf(page) !== -1) {
             print("The item " + page + " is already in the PageRow");
             return;
         }
@@ -188,10 +188,10 @@ T.Control {
         }
 
         // initialize the page
-        pagesLogic.initPage(page, properties);
+        var pageItem = pagesLogic.initPage(page, properties);
 
-        pagePushed(container.page);
-        return container.page
+        pagePushed(pageItem);
+        return pageItem;
     }
 
     /**
@@ -224,13 +224,7 @@ T.Control {
      * @since 2.5
      */
     signal pageRemoved(Item page)
-ColumnsView {
-    id: columnsView
-    anchors.fill: parent
-    z: 999999
-    columnResizeMode: depth < 2 || width < columnWidth * 2 ? ColumnsView.SingleColumn : ColumnsView.FixedColumns
-    columnWidth: root.defaultColumnWidth
-}
+
     SequentialAnimation {
         id: popScrollAnim
         property real from
@@ -288,12 +282,13 @@ ColumnsView {
      * @see push() for details.
      */
     function replace(page, properties) {
-        if (currentIndex>=1)
-            popScrollAnim.popPageCleanup(pagesLogic.get(currentIndex-1).page);
-        else if (currentIndex==0)
-            popScrollAnim.popPageCleanup();
-        else
+        if (currentIndex >= 1) {
+            pop(columnsView.contentChildren[currentIndex-1]);
+        } else if (currentIndex == 0) {
+            pop();
+        } else {
             console.warn("There's no page to replace");
+        }
         return push(page, properties);
     }
 
@@ -302,7 +297,7 @@ ColumnsView {
      * Destroy (or reparent) all the pages contained.
      */
     function clear() {
-        return pagesLogic.clearPages();
+        return columnsView.clear();
     }
 
     /**
@@ -310,7 +305,7 @@ ColumnsView {
      * @param idx the depth of the page we want
      */
     function get(idx) {
-        return pagesLogic.get(idx).page;
+        return columnsView.contentChildren[idx];
     }
 
     /**
@@ -637,6 +632,20 @@ ColumnsView {
         onContentWidthChanged: mainView.positionViewAtIndex(root.currentIndex, ListView.Contain)
     }
 
+    ColumnsView {
+        id: columnsView
+        anchors.fill: parent
+        readonly property Item __pageRow: root
+        columnResizeMode: depth < 2 || width < columnWidth * 2 ? ColumnsView.SingleColumn : ColumnsView.FixedColumns
+        columnWidth: root.defaultColumnWidth
+        opacity: layersStack.depth < 2
+        Behavior on opacity {
+            OpacityAnimator {
+                duration: Units.longDuration
+                easing.type: Easing.InOutQuad
+            }
+        }
+    }
     Component {
         id: containerComponent
 

@@ -53,6 +53,7 @@ public:
     qreal childWidth(QQuickItem *child);
     void layoutItems();
     void updateVisibleItems();
+    void forgetItem(QQuickItem *item);
 
     void setBoundedX(qreal x);
     void animateX(qreal x);

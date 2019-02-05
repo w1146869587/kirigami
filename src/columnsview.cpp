@@ -319,6 +319,29 @@ void ContentItem::updateVisibleItems()
     }
 }
 
+void ContentItem::forgetItem(QQuickItem *item)
+{
+    if (!m_items.contains(item)) {
+        return;
+    }
+
+    ColumnsViewAttached *attached = qobject_cast<ColumnsViewAttached *>(qmlAttachedPropertiesObject<ColumnsView>(item, true));
+    attached->setView(nullptr);
+    attached->setLevel(-1);
+
+    disconnect(attached, nullptr, this, nullptr);
+    disconnect(item, nullptr, this, nullptr);
+
+    const int index = m_items.indexOf(item);
+    m_items.removeAll(item);
+    m_view->polish();
+
+    if (index <= m_view->currentIndex()) {
+        m_view->setCurrentIndex(qBound(0, index - 1, m_items.count() - 1));
+    }
+    emit m_view->depthChanged();
+}
+
 void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
 {
     switch (change) {
@@ -338,21 +361,7 @@ void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
         break;
     }
     case QQuickItem::ItemChildRemovedChange: {
-        ColumnsViewAttached *attached = qobject_cast<ColumnsViewAttached *>(qmlAttachedPropertiesObject<ColumnsView>(value.item, true));
-        attached->setView(nullptr);
-        attached->setLevel(-1);
-
-        disconnect(attached, nullptr, this, nullptr);
-        disconnect(value.item, nullptr, this, nullptr);
-
-        const int index = m_items.indexOf(value.item);
-        m_items.removeAll(value.item);
-        m_view->polish();
-        qWarning()<<"FFFFF"<<value.item<<index<<m_view->currentIndex();
-        if (index <= m_view->currentIndex()) {
-            m_view->setCurrentIndex(qBound(0, index - 1, m_items.count() - 1));
-        }
-        emit m_view->depthChanged();
+        forgetItem(value.item);
         break;
     }
     case QQuickItem::ItemVisibleHasChanged:
@@ -595,7 +604,7 @@ void ColumnsView::removeItem(QQuickItem *item)
         return;
     }
 
-    // Don't remove the item from m_items: it will be taken care by from ContentItem::itemChange
+    m_contentItem->forgetItem(item);
 
     if (QQmlEngine::objectOwnership(item) == QQmlEngine::JavaScriptOwnership) {
         item->deleteLater();
