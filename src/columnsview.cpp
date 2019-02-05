@@ -264,7 +264,6 @@ qreal ContentItem::childWidth(QQuickItem *child)
         return qRound(parentItem()->width());
 
     } else if (attached->fillWidth()) {
-        
         return qRound(qBound(m_columnWidth, (parentItem()->width() - attached->reservedSpace()), parentItem()->width()));
 
     } else if (m_columnResizeMode == ColumnsView::FixedColumns) {
@@ -278,7 +277,7 @@ qreal ContentItem::childWidth(QQuickItem *child)
         if (width < 1.0) {
             width = m_columnWidth;
         }
-        
+
         return qRound(qMin(m_view->width(), width));
     }
 }
@@ -362,6 +361,15 @@ void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
             connect(value.item, &QQuickItem::widthChanged, this, &ContentItem::layoutItems);
             m_items << value.item;
         }
+
+        if (privateQmlComponentsPoolSelf->self.m_separatorComponent) {
+            QQuickItem *separatorItem = qobject_cast<QQuickItem *>(privateQmlComponentsPoolSelf->self.m_separatorComponent->create());
+            if (separatorItem) {
+                separatorItem->setParentItem(value.item);
+                separatorItem->setZ(9999);
+            }
+        }
+
         m_shouldAnimate = true;
         m_view->polish();
         emit m_view->depthChanged();
