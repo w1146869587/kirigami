@@ -474,36 +474,6 @@ T.Control {
         }
     }
 
-    T.ScrollIndicator {
-        anchors {
-            left: parent.left
-            right: parent.right
-            bottom: parent.bottom
-        }
-        height: Units.smallSpacing
-        contentItem: Rectangle {
-            height: Units.smallSpacing
-            width: Units.smallSpacing
-            color: Theme.textColor
-            opacity: 0
-            onXChanged: {
-                opacity = 0.3
-                scrollIndicatorTimer.restart();
-            }
-            Behavior on opacity {
-                OpacityAnimator {
-                    duration: Units.longDuration
-                    easing.type: Easing.InOutQuad
-                }
-            }
-            Timer {
-                id: scrollIndicatorTimer
-                interval: Units.longDuration * 4
-                onTriggered: parent.opacity = 0;
-            }
-        }
-    }
-
 
     ColumnsView {
         id: columnsView
@@ -517,6 +487,30 @@ T.Control {
                 duration: Units.longDuration
                 easing.type: Easing.InOutQuad
             }
+        }
+    }
+
+    Rectangle {
+        anchors.bottom: columnsView.bottom
+        height: Units.smallSpacing
+        x: columnsView.width * (columnsView.contentX / columnsView.width)
+        width: 100//columnsView.width * (columnsView.width/columnsView.contentWidth)
+        color: Theme.textColor
+        opacity: 1// columnsView.dragging || columnsView.moving
+        onXChanged: {
+            opacity = 0.3
+            scrollIndicatorTimer.restart();
+        }
+        Behavior on opacity {
+            OpacityAnimator {
+                duration: Units.longDuration
+                easing.type: Easing.InOutQuad
+            }
+        }
+        Timer {
+            id: scrollIndicatorTimer
+            interval: Units.longDuration * 4
+            onTriggered: parent.opacity = 0;
         }
     }
 }
