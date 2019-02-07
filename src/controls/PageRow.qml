@@ -493,10 +493,10 @@ T.Control {
     Rectangle {
         anchors.bottom: columnsView.bottom
         height: Units.smallSpacing
-        x: columnsView.width * (columnsView.contentX / columnsView.width)
-        width: 100//columnsView.width * (columnsView.width/columnsView.contentWidth)
+        x: (columnsView.width - width) * (columnsView.contentX / (columnsView.contentWidth - columnsView.width))
+        width: columnsView.width * (columnsView.width/columnsView.contentWidth)
         color: Theme.textColor
-        opacity: 1// columnsView.dragging || columnsView.moving
+        opacity: 0
         onXChanged: {
             opacity = 0.3
             scrollIndicatorTimer.restart();
