@@ -73,6 +73,15 @@ T2.ItemDelegate {
     property alias containsMouse: listItem.hovered
 
     /**
+     * alternatingBackground: bool
+     * If true the background of the list items will be alternating between two
+     * colors, helping readability with multiple column views.
+     * Use it only when implementing a view which shows data visually in multiple columns
+     * @ since 2.7 
+     */
+    property bool alternatingBackground: false
+
+    /**
      * sectionDelegate: bool
      * If true the item will be a delegate for a section, so will look like a
      * "title" for the items under it.
@@ -119,6 +128,14 @@ T2.ItemDelegate {
     property color backgroundColor: Theme.backgroundColor
 
     /**
+     * alternateBackgroundColor: color
+     * The background color to use if alternatingBackground is true.
+     * It is advised to leave the default.
+     * @since 2.7
+     */
+    property color alternateBackgroundColor: Theme.alternateBackgroundColor
+
+    /**
      * activeTextColor: color
      * Color for the text in the item when pressed or selected
      * It is advised to leave the default value (Theme.highlightedTextColor)
@@ -142,14 +159,16 @@ T2.ItemDelegate {
     hoverEnabled: true
     implicitWidth: contentItem ? contentItem.implicitWidth : Units.gridUnit * 12
     width: parent ? parent.width : implicitWidth
-    implicitHeight: contentItem.implicitHeight + Units.smallSpacing * 5
+    implicitHeight: contentItem.implicitHeight + topPadding + bottomPadding
 
-    leftPadding: Units.smallSpacing * 2
+    padding: Settings.tabletMode ? Units.largeSpacing : Units.smallSpacing
 
-    rightPadding: Units.smallSpacing * 2 + (handleMouse.visible ? handleMouse.width : hovered * actionsLayout.width) + handleMouse.anchors.rightMargin
+    leftPadding: padding * 2
+
+    rightPadding: padding * 2 + (handleMouse.visible ? handleMouse.width : hovered * actionsLayout.width) + handleMouse.anchors.rightMargin
     
-    topPadding: Units.smallSpacing * 2
-    bottomPadding: Units.smallSpacing * 2
+    topPadding: padding
+    bottomPadding: padding
 
 //END properties
 
@@ -224,6 +243,7 @@ T2.ItemDelegate {
             property bool exclusive: false
             property Item checkedButton
             spacing: Units.largeSpacing
+            property int visibleActions: 0
             Repeater {
                 model: {
                     if (listItem.actions.length === 0) {
@@ -241,6 +261,23 @@ T2.ItemDelegate {
                     source: modelData.iconName !== "" ? modelData.iconName : modelData.iconSource
                     enabled: (modelData && modelData.enabled !== undefined) ? modelData.enabled : true;
                     visible: (modelData && modelData.visible !== undefined) ? modelData.visible : true;
+                    onVisibleChanged: {
+                        if (visible) {
+                            actionsLayout.visibleActions++;
+                        } else {
+                            actionsLayout.visibleActions--;
+                        }
+                    }
+                    Component.onCompleted: {
+                        if (visible) {
+                            actionsLayout.visibleActions++;
+                        }
+                    }
+                    Component.onDestruction: {
+                        if (visible) {
+                            actionsLayout.visibleActions--;
+                        }
+                    }
                     MouseArea {
                         id: actionMouse
                         anchors {
@@ -262,7 +299,6 @@ T2.ItemDelegate {
                         Controls.ToolTip.visible: listItem.visible && (Settings.tabletMode ? actionMouse.pressed : actionMouse.containsMouse) && Controls.ToolTip.text.length > 0
                         Controls.ToolTip.text: modelData.tooltip || modelData.text
                     }
-                    
                 }
             }
         }
@@ -271,7 +307,7 @@ T2.ItemDelegate {
     MouseArea {
         id: handleMouse
         parent: listItem.background
-        visible: Settings.tabletMode && listItem.actionsVisible && actions.length > 0
+        visible: Settings.tabletMode && listItem.actionsVisible && actionsLayout.visibleActions > 0
         z: 99
         anchors {
             right: parent.right

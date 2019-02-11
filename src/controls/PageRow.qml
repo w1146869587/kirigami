@@ -70,6 +70,34 @@ T.Control {
     contentItem: columnsView
 
     /**
+     * items: list<Item>
+     * All the items that are present in the PageRow
+     * @since 2.6
+     */
+    readonly property var items: pagesLogic.pages;
+
+    /**
+     * visibleItems: list<Item>
+     * All pages which are visible in the PageRow, excluding those which are scrolled away
+     * @since 2.6
+     */
+    property var visibleItems: []
+
+    /**
+     * firstVisibleItem: Item
+     * The first at least partially visible page in the PageRow, pages before that one will be out of the viewport
+     * @since 2.6
+     */
+    readonly property Item firstVisibleItem: visibleItems.length > 0 ? visibleItems[0] : null
+
+    /**
+     * lastVisibleItem: Item
+     * The last at least partially visible page in the PageRow, pages after that one will be out of the viewport
+     * @since 2.6
+     */
+    readonly property Item lastVisibleItem: visibleItems.length > 0 ? visibleItems[visibleItems.length - 1] : null
+
+    /**
      * The default width for a column
      * default is wide enough for 30 grid units.
      * Pages can override it with their Layout.fillWidth,
@@ -184,6 +212,8 @@ T.Control {
 
                 var container = pagesLogic.initPage(tPage, tProps);
                 pagesLogic.append(container);
+                pagesLogic.pages.push(tPage);
+                root.itemsChanged();
             }
         }
 
@@ -366,6 +396,7 @@ T.Control {
             }
         }
 
+
         pushExit: Transition {
             OpacityAnimator {
                 from: 1
@@ -424,8 +455,6 @@ T.Control {
         source: Qt.resolvedUrl("private/globaltoolbar/PageRowGlobalToolBarUI.qml");
     }
 
-
-
     QtObject {
         id: pagesLogic
         readonly property var componentCache: new Array()
@@ -473,7 +502,6 @@ T.Control {
             }
         }
     }
-
 
     ColumnsView {
         id: columnsView
