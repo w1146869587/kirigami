@@ -665,6 +665,11 @@ void ColumnsView::clear()
     emit contentChildrenChanged();
 }
 
+bool ColumnsView::contains(QQuickItem *item)
+{
+    return m_contentItem->m_items.contains(item);
+}
+
 ColumnsViewAttached *ColumnsView::qmlAttachedProperties(QObject *object)
 {
     return new ColumnsViewAttached(object);

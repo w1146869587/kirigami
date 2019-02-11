@@ -47,7 +47,7 @@ T.Control {
     /**
      * The last Page in the Row
      */
-    readonly property Item lastItem: columnsView.contentChildren[columnsView.contentChildren.length - 1]
+    readonly property Item lastItem: columnsView.contentChildren.length > 0 ?  columnsView.contentChildren[columnsView.contentChildren.length - 1] : null
 
     /**
      * The currently visible Item
@@ -177,7 +177,7 @@ T.Control {
      */
     function push(page, properties) {
         //don't push again things already there
-        if (page.createObject === undefined && typeof page != "string" && columnsView.contentChildren.indexOf(page) !== -1) {
+        if (page.createObject === undefined && typeof page != "string" && columnsView.contains(page)) {
             print("The item " + page + " is already in the PageRow");
             return;
         }
@@ -210,9 +210,7 @@ T.Control {
                     tPage = tPage.page;
                 }
 
-                var container = pagesLogic.initPage(tPage, tProps);
-                pagesLogic.append(container);
-                pagesLogic.pages.push(tPage);
+                var pageItem = pagesLogic.initPage(tPage, tProps);
                 root.itemsChanged();
             }
         }
@@ -472,11 +470,13 @@ T.Control {
                 if (!pageComp) {
                     pageComp = pagesLogic.componentCache[page] = Qt.createComponent(page);
                 }
+                root.itemsChanged();
             }
             if (pageComp) {
                 // instantiate page from component
                 // FIXME: parent directly to columnsview or root?
-                page = pageComp.createObject(columnsView, properties || {});
+                page = pageComp.createObject(null, properties || {});
+                columnsView.addItem(page);
 
                 if (pageComp.status === Component.Error) {
                     throw new Error("Error while loading page: " + pageComp.errorString());
@@ -488,6 +488,7 @@ T.Control {
                         page[prop] = properties[prop];
                     }
                 }
+                columnsView.addItem(page);
             }
             columnsView.currentIndex = page.ColumnsView.level;
             return page;
