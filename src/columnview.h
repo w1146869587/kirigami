@@ -24,20 +24,20 @@
 #include <QPointer>
 
 class ContentItem;
-class ColumnsView;
+class ColumnView;
 
-class ColumnsViewAttached : public QObject
+class ColumnViewAttached : public QObject
 {
     Q_OBJECT
 
     Q_PROPERTY(int level READ level WRITE setLevel NOTIFY levelChanged)
     Q_PROPERTY(bool fillWidth READ fillWidth WRITE setFillWidth NOTIFY fillWidthChanged)
     Q_PROPERTY(qreal reservedSpace READ reservedSpace WRITE setReservedSpace NOTIFY reservedSpaceChanged)
-    Q_PROPERTY(ColumnsView *view READ view NOTIFY viewChanged)
+    Q_PROPERTY(ColumnView *view READ view NOTIFY viewChanged)
 
 public:
-    ColumnsViewAttached(QObject *parent = nullptr);
-    ~ColumnsViewAttached();
+    ColumnViewAttached(QObject *parent = nullptr);
+    ~ColumnViewAttached();
 
     void setLevel(int level);
     int  level() const;
@@ -48,8 +48,8 @@ public:
     qreal reservedSpace() const;
     void setReservedSpace(qreal space);
 
-    ColumnsView *view();
-    void setView(ColumnsView *view);
+    ColumnView *view();
+    void setView(ColumnView *view);
 
 Q_SIGNALS:
     void levelChanged();
@@ -61,12 +61,12 @@ private:
     int m_level = -1;
     bool m_fillWidth = false;
     qreal m_reservedSpace = 0;
-    QPointer<ColumnsView> m_view;
+    QPointer<ColumnView> m_view;
     bool m_customFillWidth = false;
     bool m_customReservedSpace = false;
 };
 
-class ColumnsView : public QQuickItem
+class ColumnView : public QQuickItem
 {
     Q_OBJECT
 
@@ -103,8 +103,8 @@ public:
         DynamicColumns,
         SingleColumn
     };
-    ColumnsView(QQuickItem *parent = nullptr);
-    ~ColumnsView();
+    ColumnView(QQuickItem *parent = nullptr);
+    ~ColumnView();
 
     // QML property accessors
     ColumnResizeMode columnResizeMode() const;
@@ -151,7 +151,7 @@ public:
     void removeItem(int item);
 
     // QML attached property
-    static ColumnsViewAttached *qmlAttachedProperties(QObject *object);
+    static ColumnViewAttached *qmlAttachedProperties(QObject *object);
 
 public Q_SLOTS:
     void addItem(QQuickItem *item);
@@ -206,7 +206,7 @@ private:
     ContentItem *m_contentItem;
     QPointer<QQuickItem> m_currentItem;
 
-    static QHash<QObject *, ColumnsViewAttached *> m_attachedObjects;
+    static QHash<QObject *, ColumnViewAttached *> m_attachedObjects;
     qreal m_oldMouseX = -1.0;
     qreal m_startMouseX = -1.0;
     int m_currentIndex = -1;
@@ -217,4 +217,4 @@ private:
     bool m_separatorVisible = true;
 };
 
-QML_DECLARE_TYPEINFO(ColumnsView, QML_HAS_ATTACHED_PROPERTIES)
+QML_DECLARE_TYPEINFO(ColumnView, QML_HAS_ATTACHED_PROPERTIES)

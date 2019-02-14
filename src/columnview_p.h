@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "columnsview.h"
+#include "columnview.h"
 
 #include <QQuickItem>
 #include <QPointer>
@@ -51,7 +51,7 @@ class ContentItem : public QQuickItem {
     Q_OBJECT
 
 public:
-    ContentItem(ColumnsView *parent = nullptr);
+    ContentItem(ColumnView *parent = nullptr);
     ~ContentItem();
 
     qreal childWidth(QQuickItem *child);
@@ -69,7 +69,7 @@ protected:
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
 
 private:
-    ColumnsView *m_view;
+    ColumnView *m_view;
     QPropertyAnimation *m_slideAnim;
     QList<QQuickItem *> m_items;
     QList<QObject *> m_visibleItems;
@@ -77,8 +77,8 @@ private:
     QHash<QQuickItem *, QQuickItem *> m_separators;
 
     qreal m_columnWidth = 0;
-    ColumnsView::ColumnResizeMode m_columnResizeMode = ColumnsView::FixedColumns;
+    ColumnView::ColumnResizeMode m_columnResizeMode = ColumnView::FixedColumns;
     bool m_shouldAnimate = false;
-    friend class ColumnsView;
+    friend class ColumnView;
 };
 

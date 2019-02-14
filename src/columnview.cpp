@@ -17,8 +17,8 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include "columnsview.h"
-#include "columnsview_p.h"
+#include "columnview.h"
+#include "columnview_p.h"
 
 #include <QGuiApplication>
 #include <QStyleHints>
@@ -29,7 +29,7 @@
 #include <QPropertyAnimation>
 
 
-QHash<QObject *, ColumnsViewAttached *> ColumnsView::m_attachedObjects = QHash<QObject *, ColumnsViewAttached *>();
+QHash<QObject *, ColumnViewAttached *> ColumnView::m_attachedObjects = QHash<QObject *, ColumnViewAttached *>();
 
 class QmlComponentsPoolSingleton
 {
@@ -62,7 +62,7 @@ void QmlComponentsPool::initialize(QQmlEngine *engine)
             "readonly property Kirigami.Units units: Kirigami.Units\n"
             "readonly property Component separator: Kirigami.Separator {"
                 "property Item column\n"
-                "visible: column.Kirigami.ColumnsView.view.contentX < column.x;"
+                "visible: column.Kirigami.ColumnView.view.contentX < column.x;"
                 "anchors.top: column.top;"
                 "anchors.bottom: column.bottom;"
             "}"
@@ -88,14 +88,14 @@ QmlComponentsPool::~QmlComponentsPool()
 
 /////////
 
-ColumnsViewAttached::ColumnsViewAttached(QObject *parent)
+ColumnViewAttached::ColumnViewAttached(QObject *parent)
     : QObject(parent)
 {}
 
-ColumnsViewAttached::~ColumnsViewAttached()
+ColumnViewAttached::~ColumnViewAttached()
 {}
 
-void ColumnsViewAttached::setLevel(int level)
+void ColumnViewAttached::setLevel(int level)
 {
     if (!m_customFillWidth && m_view) {
         m_fillWidth = level == m_view->depth() - 1;
@@ -109,15 +109,15 @@ void ColumnsViewAttached::setLevel(int level)
     emit levelChanged();
 }
 
-int ColumnsViewAttached::level() const
+int ColumnViewAttached::level() const
 {
     return m_level;
 }
 
-void ColumnsViewAttached::setFillWidth(bool fill)
+void ColumnViewAttached::setFillWidth(bool fill)
 {
     if (m_view) {
-        disconnect(m_view.data(), &ColumnsView::depthChanged, this, nullptr);
+        disconnect(m_view.data(), &ColumnView::depthChanged, this, nullptr);
     }
     m_customFillWidth = true;
 
@@ -129,20 +129,20 @@ void ColumnsViewAttached::setFillWidth(bool fill)
     emit fillWidthChanged();
 }
 
-bool ColumnsViewAttached::fillWidth() const
+bool ColumnViewAttached::fillWidth() const
 {
     return m_fillWidth;
 }
 
-qreal ColumnsViewAttached::reservedSpace() const
+qreal ColumnViewAttached::reservedSpace() const
 {
     return m_reservedSpace;
 }
 
-void ColumnsViewAttached::setReservedSpace(qreal space)
+void ColumnViewAttached::setReservedSpace(qreal space)
 {
     if (m_view) {
-        disconnect(m_view.data(), &ColumnsView::columnWidthChanged, this, nullptr);
+        disconnect(m_view.data(), &ColumnView::columnWidthChanged, this, nullptr);
     }
     m_customReservedSpace = true;
 
@@ -154,12 +154,12 @@ void ColumnsViewAttached::setReservedSpace(qreal space)
     emit reservedSpaceChanged();
 }
 
-ColumnsView *ColumnsViewAttached::view()
+ColumnView *ColumnViewAttached::view()
 {
     return m_view;
 }
 
-void ColumnsViewAttached::setView(ColumnsView *view)
+void ColumnViewAttached::setView(ColumnView *view)
 {
     if (view == m_view) {
         return;
@@ -172,14 +172,14 @@ void ColumnsViewAttached::setView(ColumnsView *view)
 
     if (!m_customFillWidth && m_view) {
         m_fillWidth = m_level == m_view->depth() - 1;
-        connect(m_view.data(), &ColumnsView::depthChanged, this, [this]() {
+        connect(m_view.data(), &ColumnView::depthChanged, this, [this]() {
             m_fillWidth = m_level == m_view->depth() - 1;
             emit fillWidthChanged();
         });
     }
     if (!m_customReservedSpace && m_view) {
         m_reservedSpace = m_view->columnWidth();
-        connect(m_view.data(), &ColumnsView::columnWidthChanged, this, [this]() {
+        connect(m_view.data(), &ColumnView::columnWidthChanged, this, [this]() {
             m_reservedSpace = m_view->columnWidth();
             emit reservedSpaceChanged();
         });
@@ -190,7 +190,7 @@ void ColumnsViewAttached::setView(ColumnsView *view)
 
 
 
-ContentItem::ContentItem(ColumnsView *parent)
+ContentItem::ContentItem(ColumnView *parent)
     : QQuickItem(parent),
       m_view(parent)
 {
@@ -268,15 +268,15 @@ qreal ContentItem::childWidth(QQuickItem *child)
         return 0.0;
     }
 
-    ColumnsViewAttached *attached = qobject_cast<ColumnsViewAttached *>(qmlAttachedPropertiesObject<ColumnsView>(child, true));
+    ColumnViewAttached *attached = qobject_cast<ColumnViewAttached *>(qmlAttachedPropertiesObject<ColumnView>(child, true));
 
-    if (m_columnResizeMode == ColumnsView::SingleColumn) {
+    if (m_columnResizeMode == ColumnView::SingleColumn) {
         return qRound(parentItem()->width());
 
     } else if (attached->fillWidth()) {
         return qRound(qBound(m_columnWidth, (parentItem()->width() - attached->reservedSpace()), parentItem()->width()));
 
-    } else if (m_columnResizeMode == ColumnsView::FixedColumns) {
+    } else if (m_columnResizeMode == ColumnView::FixedColumns) {
         return qRound(qMin(parentItem()->width(), m_columnWidth));
 
     // DynamicColumns
@@ -302,7 +302,7 @@ void ContentItem::layoutItems()
             child->setPosition(QPointF(partialWidth, 0.0));
             partialWidth += child->width();
         }
-        ColumnsViewAttached *attached = qobject_cast<ColumnsViewAttached *>(qmlAttachedPropertiesObject<ColumnsView>(child, true));
+        ColumnViewAttached *attached = qobject_cast<ColumnViewAttached *>(qmlAttachedPropertiesObject<ColumnView>(child, true));
         attached->setLevel(i++);
     }
     setWidth(partialWidth);
@@ -339,7 +339,7 @@ void ContentItem::forgetItem(QQuickItem *item)
         return;
     }
 
-    ColumnsViewAttached *attached = qobject_cast<ColumnsViewAttached *>(qmlAttachedPropertiesObject<ColumnsView>(item, true));
+    ColumnViewAttached *attached = qobject_cast<ColumnViewAttached *>(qmlAttachedPropertiesObject<ColumnView>(item, true));
     attached->setView(nullptr);
     attached->setLevel(-1);
 
@@ -384,11 +384,11 @@ void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
 {
     switch (change) {
     case QQuickItem::ItemChildAddedChange: {
-        ColumnsViewAttached *attached = qobject_cast<ColumnsViewAttached *>(qmlAttachedPropertiesObject<ColumnsView>(value.item, true));
+        ColumnViewAttached *attached = qobject_cast<ColumnViewAttached *>(qmlAttachedPropertiesObject<ColumnView>(value.item, true));
         attached->setView(m_view);
 
-        connect(attached, &ColumnsViewAttached::fillWidthChanged, this, &ContentItem::layoutItems);
-        connect(attached, &ColumnsViewAttached::reservedSpaceChanged, this, &ContentItem::layoutItems);
+        connect(attached, &ColumnViewAttached::fillWidthChanged, this, &ContentItem::layoutItems);
+        connect(attached, &ColumnViewAttached::reservedSpaceChanged, this, &ContentItem::layoutItems);
 
         if (!m_items.contains(value.item)) {
             connect(value.item, &QQuickItem::widthChanged, this, &ContentItem::layoutItems);
@@ -429,7 +429,7 @@ void ContentItem::geometryChanged(const QRectF &newGeometry, const QRectF &oldGe
 
 
 
-ColumnsView::ColumnsView(QQuickItem *parent)
+ColumnView::ColumnView(QQuickItem *parent)
     : QQuickItem(parent),
       m_contentItem(nullptr)
 {
@@ -442,20 +442,20 @@ ColumnsView::ColumnsView(QQuickItem *parent)
         m_moving = false;
         emit movingChanged();
     });
-    connect(m_contentItem, &ContentItem::widthChanged, this, &ColumnsView::contentWidthChanged);
-    connect(m_contentItem, &ContentItem::xChanged, this, &ColumnsView::contentXChanged);
+    connect(m_contentItem, &ContentItem::widthChanged, this, &ColumnView::contentWidthChanged);
+    connect(m_contentItem, &ContentItem::xChanged, this, &ColumnView::contentXChanged);
 }
 
-ColumnsView::~ColumnsView()
+ColumnView::~ColumnView()
 {
 }
 
-ColumnsView::ColumnResizeMode ColumnsView::columnResizeMode() const
+ColumnView::ColumnResizeMode ColumnView::columnResizeMode() const
 {
     return m_contentItem->m_columnResizeMode;
 }
 
-void ColumnsView::setColumnResizeMode(ColumnResizeMode mode)
+void ColumnView::setColumnResizeMode(ColumnResizeMode mode)
 {
     if (m_contentItem->m_columnResizeMode == mode) {
         return;
@@ -470,12 +470,12 @@ void ColumnsView::setColumnResizeMode(ColumnResizeMode mode)
     emit columnResizeModeChanged();
 }
 
-qreal ColumnsView::columnWidth() const
+qreal ColumnView::columnWidth() const
 {
     return m_contentItem->m_columnWidth;
 }
 
-void ColumnsView::setColumnWidth(qreal width)
+void ColumnView::setColumnWidth(qreal width)
 {
     // Always forget the internal binding when the user sets anything, even the same value
     disconnect(&privateQmlComponentsPoolSelf->self, &QmlComponentsPool::gridUnitChanged, this, nullptr);
@@ -490,12 +490,12 @@ void ColumnsView::setColumnWidth(qreal width)
     emit columnWidthChanged();
 }
 
-int ColumnsView::currentIndex() const
+int ColumnView::currentIndex() const
 {
     return m_currentIndex;
 }
 
-void ColumnsView::setCurrentIndex(int index)
+void ColumnView::setCurrentIndex(int index)
 {
     if (!parentItem() || m_currentIndex == index || index < -1 || index >= m_contentItem->m_items.count()) {
         return;
@@ -522,32 +522,32 @@ void ColumnsView::setCurrentIndex(int index)
     emit currentItemChanged();
 }
 
-QQuickItem *ColumnsView::currentItem()
+QQuickItem *ColumnView::currentItem()
 {
     return m_currentItem;
 }
 
-QList<QObject *>ColumnsView::visibleItems() const
+QList<QObject *>ColumnView::visibleItems() const
 {
     return m_contentItem->m_visibleItems;
 }
 
-int ColumnsView::depth() const
+int ColumnView::depth() const
 {
     return m_contentItem->m_items.count();
 }
 
-QQuickItem *ColumnsView::contentItem() const
+QQuickItem *ColumnView::contentItem() const
 {
     return m_contentItem;
 }
 
-int ColumnsView::scrollDuration() const
+int ColumnView::scrollDuration() const
 {
     return m_contentItem->m_slideAnim->duration();
 }
 
-void ColumnsView::setScrollDuration(int duration)
+void ColumnView::setScrollDuration(int duration)
 {
     disconnect(&privateQmlComponentsPoolSelf->self, &QmlComponentsPool::longDurationChanged, this, nullptr);
 
@@ -559,12 +559,12 @@ void ColumnsView::setScrollDuration(int duration)
     emit scrollDurationChanged();
 }
 
-bool ColumnsView::separatorVisible() const
+bool ColumnView::separatorVisible() const
 {
     return m_separatorVisible;
 }
 
-void ColumnsView::setSeparatorVisible(bool visible)
+void ColumnView::setSeparatorVisible(bool visible)
 {
     if (visible == m_separatorVisible) {
         return;
@@ -588,37 +588,37 @@ void ColumnsView::setSeparatorVisible(bool visible)
     emit separatorVisibleChanged();
 }
 
-bool ColumnsView::dragging() const
+bool ColumnView::dragging() const
 {
     return m_dragging;
 }
 
-bool ColumnsView::moving() const
+bool ColumnView::moving() const
 {
     return m_moving;
 }
 
-qreal ColumnsView::contentWidth() const
+qreal ColumnView::contentWidth() const
 {
     return m_contentItem->width();
 }
 
-qreal ColumnsView::contentX() const
+qreal ColumnView::contentX() const
 {
     return -m_contentItem->x();
 }
 
-void ColumnsView::setContentX(qreal x) const
+void ColumnView::setContentX(qreal x) const
 {
     m_contentItem->setX(qRound(-x));
 }
 
-bool ColumnsView::interactive() const
+bool ColumnView::interactive() const
 {
     return m_interactive;
 }
 
-void ColumnsView::setInteractive(bool interactive)
+void ColumnView::setInteractive(bool interactive)
 {
     if (m_interactive != interactive) {
         return;
@@ -639,12 +639,12 @@ void ColumnsView::setInteractive(bool interactive)
     emit interactiveChanged();
 }
 
-void ColumnsView::addItem(QQuickItem *item)
+void ColumnView::addItem(QQuickItem *item)
 {
     insertItem(m_contentItem->m_items.length(), item);
 }
 
-void ColumnsView::insertItem(int pos, QQuickItem *item)
+void ColumnView::insertItem(int pos, QQuickItem *item)
 {
     if (m_contentItem->m_items.contains(item)) {
         return;
@@ -657,7 +657,7 @@ void ColumnsView::insertItem(int pos, QQuickItem *item)
     emit contentChildrenChanged();
 }
 
-void ColumnsView::moveItem(int from, int to)
+void ColumnView::moveItem(int from, int to)
 {
     if (m_contentItem->m_items.isEmpty()
         || from < 0 || from >= m_contentItem->m_items.length()
@@ -670,7 +670,7 @@ void ColumnsView::moveItem(int from, int to)
     polish();
 }
 
-void ColumnsView::removeItem(const QVariant &item)
+void ColumnView::removeItem(const QVariant &item)
 {
     if (item.canConvert<QQuickItem *>()) {
         removeItem(item.value<QQuickItem *>());
@@ -679,7 +679,7 @@ void ColumnsView::removeItem(const QVariant &item)
     }
 }
 
-void ColumnsView::removeItem(QQuickItem *item)
+void ColumnView::removeItem(QQuickItem *item)
 {
     if (m_contentItem->m_items.isEmpty() || !m_contentItem->m_items.contains(item)) {
         return;
@@ -694,7 +694,7 @@ void ColumnsView::removeItem(QQuickItem *item)
     }
 }
 
-void ColumnsView::removeItem(int pos)
+void ColumnView::removeItem(int pos)
 {
     if (m_contentItem->m_items.isEmpty()
         || pos < 0 || pos >= m_contentItem->m_items.length()) {
@@ -704,7 +704,7 @@ void ColumnsView::removeItem(int pos)
     removeItem(m_contentItem->m_items[pos]); 
 }
 
-void ColumnsView::pop(QQuickItem *item)
+void ColumnView::pop(QQuickItem *item)
 {
     while (!m_contentItem->m_items.isEmpty() && m_contentItem->m_items.last() != item) {
         removeItem(m_contentItem->m_items.last());
@@ -715,7 +715,7 @@ void ColumnsView::pop(QQuickItem *item)
     }
 }
 
-void ColumnsView::clear()
+void ColumnView::clear()
 {
     for (QQuickItem *item : m_contentItem->m_items) {
         if (QQmlEngine::objectOwnership(item) == QQmlEngine::JavaScriptOwnership) {
@@ -728,17 +728,17 @@ void ColumnsView::clear()
     emit contentChildrenChanged();
 }
 
-bool ColumnsView::containsItem(QQuickItem *item)
+bool ColumnView::containsItem(QQuickItem *item)
 {
     return m_contentItem->m_items.contains(item);
 }
 
-ColumnsViewAttached *ColumnsView::qmlAttachedProperties(QObject *object)
+ColumnViewAttached *ColumnView::qmlAttachedProperties(QObject *object)
 {
-    return new ColumnsViewAttached(object);
+    return new ColumnViewAttached(object);
 }
 
-void ColumnsView::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
+void ColumnView::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
 {
     m_contentItem->setHeight(newGeometry.height());
     m_contentItem->m_shouldAnimate = false;
@@ -748,7 +748,7 @@ void ColumnsView::geometryChanged(const QRectF &newGeometry, const QRectF &oldGe
     QQuickItem::geometryChanged(newGeometry, oldGeometry);
 }
 
-bool ColumnsView::childMouseEventFilter(QQuickItem *item, QEvent *event)
+bool ColumnView::childMouseEventFilter(QQuickItem *item, QEvent *event)
 {
     if (!m_interactive || item == m_contentItem) {
         return QQuickItem::childMouseEventFilter(item, event);
@@ -834,7 +834,7 @@ bool ColumnsView::childMouseEventFilter(QQuickItem *item, QEvent *event)
     return QQuickItem::childMouseEventFilter(item, event);
 }
 
-void ColumnsView::mousePressEvent(QMouseEvent *event)
+void ColumnView::mousePressEvent(QMouseEvent *event)
 {
     if (!m_interactive) {
         return;
@@ -847,7 +847,7 @@ void ColumnsView::mousePressEvent(QMouseEvent *event)
     event->accept();
 }
 
-void ColumnsView::mouseMoveEvent(QMouseEvent *event)
+void ColumnView::mouseMoveEvent(QMouseEvent *event)
 {
     if (!m_interactive) {
         return;
@@ -872,7 +872,7 @@ void ColumnsView::mouseMoveEvent(QMouseEvent *event)
     event->accept();
 }
 
-void ColumnsView::mouseReleaseEvent(QMouseEvent *event)
+void ColumnView::mouseReleaseEvent(QMouseEvent *event)
 {
     if (!m_interactive) {
         return;
@@ -888,7 +888,7 @@ void ColumnsView::mouseReleaseEvent(QMouseEvent *event)
     event->accept();
 }
 
-void ColumnsView::mouseUngrabEvent()
+void ColumnView::mouseUngrabEvent()
 {
     if (m_dragging) {
         m_dragging = false;
@@ -899,7 +899,7 @@ void ColumnsView::mouseUngrabEvent()
     setKeepMouseGrab(false);
 }
 
-void ColumnsView::classBegin()
+void ColumnView::classBegin()
 {
     privateQmlComponentsPoolSelf->self.initialize(qmlEngine(this));
 
@@ -920,12 +920,12 @@ void ColumnsView::classBegin()
     syncDuration();
 }
 
-void ColumnsView::updatePolish()
+void ColumnView::updatePolish()
 {
     m_contentItem->layoutItems();
 }
 
-void ColumnsView::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
+void ColumnView::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
 {
     switch (change) {
     case QQuickItem::ItemChildAddedChange:
@@ -939,9 +939,9 @@ void ColumnsView::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
     QQuickItem::itemChange(change, value);
 }
 
-void ColumnsView::contentChildren_append(QQmlListProperty<QQuickItem> *prop, QQuickItem *item)
+void ColumnView::contentChildren_append(QQmlListProperty<QQuickItem> *prop, QQuickItem *item)
 {
-    ColumnsView *view = static_cast<ColumnsView *>(prop->object);
+    ColumnView *view = static_cast<ColumnView *>(prop->object);
     if (!view) {
         return;
     }
@@ -950,9 +950,9 @@ void ColumnsView::contentChildren_append(QQmlListProperty<QQuickItem> *prop, QQu
     item->setParentItem(view->m_contentItem);
 }
 
-int ColumnsView::contentChildren_count(QQmlListProperty<QQuickItem> *prop)
+int ColumnView::contentChildren_count(QQmlListProperty<QQuickItem> *prop)
 {
-    ColumnsView *view = static_cast<ColumnsView *>(prop->object);
+    ColumnView *view = static_cast<ColumnView *>(prop->object);
     if (!view) {
         return 0;
     }
@@ -960,9 +960,9 @@ int ColumnsView::contentChildren_count(QQmlListProperty<QQuickItem> *prop)
     return view->m_contentItem->m_items.count();
 }
 
-QQuickItem *ColumnsView::contentChildren_at(QQmlListProperty<QQuickItem> *prop, int index)
+QQuickItem *ColumnView::contentChildren_at(QQmlListProperty<QQuickItem> *prop, int index)
 {
-    ColumnsView *view = static_cast<ColumnsView *>(prop->object);
+    ColumnView *view = static_cast<ColumnView *>(prop->object);
     if (!view) {
         return nullptr;
     }
@@ -973,9 +973,9 @@ QQuickItem *ColumnsView::contentChildren_at(QQmlListProperty<QQuickItem> *prop, 
     return view->m_contentItem->m_items.value(index);
 }
 
-void ColumnsView::contentChildren_clear(QQmlListProperty<QQuickItem> *prop)
+void ColumnView::contentChildren_clear(QQmlListProperty<QQuickItem> *prop)
 {
-    ColumnsView *view = static_cast<ColumnsView *>(prop->object);
+    ColumnView *view = static_cast<ColumnView *>(prop->object);
     if (!view) {
         return;
     }
@@ -983,7 +983,7 @@ void ColumnsView::contentChildren_clear(QQmlListProperty<QQuickItem> *prop)
     return view->m_contentItem->m_items.clear();
 }
 
-QQmlListProperty<QQuickItem> ColumnsView::contentChildren()
+QQmlListProperty<QQuickItem> ColumnView::contentChildren()
 {
     return QQmlListProperty<QQuickItem>(this, nullptr,
                                      contentChildren_append,
@@ -992,9 +992,9 @@ QQmlListProperty<QQuickItem> ColumnsView::contentChildren()
                                      contentChildren_clear);
 }
 
-void ColumnsView::contentData_append(QQmlListProperty<QObject> *prop, QObject *object)
+void ColumnView::contentData_append(QQmlListProperty<QObject> *prop, QObject *object)
 {
-    ColumnsView *view = static_cast<ColumnsView *>(prop->object);
+    ColumnView *view = static_cast<ColumnView *>(prop->object);
     if (!view) {
         return;
     }
@@ -1011,9 +1011,9 @@ void ColumnsView::contentData_append(QQmlListProperty<QObject> *prop, QObject *o
     }
 }
 
-int ColumnsView::contentData_count(QQmlListProperty<QObject> *prop)
+int ColumnView::contentData_count(QQmlListProperty<QObject> *prop)
 {
-    ColumnsView *view = static_cast<ColumnsView *>(prop->object);
+    ColumnView *view = static_cast<ColumnView *>(prop->object);
     if (!view) {
         return 0;
     }
@@ -1021,9 +1021,9 @@ int ColumnsView::contentData_count(QQmlListProperty<QObject> *prop)
     return view->m_contentData.count();
 }
 
-QObject *ColumnsView::contentData_at(QQmlListProperty<QObject> *prop, int index)
+QObject *ColumnView::contentData_at(QQmlListProperty<QObject> *prop, int index)
 {
-    ColumnsView *view = static_cast<ColumnsView *>(prop->object);
+    ColumnView *view = static_cast<ColumnView *>(prop->object);
     if (!view) {
         return nullptr;
     }
@@ -1034,9 +1034,9 @@ QObject *ColumnsView::contentData_at(QQmlListProperty<QObject> *prop, int index)
     return view->m_contentData.value(index);
 }
 
-void ColumnsView::contentData_clear(QQmlListProperty<QObject> *prop)
+void ColumnView::contentData_clear(QQmlListProperty<QObject> *prop)
 {
-    ColumnsView *view = static_cast<ColumnsView *>(prop->object);
+    ColumnView *view = static_cast<ColumnView *>(prop->object);
     if (!view) {
         return;
     }
@@ -1044,7 +1044,7 @@ void ColumnsView::contentData_clear(QQmlListProperty<QObject> *prop)
     return view->m_contentData.clear();
 }
 
-QQmlListProperty<QObject> ColumnsView::contentData()
+QQmlListProperty<QObject> ColumnView::contentData()
 {
     return QQmlListProperty<QObject>(this, nullptr,
                                      contentData_append,
@@ -1053,4 +1053,4 @@ QQmlListProperty<QObject> ColumnsView::contentData()
                                      contentData_clear);
 }
 
-#include "moc_columnsview.cpp"
+#include "moc_columnview.cpp"

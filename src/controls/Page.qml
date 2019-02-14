@@ -314,8 +314,8 @@ T2.Page {
         globalToolBar.stack = null;
         globalToolBar.row = null;
 
-        if (root.Kirigami.ColumnsView.view) {
-            globalToolBar.row = root.Kirigami.ColumnsView.view.__pageRow;
+        if (root.Kirigami.ColumnView.view) {
+            globalToolBar.row = root.Kirigami.ColumnView.view.__pageRow;
         }
         if (root.T2.StackView.view) {
             globalToolBar.stack = root.T2.StackView.view;
@@ -361,7 +361,7 @@ T2.Page {
                     //TODO: find container reliably, remove assumption
                     {"pageRow": Qt.binding(function() {return row}),
                     "page": root,
-                    "current": Qt.binding(function() {return stack || row.currentIndex === root.Kirigami.ColumnsView.level})});
+                    "current": Qt.binding(function() {return stack || row.currentIndex === root.Kirigami.ColumnView.level})});
                 }
             }
         },

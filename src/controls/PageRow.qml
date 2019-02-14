@@ -42,22 +42,22 @@ T.Control {
     /**
      * This property holds the number of items currently pushed onto the view
      */
-    property alias depth: columnsView.depth
+    property alias depth: columnView.depth
 
     /**
      * The last Page in the Row
      */
-    readonly property Item lastItem: columnsView.contentChildren.length > 0 ?  columnsView.contentChildren[columnsView.contentChildren.length - 1] : null
+    readonly property Item lastItem: columnView.contentChildren.length > 0 ?  columnView.contentChildren[columnView.contentChildren.length - 1] : null
 
     /**
      * The currently visible Item
      */
-    property alias currentItem: columnsView.currentItem
+    property alias currentItem: columnView.currentItem
 
     /**
      * the index of the currently visible Item
      */
-    property alias currentIndex: columnsView.currentIndex
+    property alias currentIndex: columnView.currentIndex
 
     /**
      * The initial item when this PageRow is created
@@ -67,7 +67,7 @@ T.Control {
     /**
      * The main flickable of this Row
      */
-    contentItem: columnsView
+    contentItem: columnView
 
     /**
      * items: list<Item>
@@ -81,7 +81,7 @@ T.Control {
      * All pages which are visible in the PageRow, excluding those which are scrolled away
      * @since 2.6
      */
-    property alias visibleItems: columnsView.visibleItems
+    property alias visibleItems: columnView.visibleItems
 
     /**
      * firstVisibleItem: Item
@@ -112,7 +112,7 @@ T.Control {
      * Otherwise the only way to go back will be programmatically
      * default: true
      */
-    property alias interactive: columnsView.interactive
+    property alias interactive: columnView.interactive
 
     /**
      * wideMode: bool
@@ -127,7 +127,7 @@ T.Control {
      * default: true
      * @since 5.38
      */
-    property alias separatorVisible: columnsView.separatorVisible
+    property alias separatorVisible: columnView.separatorVisible
 
     /**
      * globalToolBar: grouped property
@@ -177,12 +177,12 @@ T.Control {
      */
     function push(page, properties) {
         //don't push again things already there
-        if (page.createObject === undefined && typeof page != "string" && columnsView.containsItem(page)) {
+        if (page.createObject === undefined && typeof page != "string" && columnView.containsItem(page)) {
             print("The item " + page + " is already in the PageRow");
             return;
         }
 
-        columnsView.pop(columnsView.currentItem);
+        columnView.pop(columnView.currentItem);
 
         // figure out if more than one page is being pushed
         var pages;
@@ -234,7 +234,7 @@ T.Control {
             return;
         }
 
-        columnsView.pop(page)
+        columnView.pop(page)
         pageRemoved(page)
     }
 
@@ -270,7 +270,7 @@ T.Control {
      */
     function replace(page, properties) {
         if (currentIndex >= 1) {
-            pop(columnsView.contentChildren[currentIndex-1]);
+            pop(columnView.contentChildren[currentIndex-1]);
         } else if (currentIndex == 0) {
             pop();
         } else {
@@ -284,7 +284,7 @@ T.Control {
      * Destroy (or reparent) all the pages contained.
      */
     function clear() {
-        return columnsView.clear();
+        return columnView.clear();
     }
 
     /**
@@ -292,7 +292,7 @@ T.Control {
      * @param idx the depth of the page we want
      */
     function get(idx) {
-        return columnsView.contentChildren[idx];
+        return columnView.contentChildren[idx];
     }
 
     /**
@@ -474,9 +474,9 @@ T.Control {
             }
             if (pageComp) {
                 // instantiate page from component
-                // FIXME: parent directly to columnsView or root?
+                // FIXME: parent directly to columnView or root?
                 page = pageComp.createObject(null, properties || {});
-                columnsView.addItem(page);
+                columnView.addItem(page);
 
                 if (pageComp.status === Component.Error) {
                     throw new Error("Error while loading page: " + pageComp.errorString());
@@ -488,9 +488,9 @@ T.Control {
                         page[prop] = properties[prop];
                     }
                 }
-                columnsView.addItem(page);
+                columnView.addItem(page);
             }
-            columnsView.currentIndex = page.ColumnsView.level;
+            columnView.currentIndex = page.ColumnView.level;
             return page;
         }
         function containsPage(page) {
@@ -504,11 +504,11 @@ T.Control {
         }
     }
 
-    ColumnsView {
-        id: columnsView
+    ColumnView {
+        id: columnView
         anchors.fill: parent
         readonly property Item __pageRow: root
-        columnResizeMode: depth < 2 || width < columnWidth * 2 ? ColumnsView.SingleColumn : ColumnsView.FixedColumns
+        columnResizeMode: depth < 2 || width < columnWidth * 2 ? ColumnView.SingleColumn : ColumnView.FixedColumns
         columnWidth: root.defaultColumnWidth
         opacity: layersStack.depth < 2
         Behavior on opacity {
@@ -520,10 +520,10 @@ T.Control {
     }
 
     Rectangle {
-        anchors.bottom: columnsView.bottom
+        anchors.bottom: columnView.bottom
         height: Units.smallSpacing
-        x: (columnsView.width - width) * (columnsView.contentX / (columnsView.contentWidth - columnsView.width))
-        width: columnsView.width * (columnsView.width/columnsView.contentWidth)
+        x: (columnView.width - width) * (columnView.contentX / (columnView.contentWidth - columnView.width))
+        width: columnView.width * (columnView.width/columnView.contentWidth)
         color: Theme.textColor
         opacity: 0
         onXChanged: {
