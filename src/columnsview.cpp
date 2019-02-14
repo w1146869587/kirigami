@@ -68,8 +68,12 @@ void QmlComponentsPool::initialize(QQmlEngine *engine)
 
     m_separatorComponent = m_instance->property("separator").value<QQmlComponent *>();
     Q_ASSERT(m_separatorComponent);
+
     m_units = m_instance->property("units").value<QObject *>();
     Q_ASSERT(m_units);
+
+    connect(m_units, SIGNAL(gridUnitChanged()), this, SIGNAL(gridUnitChanged()));
+    connect(m_units, SIGNAL(longDurationChanged()), this, SIGNAL(longDurationChanged()));
 }
 
 QmlComponentsPool::~QmlComponentsPool()
@@ -448,6 +452,9 @@ qreal ColumnsView::columnWidth() const
 
 void ColumnsView::setColumnWidth(qreal width)
 {
+    // Always forget the internal binding when the user sets anything, even the same value
+    disconnect(&privateQmlComponentsPoolSelf->self, &QmlComponentsPool::gridUnitChanged, this, nullptr);
+
     if (m_contentItem->m_columnWidth == width) {
         return;
     }
@@ -517,6 +524,8 @@ int ColumnsView::scrollDuration() const
 
 void ColumnsView::setScrollDuration(int duration)
 {
+    disconnect(&privateQmlComponentsPoolSelf->self, &QmlComponentsPool::longDurationChanged, this, nullptr);
+
     if (m_contentItem->m_slideAnim->duration() == duration) {
         return;
     }
@@ -839,10 +848,22 @@ void ColumnsView::mouseUngrabEvent()
 void ColumnsView::classBegin()
 {
     privateQmlComponentsPoolSelf->self.initialize(qmlEngine(this));
-    //TODO: connect to changes
-    
-    m_contentItem->m_slideAnim->setDuration(privateQmlComponentsPoolSelf->self.m_units->property("longDuration").toInt());
-    qWarning()<<privateQmlComponentsPoolSelf->self.m_units->property("longDuration")<<m_contentItem->m_slideAnim->duration();
+
+    auto syncColumnWidth = [this]() {
+        m_contentItem->m_columnWidth = privateQmlComponentsPoolSelf->self.m_units->property("gridUnit").toInt() * 20;
+        emit columnWidthChanged();
+    };
+
+    connect(&privateQmlComponentsPoolSelf->self, &QmlComponentsPool::gridUnitChanged, this, syncColumnWidth);
+    syncColumnWidth();
+
+    auto syncDuration = [this]() {
+        m_contentItem->m_slideAnim->setDuration(privateQmlComponentsPoolSelf->self.m_units->property("longDuration").toInt());
+        emit scrollDurationChanged();
+    };
+
+    connect(&privateQmlComponentsPoolSelf->self, &QmlComponentsPool::longDurationChanged, this, syncDuration);
+    syncDuration();
 }
 
 void ColumnsView::updatePolish()

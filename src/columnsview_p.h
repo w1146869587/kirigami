@@ -39,6 +39,10 @@ public:
     QQmlComponent *m_separatorComponent = nullptr;
     QObject *m_units = nullptr;
 
+Q_SIGNALS:
+    void gridUnitChanged();
+    void longDurationChanged();
+
 private:
     QObject *m_instance = nullptr;
 };
@@ -70,7 +74,7 @@ private:
     QList<QQuickItem *> m_visibleItems;
     QPointer<QQuickItem> m_viewAnchorItem;
 
-    qreal m_columnWidth = 200;
+    qreal m_columnWidth = 0;
     ColumnsView::ColumnResizeMode m_columnResizeMode = ColumnsView::FixedColumns;
     bool m_shouldAnimate = false;
     friend class ColumnsView;
