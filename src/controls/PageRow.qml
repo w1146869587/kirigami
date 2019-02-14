@@ -177,7 +177,7 @@ T.Control {
      */
     function push(page, properties) {
         //don't push again things already there
-        if (page.createObject === undefined && typeof page != "string" && columnsView.contains(page)) {
+        if (page.createObject === undefined && typeof page != "string" && columnsView.containsItem(page)) {
             print("The item " + page + " is already in the PageRow");
             return;
         }

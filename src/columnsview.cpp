@@ -728,7 +728,7 @@ void ColumnsView::clear()
     emit contentChildrenChanged();
 }
 
-bool ColumnsView::contains(QQuickItem *item)
+bool ColumnsView::containsItem(QQuickItem *item)
 {
     return m_contentItem->m_items.contains(item);
 }

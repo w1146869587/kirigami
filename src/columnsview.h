@@ -160,7 +160,7 @@ public Q_SLOTS:
     void removeItem(const QVariant &item);
     void pop(QQuickItem *item);
     void clear();
-    bool contains(QQuickItem *item);
+    bool containsItem(QQuickItem *item);
 
 protected:
     void classBegin() override;
