@@ -127,7 +127,7 @@ T.Control {
      * default: true
      * @since 5.38
      */
-    property bool separatorVisible: true
+    property alias separatorVisible: columnsView.separatorVisible
 
     /**
      * globalToolBar: grouped property
@@ -474,7 +474,7 @@ T.Control {
             }
             if (pageComp) {
                 // instantiate page from component
-                // FIXME: parent directly to columnsview or root?
+                // FIXME: parent directly to columnsView or root?
                 page = pageComp.createObject(null, properties || {});
                 columnsView.addItem(page);
 

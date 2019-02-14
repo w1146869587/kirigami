@@ -81,7 +81,7 @@ class ColumnsView : public QQuickItem
     Q_PROPERTY(qreal contentX READ contentX WRITE setContentX NOTIFY contentXChanged)
     Q_PROPERTY(qreal contentWidth READ contentWidth NOTIFY contentWidthChanged)
     Q_PROPERTY(int scrollDuration READ scrollDuration WRITE setScrollDuration NOTIFY scrollDurationChanged)
-    Q_PROPERTY(bool separatorsVisible READ separatorsVisible WRITE setSeparatorsVisible NOTIFY separatorsVisibleChanged)
+    Q_PROPERTY(bool separatorVisible READ separatorVisible WRITE setSeparatorVisible NOTIFY separatorVisibleChanged)
 
     Q_PROPERTY(QList<QQuickItem *> visibleItems READ visibleItems NOTIFY visibleItemsChanged)
 
@@ -119,8 +119,8 @@ public:
     int scrollDuration() const;
     void setScrollDuration(int duration);
 
-    bool separatorsVisible() const;
-    void setSeparatorsVisible(bool visible);
+    bool separatorVisible() const;
+    void setSeparatorVisible(bool visible);
 
     int depth() const;
 
@@ -186,7 +186,7 @@ Q_SIGNALS:
     void contentWidthChanged();
     void interactiveChanged();
     void scrollDurationChanged();
-    void separatorsVisibleChanged();
+    void separatorVisibleChanged();
 
 private:
     static void contentChildren_append(QQmlListProperty<QQuickItem> *prop, QQuickItem *object);
@@ -213,7 +213,7 @@ private:
     bool m_interactive = true;
     bool m_dragging = false;
     bool m_moving = false;
-    bool m_separatorsVisible = true;
+    bool m_separatorVisible = true;
 };
 
 QML_DECLARE_TYPEINFO(ColumnsView, QML_HAS_ATTACHED_PROPERTIES)

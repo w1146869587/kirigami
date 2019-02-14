@@ -395,7 +395,7 @@ void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
             m_items << value.item;
         }
 
-        if (m_view->separatorsVisible()) {
+        if (m_view->separatorVisible()) {
             ensureSeparator(value.item);
         }
 
@@ -559,18 +559,18 @@ void ColumnsView::setScrollDuration(int duration)
     emit scrollDurationChanged();
 }
 
-bool ColumnsView::separatorsVisible() const
+bool ColumnsView::separatorVisible() const
 {
-    return m_separatorsVisible;
+    return m_separatorVisible;
 }
 
-void ColumnsView::setSeparatorsVisible(bool visible)
+void ColumnsView::setSeparatorVisible(bool visible)
 {
-    if (visible == m_separatorsVisible) {
+    if (visible == m_separatorVisible) {
         return;
     }
 
-    m_separatorsVisible = visible;
+    m_separatorVisible = visible;
 
     if (visible) {
         for (QQuickItem *item : m_contentItem->m_items) {
@@ -585,7 +585,7 @@ void ColumnsView::setSeparatorsVisible(bool visible)
         }
     }
 
-    emit separatorsVisibleChanged();
+    emit separatorVisibleChanged();
 }
 
 bool ColumnsView::dragging() const
