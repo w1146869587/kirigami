@@ -56,14 +56,20 @@ void QmlComponentsPool::initialize(QQmlEngine *engine)
     QQmlComponent *component = new QQmlComponent(engine, this);
 
     component->setData(QByteArrayLiteral("import QtQuick 2.7\n"
-        "import org.kde.kirigami 2.6 as Kirigami\n"
+        "import org.kde.kirigami 2.7 as Kirigami\n"
         "QtObject {\n"
+            "id: root\n"
             "readonly property Kirigami.Units units: Kirigami.Units\n"
-            "readonly property Component separator: Kirigami.Separator{anchors.top:parent.top;anchors.bottom:parent.bottom}"
+            "readonly property Component separator: Kirigami.Separator {"
+                "property Item column\n"
+                "visible: column.Kirigami.ColumnsView.view.contentX < column.x;"
+                "anchors.top: column.top;"
+                "anchors.bottom: column.bottom;"
+            "}"
         "}"), QUrl());
 
     m_instance = component->create();
-
+    //qWarning()<<component->errors();
     Q_ASSERT(m_instance);
 
     m_separatorComponent = m_instance->property("separator").value<QQmlComponent *>();
@@ -367,10 +373,12 @@ void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
         }
 
         if (privateQmlComponentsPoolSelf->self.m_separatorComponent) {
-            QQuickItem *separatorItem = qobject_cast<QQuickItem *>(privateQmlComponentsPoolSelf->self.m_separatorComponent->create());
+            QQuickItem *separatorItem = qobject_cast<QQuickItem *>(privateQmlComponentsPoolSelf->self.m_separatorComponent->beginCreate(QQmlEngine::contextForObject(value.item)));
             if (separatorItem) {
                 separatorItem->setParentItem(value.item);
                 separatorItem->setZ(9999);
+                separatorItem->setProperty("column", QVariant::fromValue(value.item));
+                privateQmlComponentsPoolSelf->self.m_separatorComponent->completeCreate();
             }
         }
 

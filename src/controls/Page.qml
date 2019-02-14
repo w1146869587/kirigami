@@ -364,14 +364,6 @@ T2.Page {
                     "current": Qt.binding(function() {return stack || row.currentIndex === root.Kirigami.ColumnsView.level})});
                 }
             }
-
-            Separator {
-                z: 999
-                anchors.verticalCenter: globalToolBar.verticalCenter
-                height: globalToolBar.height * 0.6
-                visible: !root.T2.StackView.view && globalToolBar.row && root.parent && globalToolBar.row.contentItem.contentX < root.parent.x - globalToolBar.row.globalToolBar.leftReservedSpace
-                Kirigami.Theme.textColor: globalToolBar.item ? globalToolBar.item.Kirigami.Theme.textColor : undefined
-            }
         },
 
         //bottom action buttons
