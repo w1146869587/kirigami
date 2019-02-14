@@ -72,7 +72,7 @@ private:
     ColumnsView *m_view;
     QPropertyAnimation *m_slideAnim;
     QList<QQuickItem *> m_items;
-    QList<QQuickItem *> m_visibleItems;
+    QList<QObject *> m_visibleItems;
     QPointer<QQuickItem> m_viewAnchorItem;
     QHash<QQuickItem *, QQuickItem *> m_separators;
 

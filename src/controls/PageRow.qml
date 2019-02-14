@@ -81,7 +81,7 @@ T.Control {
      * All pages which are visible in the PageRow, excluding those which are scrolled away
      * @since 2.6
      */
-    property var visibleItems: []
+    property alias visibleItems: columnsView.visibleItems
 
     /**
      * firstVisibleItem: Item

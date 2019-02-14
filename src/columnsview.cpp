@@ -319,7 +319,7 @@ void ContentItem::layoutItems()
 
 void ContentItem::updateVisibleItems()
 {
-    QList <QQuickItem *> newItems;
+    QList <QObject *> newItems;
 
     for (auto *item : m_items) {
         if (item->isVisible() && item->x() + x() < width() && item->x() + item->width() + x() > 0) {
@@ -527,7 +527,7 @@ QQuickItem *ColumnsView::currentItem()
     return m_currentItem;
 }
 
-QList<QQuickItem *>ColumnsView::visibleItems() const
+QList<QObject *>ColumnsView::visibleItems() const
 {
     return m_contentItem->m_visibleItems;
 }
