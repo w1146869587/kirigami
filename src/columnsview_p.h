@@ -58,6 +58,7 @@ public:
     void layoutItems();
     void updateVisibleItems();
     void forgetItem(QQuickItem *item);
+    QQuickItem *ensureSeparator(QQuickItem *item);
 
     void setBoundedX(qreal x);
     void animateX(qreal x);
@@ -73,6 +74,7 @@ private:
     QList<QQuickItem *> m_items;
     QList<QQuickItem *> m_visibleItems;
     QPointer<QQuickItem> m_viewAnchorItem;
+    QHash<QQuickItem *, QQuickItem *> m_separators;
 
     qreal m_columnWidth = 0;
     ColumnsView::ColumnResizeMode m_columnResizeMode = ColumnsView::FixedColumns;

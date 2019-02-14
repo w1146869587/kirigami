@@ -346,6 +346,11 @@ void ContentItem::forgetItem(QQuickItem *item)
     disconnect(attached, nullptr, this, nullptr);
     disconnect(item, nullptr, this, nullptr);
 
+    QQuickItem *separatorItem = m_separators.take(item);
+    if (separatorItem) {
+        separatorItem->deleteLater();
+    }
+
     const int index = m_items.indexOf(item);
     m_items.removeAll(item);
     m_shouldAnimate = true;
@@ -355,6 +360,24 @@ void ContentItem::forgetItem(QQuickItem *item)
         m_view->setCurrentIndex(qBound(0, index - 1, m_items.count() - 1));
     }
     emit m_view->depthChanged();
+}
+
+QQuickItem *ContentItem::ensureSeparator(QQuickItem *item)
+{
+    QQuickItem *separatorItem = m_separators.value(item);
+    
+    if (!separatorItem) {
+        separatorItem = qobject_cast<QQuickItem *>(privateQmlComponentsPoolSelf->self.m_separatorComponent->beginCreate(QQmlEngine::contextForObject(item)));
+        if (separatorItem) {
+            separatorItem->setParentItem(item);
+            separatorItem->setZ(9999);
+            separatorItem->setProperty("column", QVariant::fromValue(item));
+            privateQmlComponentsPoolSelf->self.m_separatorComponent->completeCreate();
+            m_separators[item] = separatorItem;
+        }
+    }
+
+    return separatorItem;
 }
 
 void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
@@ -372,14 +395,8 @@ void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
             m_items << value.item;
         }
 
-        if (privateQmlComponentsPoolSelf->self.m_separatorComponent) {
-            QQuickItem *separatorItem = qobject_cast<QQuickItem *>(privateQmlComponentsPoolSelf->self.m_separatorComponent->beginCreate(QQmlEngine::contextForObject(value.item)));
-            if (separatorItem) {
-                separatorItem->setParentItem(value.item);
-                separatorItem->setZ(9999);
-                separatorItem->setProperty("column", QVariant::fromValue(value.item));
-                privateQmlComponentsPoolSelf->self.m_separatorComponent->completeCreate();
-            }
+        if (m_view->separatorsVisible()) {
+            ensureSeparator(value.item);
         }
 
         m_shouldAnimate = true;
@@ -540,6 +557,35 @@ void ColumnsView::setScrollDuration(int duration)
 
     m_contentItem->m_slideAnim->setDuration(duration);
     emit scrollDurationChanged();
+}
+
+bool ColumnsView::separatorsVisible() const
+{
+    return m_separatorsVisible;
+}
+
+void ColumnsView::setSeparatorsVisible(bool visible)
+{
+    if (visible == m_separatorsVisible) {
+        return;
+    }
+
+    m_separatorsVisible = visible;
+
+    if (visible) {
+        for (QQuickItem *item : m_contentItem->m_items) {
+            QQuickItem *sep = m_contentItem->ensureSeparator(item);
+            if (sep) {
+                sep->setVisible(true);
+            }
+        }
+    } else {
+        for (QQuickItem *sep : m_contentItem->m_separators.values()) {
+            sep->setVisible(false);
+        }
+    }
+
+    emit separatorsVisibleChanged();
 }
 
 bool ColumnsView::dragging() const
