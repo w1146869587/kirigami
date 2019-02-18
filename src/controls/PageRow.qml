@@ -42,7 +42,7 @@ T.Control {
     /**
      * This property holds the number of items currently pushed onto the view
      */
-    property alias depth: columnView.depth
+    property alias depth: columnView.count
 
     /**
      * The last Page in the Row
@@ -88,14 +88,14 @@ T.Control {
      * The first at least partially visible page in the PageRow, pages before that one will be out of the viewport
      * @since 2.6
      */
-    readonly property Item firstVisibleItem: columnView.firstVisibleItem
+    property alias firstVisibleItem: columnView.firstVisibleItem
 
     /**
      * lastVisibleItem: Item
      * The last at least partially visible page in the PageRow, pages after that one will be out of the viewport
      * @since 2.6
      */
-    readonly property Item lastVisibleItem: columnView.lastVisibleItem
+    property alias lastVisibleItem: columnView.lastVisibleItem
 
     /**
      * The default width for a column
@@ -259,6 +259,7 @@ T.Control {
      *     In this case all those pages will
      *     be pushed onto the stack. The items in the stack can be components, items or
      *     strings just like for single pages.
+     *     the current page and all pagest after it in the stack will be removed.
      *     Additionally an object can be used, which specifies a page and an optional
      *     properties property.
      *     This can be used to push multiple pages while still giving each of
@@ -508,7 +509,7 @@ T.Control {
         id: columnView
         anchors.fill: parent
         readonly property Item __pageRow: root
-        columnResizeMode: depth < 2 || width < columnWidth * 2 ? ColumnView.SingleColumn : ColumnView.FixedColumns
+        columnResizeMode: root.wideMode ? ColumnView.FixedColumns : ColumnView.SingleColumn
         columnWidth: root.defaultColumnWidth
         opacity: layersStack.depth < 2
         Behavior on opacity {

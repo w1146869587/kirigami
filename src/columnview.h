@@ -72,7 +72,7 @@ class ColumnView : public QQuickItem
 
     Q_PROPERTY(ColumnResizeMode columnResizeMode READ columnResizeMode WRITE setColumnResizeMode NOTIFY columnResizeModeChanged)
     Q_PROPERTY(qreal columnWidth READ columnWidth WRITE setColumnWidth NOTIFY columnWidthChanged)
-    Q_PROPERTY(int depth READ depth NOTIFY depthChanged)
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
 
     Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentIndexChanged)
     Q_PROPERTY(QQuickItem *currentItem READ currentItem NOTIFY currentItemChanged)
@@ -124,7 +124,7 @@ public:
     bool separatorVisible() const;
     void setSeparatorVisible(bool visible);
 
-    int depth() const;
+    int count() const;
 
     QQuickItem *currentItem();
 
@@ -184,7 +184,7 @@ Q_SIGNALS:
     void currentIndexChanged();
     void currentItemChanged();
     void visibleItemsChanged();
-    void depthChanged();
+    void countChanged();
     void draggingChanged();
     void movingChanged();
     void contentXChanged();

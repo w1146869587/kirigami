@@ -98,7 +98,7 @@ ColumnViewAttached::~ColumnViewAttached()
 void ColumnViewAttached::setLevel(int level)
 {
     if (!m_customFillWidth && m_view) {
-        m_fillWidth = level == m_view->depth() - 1;
+        m_fillWidth = level == m_view->count() - 1;
     }
 
     if (level == m_level) {
@@ -117,7 +117,7 @@ int ColumnViewAttached::level() const
 void ColumnViewAttached::setFillWidth(bool fill)
 {
     if (m_view) {
-        disconnect(m_view.data(), &ColumnView::depthChanged, this, nullptr);
+        disconnect(m_view.data(), &ColumnView::countChanged, this, nullptr);
     }
     m_customFillWidth = true;
 
@@ -171,9 +171,9 @@ void ColumnViewAttached::setView(ColumnView *view)
     m_view = view;
 
     if (!m_customFillWidth && m_view) {
-        m_fillWidth = m_level == m_view->depth() - 1;
-        connect(m_view.data(), &ColumnView::depthChanged, this, [this]() {
-            m_fillWidth = m_level == m_view->depth() - 1;
+        m_fillWidth = m_level == m_view->count() - 1;
+        connect(m_view.data(), &ColumnView::countChanged, this, [this]() {
+            m_fillWidth = m_level == m_view->count() - 1;
             emit fillWidthChanged();
         });
     }
@@ -368,7 +368,7 @@ void ContentItem::forgetItem(QQuickItem *item)
     if (index <= m_view->currentIndex()) {
         m_view->setCurrentIndex(qBound(0, index - 1, m_items.count() - 1));
     }
-    emit m_view->depthChanged();
+    emit m_view->countChanged();
 }
 
 QQuickItem *ContentItem::ensureSeparator(QQuickItem *item)
@@ -410,7 +410,7 @@ void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
 
         m_shouldAnimate = true;
         m_view->polish();
-        emit m_view->depthChanged();
+        emit m_view->countChanged();
         break;
     }
     case QQuickItem::ItemChildRemovedChange: {
@@ -559,7 +559,7 @@ QQuickItem *ColumnView::lastVisibleItem() const
     return qobject_cast<QQuickItem *>(m_contentItem->m_visibleItems.last());
 }
 
-int ColumnView::depth() const
+int ColumnView::count() const
 {
     return m_contentItem->m_items.count();
 }
