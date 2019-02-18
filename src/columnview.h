@@ -84,6 +84,8 @@ class ColumnView : public QQuickItem
     Q_PROPERTY(bool separatorVisible READ separatorVisible WRITE setSeparatorVisible NOTIFY separatorVisibleChanged)
 
     Q_PROPERTY(QList<QObject *> visibleItems READ visibleItems NOTIFY visibleItemsChanged)
+    Q_PROPERTY(QQuickItem *firstVisibleItem READ firstVisibleItem NOTIFY firstVisibleItemChanged)
+    Q_PROPERTY(QQuickItem *lastVisibleItem READ lastVisibleItem NOTIFY lastVisibleItemChanged)
 
     // Properties to make it similar to Flickable
     Q_PROPERTY(bool dragging READ dragging NOTIFY draggingChanged)
@@ -128,6 +130,8 @@ public:
 
     //NOTE: It's a QList<QObject *> as QML can't corectly build an Array out of QList<QQuickItem*>
     QList<QObject *> visibleItems() const;
+    QQuickItem *firstVisibleItem() const;
+    QQuickItem *lastVisibleItem() const;
 
 
     QQuickItem *contentItem() const;
@@ -188,6 +192,8 @@ Q_SIGNALS:
     void interactiveChanged();
     void scrollDurationChanged();
     void separatorVisibleChanged();
+    void firstVisibleItemChanged();
+    void lastVisibleItemChanged();
 
 private:
     static void contentChildren_append(QQmlListProperty<QQuickItem> *prop, QQuickItem *object);

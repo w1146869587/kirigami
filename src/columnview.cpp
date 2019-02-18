@@ -327,9 +327,18 @@ void ContentItem::updateVisibleItems()
         }
     }
 
+    const QQuickItem *oldFirstVisibleItem = m_visibleItems.isEmpty() ? nullptr : qobject_cast<QQuickItem *>(m_visibleItems.first());
+    const QQuickItem *oldLastVisibleItem = m_visibleItems.isEmpty() ? nullptr : qobject_cast<QQuickItem *>(m_visibleItems.last());
+
     if (newItems != m_visibleItems) {
         m_visibleItems = newItems;
         emit m_view->visibleItemsChanged();
+        if (!newItems.isEmpty() && m_visibleItems.first() != oldFirstVisibleItem) {
+            emit m_view->firstVisibleItemChanged();
+        }
+        if (!newItems.isEmpty() && m_visibleItems.last() != oldLastVisibleItem) {
+            emit m_view->lastVisibleItemChanged();
+        }
     }
 }
 
@@ -530,6 +539,24 @@ QQuickItem *ColumnView::currentItem()
 QList<QObject *>ColumnView::visibleItems() const
 {
     return m_contentItem->m_visibleItems;
+}
+
+QQuickItem *ColumnView::firstVisibleItem() const
+{
+    if (m_contentItem->m_visibleItems.isEmpty()) {
+        return nullptr;
+    }
+
+    return qobject_cast<QQuickItem *>(m_contentItem->m_visibleItems.first());
+}
+
+QQuickItem *ColumnView::lastVisibleItem() const
+{
+    if (m_contentItem->m_visibleItems.isEmpty()) {
+        return nullptr;
+    }
+
+    return qobject_cast<QQuickItem *>(m_contentItem->m_visibleItems.last());
 }
 
 int ColumnView::depth() const

@@ -65,7 +65,7 @@ T.Control {
     property variant initialPage
 
     /**
-     * The main flickable of this Row
+     * The main ColumnView of this Row
      */
     contentItem: columnView
 
@@ -88,14 +88,14 @@ T.Control {
      * The first at least partially visible page in the PageRow, pages before that one will be out of the viewport
      * @since 2.6
      */
-    readonly property Item firstVisibleItem: visibleItems.length > 0 ? visibleItems[0] : null
+    readonly property Item firstVisibleItem: columnView.firstVisibleItem
 
     /**
      * lastVisibleItem: Item
      * The last at least partially visible page in the PageRow, pages after that one will be out of the viewport
      * @since 2.6
      */
-    readonly property Item lastVisibleItem: visibleItems.length > 0 ? visibleItems[visibleItems.length - 1] : null
+    readonly property Item lastVisibleItem: columnView.lastVisibleItem
 
     /**
      * The default width for a column
