@@ -203,11 +203,11 @@ ContentItem::ContentItem(ColumnView *parent)
     m_slideAnim->setEasingCurve(QEasingCurve(QEasingCurve::InOutQuad));
     connect(m_slideAnim, &QPropertyAnimation::finished, this, [this] () {
         if (!m_view->currentItem()) {
-            m_view->setCurrentIndex(childItems().indexOf(m_viewAnchorItem));
+            m_view->setCurrentIndex(m_items.indexOf(m_viewAnchorItem));
         } else {
             QRectF mapped = m_view->currentItem()->mapRectToItem(parentItem(), QRectF(m_view->currentItem()->position(), m_view->currentItem()->size()));
             if (!QRectF(QPointF(0, 0), size()).intersects(mapped)) {
-                m_view->setCurrentIndex(childItems().indexOf(m_viewAnchorItem));
+                m_view->setCurrentIndex(m_items.indexOf(m_viewAnchorItem));
             }
         }
     });
@@ -297,7 +297,7 @@ void ContentItem::layoutItems()
 {
     qreal partialWidth = 0;
     int i = 0;
-    for (QQuickItem *child : childItems()) {
+    for (QQuickItem *child : m_items) {
         if (child->isVisible()) {
             child->setSize(QSizeF(childWidth(child), height()));
             child->setPosition(QPointF(partialWidth, 0.0));
@@ -433,6 +433,16 @@ void ContentItem::geometryChanged(const QRectF &newGeometry, const QRectF &oldGe
     QQuickItem::geometryChanged(newGeometry, oldGeometry);
 }
 
+void ContentItem::syncItemsOrder()
+{
+    if (m_items == childItems()) {
+        return;
+    }
+
+    m_items = childItems();
+    layoutItems();
+}
+
 void ContentItem::updateRepeaterModel()
 {
     if (!sender()) {
@@ -455,10 +465,10 @@ void ContentItem::updateRepeaterModel()
     QAbstractItemModel *qaim = qobject_cast<QAbstractItemModel *>(modelObj);
 
     if (qaim) {
-        connect(qaim, &QAbstractItemModel::rowsMoved, this, &ContentItem::layoutItems);
+        connect(qaim, &QAbstractItemModel::rowsMoved, this, &ContentItem::syncItemsOrder);
 
     } else {
-        connect(modelObj, SIGNAL(childrenChanged()), this, SLOT(layoutItems()));
+        connect(modelObj, SIGNAL(childrenChanged()), this, SLOT(syncItemsOrder()));
     }
 }
 

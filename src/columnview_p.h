@@ -54,6 +54,7 @@ public:
     ContentItem(ColumnView *parent = nullptr);
     ~ContentItem();
 
+    void layoutItems();
     qreal childWidth(QQuickItem *child);
     void updateVisibleItems();
     void forgetItem(QQuickItem *item);
@@ -68,8 +69,8 @@ protected:
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
 
 private Q_SLOTS:
+    void syncItemsOrder();
     void updateRepeaterModel();
-    void layoutItems();
 
 private:
     ColumnView *m_view;
