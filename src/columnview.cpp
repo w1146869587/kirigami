@@ -99,7 +99,11 @@ ColumnViewAttached::~ColumnViewAttached()
 void ColumnViewAttached::setLevel(int level)
 {
     if (!m_customFillWidth && m_view) {
+        const bool oldFillWidth = m_fillWidth;
         m_fillWidth = level == m_view->count() - 1;
+        if (oldFillWidth != m_fillWidth) {
+            emit fillWidthChanged();
+        }
     }
 
     if (level == m_level) {
@@ -355,6 +359,7 @@ void ContentItem::forgetItem(QQuickItem *item)
 
     disconnect(attached, nullptr, this, nullptr);
     disconnect(item, nullptr, this, nullptr);
+    disconnect(item, nullptr, m_view, nullptr);
 
     QQuickItem *separatorItem = m_separators.take(item);
     if (separatorItem) {
@@ -363,6 +368,7 @@ void ContentItem::forgetItem(QQuickItem *item)
 
     const int index = m_items.indexOf(item);
     m_items.removeAll(item);
+    m_visibleItems.removeAll(item);
     m_shouldAnimate = true;
     m_view->polish();
 
@@ -397,11 +403,15 @@ void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
         ColumnViewAttached *attached = qobject_cast<ColumnViewAttached *>(qmlAttachedPropertiesObject<ColumnView>(value.item, true));
         attached->setView(m_view);
 
-        connect(attached, &ColumnViewAttached::fillWidthChanged, this, &ContentItem::layoutItems);
-        connect(attached, &ColumnViewAttached::reservedSpaceChanged, this, &ContentItem::layoutItems);
+        //connect(attached, &ColumnViewAttached::fillWidthChanged, m_view, &ColumnView::polish);
+         connect(attached, &ColumnViewAttached::fillWidthChanged, this, [this, attached](){
+             m_view->polish();
+             
+        });
+        connect(attached, &ColumnViewAttached::reservedSpaceChanged, m_view, &ColumnView::polish);
 
         if (!m_items.contains(value.item)) {
-            connect(value.item, &QQuickItem::widthChanged, this, &ContentItem::layoutItems);
+            connect(value.item, &QQuickItem::widthChanged, m_view, &ColumnView::polish);
             m_items << value.item;
         }
 
@@ -440,7 +450,7 @@ void ContentItem::syncItemsOrder()
     }
 
     m_items = childItems();
-    layoutItems();
+    polish();
 }
 
 void ContentItem::updateRepeaterModel()
