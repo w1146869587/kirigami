@@ -20,6 +20,7 @@
 #include "columnview.h"
 #include "columnview_p.h"
 
+#include <QAbstractItemModel>
 #include <QGuiApplication>
 #include <QStyleHints>
 #include <QQmlComponent>
@@ -202,11 +203,11 @@ ContentItem::ContentItem(ColumnView *parent)
     m_slideAnim->setEasingCurve(QEasingCurve(QEasingCurve::InOutQuad));
     connect(m_slideAnim, &QPropertyAnimation::finished, this, [this] () {
         if (!m_view->currentItem()) {
-            m_view->setCurrentIndex(m_items.indexOf(m_viewAnchorItem));
+            m_view->setCurrentIndex(childItems().indexOf(m_viewAnchorItem));
         } else {
             QRectF mapped = m_view->currentItem()->mapRectToItem(parentItem(), QRectF(m_view->currentItem()->position(), m_view->currentItem()->size()));
             if (!QRectF(QPointF(0, 0), size()).intersects(mapped)) {
-                m_view->setCurrentIndex(m_items.indexOf(m_viewAnchorItem));
+                m_view->setCurrentIndex(childItems().indexOf(m_viewAnchorItem));
             }
         }
     });
@@ -296,7 +297,7 @@ void ContentItem::layoutItems()
 {
     qreal partialWidth = 0;
     int i = 0;
-    for (QQuickItem *child : m_items) {
+    for (QQuickItem *child : childItems()) {
         if (child->isVisible()) {
             child->setSize(QSizeF(childWidth(child), height()));
             child->setPosition(QPointF(partialWidth, 0.0));
@@ -430,6 +431,35 @@ void ContentItem::geometryChanged(const QRectF &newGeometry, const QRectF &oldGe
 {
     updateVisibleItems();
     QQuickItem::geometryChanged(newGeometry, oldGeometry);
+}
+
+void ContentItem::updateRepeaterModel()
+{
+    if (!sender()) {
+        return;
+    }
+
+    QObject *modelObj = sender()->property("model").value<QObject *>();
+
+    if (!modelObj) {
+        m_models.remove(sender());
+        return;
+    }
+
+    if (m_models[sender()]) {
+        disconnect(m_models[sender()], nullptr, this, nullptr);
+    }
+
+    m_models[sender()] = modelObj;
+
+    QAbstractItemModel *qaim = qobject_cast<QAbstractItemModel *>(modelObj);
+
+    if (qaim) {
+        connect(qaim, &QAbstractItemModel::rowsMoved, this, &ContentItem::layoutItems);
+
+    } else {
+        connect(modelObj, SIGNAL(childrenChanged()), this, SLOT(layoutItems()));
+    }
 }
 
 
@@ -1031,8 +1061,12 @@ void ColumnView::contentData_append(QQmlListProperty<QObject> *prop, QObject *ob
     //exclude repeaters from layout
     if (item && item->inherits("QQuickRepeater")) {
         item->setParentItem(view);
+
+        connect(item, SIGNAL(modelChanged()), view->m_contentItem, SLOT(updateRepeaterModel()));
+
     } else if (item) {
         view->addItem(item);
+
     } else {
         object->setParent(view);
     }

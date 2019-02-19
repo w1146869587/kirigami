@@ -55,7 +55,6 @@ public:
     ~ContentItem();
 
     qreal childWidth(QQuickItem *child);
-    void layoutItems();
     void updateVisibleItems();
     void forgetItem(QQuickItem *item);
     QQuickItem *ensureSeparator(QQuickItem *item);
@@ -68,6 +67,10 @@ protected:
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
 
+private Q_SLOTS:
+    void updateRepeaterModel();
+    void layoutItems();
+
 private:
     ColumnView *m_view;
     QPropertyAnimation *m_slideAnim;
@@ -75,6 +78,7 @@ private:
     QList<QObject *> m_visibleItems;
     QPointer<QQuickItem> m_viewAnchorItem;
     QHash<QQuickItem *, QQuickItem *> m_separators;
+    QHash<QObject *, QObject*> m_models;
 
     qreal m_columnWidth = 0;
     ColumnView::ColumnResizeMode m_columnResizeMode = ColumnView::FixedColumns;
