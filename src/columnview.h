@@ -26,13 +26,32 @@
 class ContentItem;
 class ColumnView;
 
+/**
+ * This is an attached property to every item that is inserted in the ColumnView,
+ * used to access the view and page information such as the position and informations for layouting, such as fillWidth
+ */
 class ColumnViewAttached : public QObject
 {
     Q_OBJECT
 
+    /**
+     * The position of the column in the view, starting from 0
+     */
     Q_PROPERTY(int level READ level WRITE setLevel NOTIFY levelChanged)
+
+    /**
+     * If true, the column will expand to take the whole viewport space minus reservedSpace
+     */
     Q_PROPERTY(bool fillWidth READ fillWidth WRITE setFillWidth NOTIFY fillWidthChanged)
+
+    /**
+     * When a column is fillWidth, it will keep reservedSpace amount of pixels from going to fill the full viewport width
+     */
     Q_PROPERTY(qreal reservedSpace READ reservedSpace WRITE setReservedSpace NOTIFY reservedSpaceChanged)
+
+    /**
+     * The view this column belongs to
+     */
     Q_PROPERTY(ColumnView *view READ view NOTIFY viewChanged)
 
 public:
@@ -70,30 +89,98 @@ class ColumnView : public QQuickItem
 {
     Q_OBJECT
 
+    /**
+     * The strategy to follow while automatically resizing the columns,
+     * the enum can have the following values:
+     * * FixedColumns: every column is fixed at the same width of the columnWidth property
+     * * DynamicColumns: columns take their width from their implicitWidth
+     * * SingleColumn: only one column at a time is shown, as wide as the viewport, eventual reservedSpace on the column's atttached property is ignored
+     */
     Q_PROPERTY(ColumnResizeMode columnResizeMode READ columnResizeMode WRITE setColumnResizeMode NOTIFY columnResizeModeChanged)
+
+    /**
+     * The width of all columns when columnResizeMode is FixedColumns
+     */
     Q_PROPERTY(qreal columnWidth READ columnWidth WRITE setColumnWidth NOTIFY columnWidthChanged)
+
+    /**
+     * How many columns this view containsItem*/
     Q_PROPERTY(int count READ count NOTIFY countChanged)
 
+    /**
+     * The position of the currently active column. The current column will also have keyboard focus
+     */
     Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentIndexChanged)
+
+    /**
+     * The currently active column. The current column will also have keyboard focus
+     */
     Q_PROPERTY(QQuickItem *currentItem READ currentItem NOTIFY currentItemChanged)
 
+    /**
+     * The main content item of this view: it's the parent of the column items
+     */
     Q_PROPERTY(QQuickItem *contentItem READ contentItem CONSTANT)
+
+    /**
+     * The value of the horizontal scroll of the view, in pixels
+     */
     Q_PROPERTY(qreal contentX READ contentX WRITE setContentX NOTIFY contentXChanged)
+
+    /**
+     * The compound width of all columns in the view
+     */
     Q_PROPERTY(qreal contentWidth READ contentWidth NOTIFY contentWidthChanged)
+
+    /**
+     * The duration for scrolling animations
+     */
     Q_PROPERTY(int scrollDuration READ scrollDuration WRITE setScrollDuration NOTIFY scrollDurationChanged)
+
+    /**
+     * True if columns should be visually separed by a separator line
+     */
     Q_PROPERTY(bool separatorVisible READ separatorVisible WRITE setSeparatorVisible NOTIFY separatorVisibleChanged)
 
+    /**
+     * The list of all visible column items that are at least partially in the viewport at any given moment
+     */
     Q_PROPERTY(QList<QObject *> visibleItems READ visibleItems NOTIFY visibleItemsChanged)
+
+    /**
+     * The first of visibleItems provided from convenience
+     */
     Q_PROPERTY(QQuickItem *firstVisibleItem READ firstVisibleItem NOTIFY firstVisibleItemChanged)
+
+    /**
+     * The last of visibleItems provided from convenience
+     */
     Q_PROPERTY(QQuickItem *lastVisibleItem READ lastVisibleItem NOTIFY lastVisibleItemChanged)
 
     // Properties to make it similar to Flickable
+    /**
+     * True when the user is dragging around with touch gestures the view contents
+     */
     Q_PROPERTY(bool dragging READ dragging NOTIFY draggingChanged)
+
+    /**
+     * True both when the user is dragging around with touch gestures the view contents or the view is animating
+     */
     Q_PROPERTY(bool moving READ moving NOTIFY movingChanged)
+
+    /**
+     * True if it supports moving the contents by dragging
+     */
     Q_PROPERTY(bool interactive READ interactive WRITE setInteractive NOTIFY interactiveChanged)
 
     // Default properties
+    /**
+     * Every column item the view contains
+     */
     Q_PROPERTY(QQmlListProperty<QQuickItem> contentChildren READ contentChildren NOTIFY contentChildrenChanged FINAL)
+    /**
+     * every item declared inside the view, both visual and non-visual items
+     */
     Q_PROPERTY(QQmlListProperty<QObject> contentData READ contentData  FINAL)
     Q_CLASSINFO("DefaultProperty", "contentData")
 
@@ -158,12 +245,52 @@ public:
     static ColumnViewAttached *qmlAttachedProperties(QObject *object);
 
 public Q_SLOTS:
+    /**
+     * Pushes a new item at the end of the view
+     * @param item the new item which will be reparented and managed
+     */
     void addItem(QQuickItem *item);
+
+    /**
+     * Inserts a new item in the view at a given position
+     * @param pos the position we want the new item to be inserted in
+     * @param item the new item which will be reparented and managed
+     */
     void insertItem(int pos, QQuickItem *item);
+
+    /**
+     * Move an item inside the view
+     * @param from the old position
+     * @param to the new position
+     */
     void moveItem(int from, int to);
+
+    /**
+     * Removes an item from the view.
+     * Items with C++ ownership will be reparented to
+     * nullptr and objects with QML ownership will be destroyed.
+     * @param item it can either be a pointer of an item or an integer specifying the position to remove
+     */
     void removeItem(const QVariant &item);
+
+    /**
+     * Removes all the items after item. Starting from the last column, every column will be removed until item is found, which will be left in place.
+     * Items with C++ ownership will be reparented to
+     * nullptr and objects with QML ownership will be destroyed.
+     * @param item the item which will be the new last one of the row.
+     */
     void pop(QQuickItem *item);
+
+    /**
+     * Removes every item in the view.
+     * Items with C++ ownership will be reparented to
+     * nullptr and objects with QML ownership will be destroyed.
+     */
     void clear();
+
+    /**
+     * @returns true if the view contains the given item
+     */
     bool containsItem(QQuickItem *item);
 
 protected:
