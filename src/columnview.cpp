@@ -747,49 +747,57 @@ void ColumnView::moveItem(int from, int to)
     polish();
 }
 
-void ColumnView::removeItem(const QVariant &item)
+QQuickItem *ColumnView::removeItem(const QVariant &item)
 {
     if (item.canConvert<QQuickItem *>()) {
-        removeItem(item.value<QQuickItem *>());
+        return removeItem(item.value<QQuickItem *>());
     } else if (item.canConvert<int>()) {
-        removeItem(item.toInt());
+        return removeItem(item.toInt());
+    } else {
+        return nullptr;
     }
 }
 
-void ColumnView::removeItem(QQuickItem *item)
+QQuickItem *ColumnView::removeItem(QQuickItem *item)
 {
     if (m_contentItem->m_items.isEmpty() || !m_contentItem->m_items.contains(item)) {
-        return;
+        return nullptr;
     }
 
     m_contentItem->forgetItem(item);
 
+    //FIXME: better logic for deletion
     if (QQmlEngine::objectOwnership(item) == QQmlEngine::JavaScriptOwnership) {
         item->deleteLater();
     } else {
+        //FIXME: reparent item to original parent
         item->setParentItem(nullptr);
     }
+    return item;
 }
 
-void ColumnView::removeItem(int pos)
+QQuickItem *ColumnView::removeItem(int pos)
 {
     if (m_contentItem->m_items.isEmpty()
         || pos < 0 || pos >= m_contentItem->m_items.length()) {
-        return;
+        return nullptr;
     }
 
-    removeItem(m_contentItem->m_items[pos]); 
+    return removeItem(m_contentItem->m_items[pos]); 
 }
 
-void ColumnView::pop(QQuickItem *item)
+QQuickItem *ColumnView::pop(QQuickItem *item)
 {
+    QQuickItem *removed = nullptr;
+
     while (!m_contentItem->m_items.isEmpty() && m_contentItem->m_items.last() != item) {
-        removeItem(m_contentItem->m_items.last());
+        removed = removeItem(m_contentItem->m_items.last());
         // if no item has been passed, just pop one
         if (!item) {
             break;
         }
     }
+    return removed;
 }
 
 void ColumnView::clear()

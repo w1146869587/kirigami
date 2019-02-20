@@ -238,8 +238,8 @@ public:
 
     // Api not intended for QML use
     //can't do overloads in QML
-    void removeItem(QQuickItem *item);
-    void removeItem(int item);
+    QQuickItem *removeItem(QQuickItem *item);
+    QQuickItem *removeItem(int item);
 
     // QML attached property
     static ColumnViewAttached *qmlAttachedProperties(QObject *object);
@@ -270,8 +270,9 @@ public Q_SLOTS:
      * Items with C++ ownership will be reparented to
      * nullptr and objects with QML ownership will be destroyed.
      * @param item it can either be a pointer of an item or an integer specifying the position to remove
+     * @returns the item that has just been removed
      */
-    void removeItem(const QVariant &item);
+    QQuickItem *removeItem(const QVariant &item);
 
     /**
      * Removes all the items after item. Starting from the last column, every column will be removed until item is found, which will be left in place.
@@ -279,7 +280,7 @@ public Q_SLOTS:
      * nullptr and objects with QML ownership will be destroyed.
      * @param item the item which will be the new last one of the row.
      */
-    void pop(QQuickItem *item);
+    QQuickItem *pop(QQuickItem *item);
 
     /**
      * Removes every item in the view.
