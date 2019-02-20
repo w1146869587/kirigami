@@ -193,7 +193,29 @@ void ColumnViewAttached::setView(ColumnView *view)
     emit viewChanged();
 }
 
+QQuickItem *ColumnViewAttached::originalParent() const
+{
+    return m_originalParent;
+}
 
+void ColumnViewAttached::setOriginalParent(QQuickItem *parent)
+{
+    m_originalParent = parent;
+}
+
+bool ColumnViewAttached::shouldDeleteOnRemove() const
+{
+    return m_shouldDeleteOnRemove;
+}
+
+void ColumnViewAttached::setShouldDeleteOnRemove(bool del)
+{
+    m_shouldDeleteOnRemove = del;
+}
+
+
+
+/////////
 
 ContentItem::ContentItem(ColumnView *parent)
     : QQuickItem(parent),
@@ -729,7 +751,12 @@ void ColumnView::insertItem(int pos, QQuickItem *item)
     m_contentItem->m_items.insert(qBound(0, pos, m_contentItem->m_items.length()), item);
     m_contentItem->m_viewAnchorItem = item;
     setCurrentIndex(pos);
+
+    ColumnViewAttached *attached = qobject_cast<ColumnViewAttached *>(qmlAttachedPropertiesObject<ColumnView>(item, true));
+    attached->setOriginalParent(item->parentItem());
+    attached->setShouldDeleteOnRemove(item->parentItem() == nullptr && QQmlEngine::objectOwnership(item) == QQmlEngine::JavaScriptOwnership);
     item->setParentItem(m_contentItem);
+
     item->forceActiveFocus();
     emit contentChildrenChanged();
 }
@@ -766,12 +793,12 @@ QQuickItem *ColumnView::removeItem(QQuickItem *item)
 
     m_contentItem->forgetItem(item);
 
-    //FIXME: better logic for deletion
-    if (QQmlEngine::objectOwnership(item) == QQmlEngine::JavaScriptOwnership) {
+    ColumnViewAttached *attached = qobject_cast<ColumnViewAttached *>(qmlAttachedPropertiesObject<ColumnView>(item, false));
+
+    if (attached && attached->shouldDeleteOnRemove()) {
         item->deleteLater();
     } else {
-        //FIXME: reparent item to original parent
-        item->setParentItem(nullptr);
+        item->setParentItem(attached ? attached->originalParent() : nullptr);
     }
     return item;
 }
@@ -802,11 +829,14 @@ QQuickItem *ColumnView::pop(QQuickItem *item)
 
 void ColumnView::clear()
 {
+    ColumnViewAttached *attached = nullptr;
+
     for (QQuickItem *item : m_contentItem->m_items) {
-        if (QQmlEngine::objectOwnership(item) == QQmlEngine::JavaScriptOwnership) {
+        attached = qobject_cast<ColumnViewAttached *>(qmlAttachedPropertiesObject<ColumnView>(item, false));
+        if (attached && attached->shouldDeleteOnRemove()) {
             item->deleteLater();
         } else {
-            item->setParentItem(nullptr);
+            item->setParentItem(attached ? attached->originalParent() : nullptr);
         }
     }
     m_contentItem->m_items.clear();
@@ -1003,6 +1033,14 @@ void ColumnView::classBegin()
 
     connect(&privateQmlComponentsPoolSelf->self, &QmlComponentsPool::longDurationChanged, this, syncDuration);
     syncDuration();
+
+    QQuickItem::classBegin();
+}
+
+void ColumnView::componentComplete()
+{
+    m_complete = true;
+    QQuickItem::componentComplete();
 }
 
 void ColumnView::updatePolish()
@@ -1026,12 +1064,18 @@ void ColumnView::itemChange(QQuickItem::ItemChange change, const QQuickItem::Ite
 
 void ColumnView::contentChildren_append(QQmlListProperty<QQuickItem> *prop, QQuickItem *item)
 {
+    // This can only be called from QML
     ColumnView *view = static_cast<ColumnView *>(prop->object);
     if (!view) {
         return;
     }
 
     view->m_contentItem->m_items.append(item);
+
+    ColumnViewAttached *attached = qobject_cast<ColumnViewAttached *>(qmlAttachedPropertiesObject<ColumnView>(item, true));
+    attached->setOriginalParent(item->parentItem());
+    attached->setShouldDeleteOnRemove(item->parentItem() == nullptr && QQmlEngine::objectOwnership(item) == QQmlEngine::JavaScriptOwnership);
+
     item->setParentItem(view->m_contentItem);
 }
 
@@ -1093,7 +1137,13 @@ void ColumnView::contentData_append(QQmlListProperty<QObject> *prop, QObject *ob
         connect(item, SIGNAL(modelChanged()), view->m_contentItem, SLOT(updateRepeaterModel()));
 
     } else if (item) {
-        view->addItem(item);
+        view->m_contentItem->m_items.append(item);
+
+        ColumnViewAttached *attached = qobject_cast<ColumnViewAttached *>(qmlAttachedPropertiesObject<ColumnView>(item, true));
+        attached->setOriginalParent(item->parentItem());
+        attached->setShouldDeleteOnRemove(view->m_complete && !item->parentItem() && QQmlEngine::objectOwnership(item) == QQmlEngine::JavaScriptOwnership);
+
+        item->setParentItem(view->m_contentItem);
 
     } else {
         object->setParent(view);

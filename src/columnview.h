@@ -70,6 +70,13 @@ public:
     ColumnView *view();
     void setView(ColumnView *view);
 
+    //Private API, not for QML use
+    QQuickItem *originalParent() const;
+    void setOriginalParent(QQuickItem *parent);
+
+    bool shouldDeleteOnRemove() const;
+    void setShouldDeleteOnRemove(bool del);
+
 Q_SIGNALS:
     void indexChanged();
     void fillWidthChanged();
@@ -81,8 +88,10 @@ private:
     bool m_fillWidth = false;
     qreal m_reservedSpace = 0;
     QPointer<ColumnView> m_view;
+    QPointer<QQuickItem> m_originalParent;
     bool m_customFillWidth = false;
     bool m_customReservedSpace = false;
+    bool m_shouldDeleteOnRemove = true;
 };
 
 class ColumnView : public QQuickItem
@@ -267,8 +276,8 @@ public Q_SLOTS:
 
     /**
      * Removes an item from the view.
-     * Items with C++ ownership will be reparented to
-     * nullptr and objects with QML ownership will be destroyed.
+     * Items will be reparented to their old parent.
+     * If they have JavaScript ownership and they didn't have an old parent, they will be destroyed
      * @param item it can either be a pointer of an item or an integer specifying the position to remove
      * @returns the item that has just been removed
      */
@@ -276,16 +285,16 @@ public Q_SLOTS:
 
     /**
      * Removes all the items after item. Starting from the last column, every column will be removed until item is found, which will be left in place.
-     * Items with C++ ownership will be reparented to
-     * nullptr and objects with QML ownership will be destroyed.
+     * Items will be reparented to their old parent.
+     * If they have JavaScript ownership and they didn't have an old parent, they will be destroyed
      * @param item the item which will be the new last one of the row.
      */
     QQuickItem *pop(QQuickItem *item);
 
     /**
      * Removes every item in the view.
-     * Items with C++ ownership will be reparented to
-     * nullptr and objects with QML ownership will be destroyed.
+     * Items will be reparented to their old parent.
+     * If they have JavaScript ownership and they didn't have an old parent, they will be destroyed
      */
     void clear();
 
@@ -296,6 +305,7 @@ public Q_SLOTS:
 
 protected:
     void classBegin() override;
+    void componentComplete() override;
     void updatePolish() override;
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
@@ -349,6 +359,7 @@ private:
     bool m_dragging = false;
     bool m_moving = false;
     bool m_separatorVisible = true;
+    bool m_complete = false;
 };
 
 QML_DECLARE_TYPEINFO(ColumnView, QML_HAS_ATTACHED_PROPERTIES)
