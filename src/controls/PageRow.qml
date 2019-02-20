@@ -74,7 +74,7 @@ T.Control {
      * All the items that are present in the PageRow
      * @since 2.6
      */
-    readonly property var items: pagesLogic.pages;
+    property alias items: columnView.contentChildren;
 
     /**
      * visibleItems: list<Item>
@@ -172,7 +172,7 @@ T.Control {
      *     When an array is used the transition animation will only be to the last page.
      *
      * @param properties The properties argument is optional and allows defining a
-     * map of properties to set on the page.
+     * map of properties to set on the page. If page is actually an array of pages, properties should also be an array of key/value maps
      * @return The new created page
      */
     function push(page, properties) {
@@ -186,13 +186,21 @@ T.Control {
 
         // figure out if more than one page is being pushed
         var pages;
+        var propsArray = [];
         if (page instanceof Array) {
             pages = page;
             page = pages.pop();
+            //compatibility with pre-qqc1 api, can probably be removed
             if (page.createObject === undefined && page.parent === undefined && typeof page != "string") {
                 properties = properties || page.properties;
                 page = page.page;
             }
+        }
+        if (properties instanceof Array) {
+            propsArray = properties;
+            properties = propsArray.pop();
+        } else {
+            propsArray = [properties];
         }
 
         // push any extra defined pages onto the stack
@@ -200,7 +208,8 @@ T.Control {
             var i;
             for (i = 0; i < pages.length; i++) {
                 var tPage = pages[i];
-                var tProps;
+                var tProps = propsArray[i];
+                //compatibility with pre-qqc1 api, can probably be removed
                 if (tPage.createObject === undefined && tPage.parent === undefined && typeof tPage != "string") {
                     if (pagesLogic.containsPage(tPage)) {
                         print("The item " + page + " is already in the PageRow");
@@ -211,7 +220,6 @@ T.Control {
                 }
 
                 var pageItem = pagesLogic.initPage(tPage, tProps);
-                root.itemsChanged();
             }
         }
 
@@ -472,7 +480,6 @@ T.Control {
                 if (!pageComp) {
                     pageComp = pagesLogic.componentCache[page] = Qt.createComponent(page);
                 }
-                root.itemsChanged();
             }
             if (pageComp) {
                 // instantiate page from component
@@ -492,7 +499,8 @@ T.Control {
                 }
                 columnView.addItem(page);
             }
-            columnView.currentIndex = page.ColumnView.level;
+
+            columnView.currentIndex = page.ColumnView.index;
             return page;
         }
         function containsPage(page) {

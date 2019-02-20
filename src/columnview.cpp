@@ -745,9 +745,10 @@ void ColumnView::addItem(QQuickItem *item)
 
 void ColumnView::insertItem(int pos, QQuickItem *item)
 {
-    if (m_contentItem->m_items.contains(item)) {
+    if (!item || m_contentItem->m_items.contains(item)) {
         return;
     }
+
     m_contentItem->m_items.insert(qBound(0, pos, m_contentItem->m_items.length()), item);
     m_contentItem->m_viewAnchorItem = item;
     setCurrentIndex(pos);
