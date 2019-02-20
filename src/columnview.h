@@ -35,9 +35,9 @@ class ColumnViewAttached : public QObject
     Q_OBJECT
 
     /**
-     * The position of the column in the view, starting from 0
+     * The index position of the column in the view, starting from 0
      */
-    Q_PROPERTY(int level READ level WRITE setLevel NOTIFY levelChanged)
+    Q_PROPERTY(int index READ index WRITE setIndex NOTIFY indexChanged)
 
     /**
      * If true, the column will expand to take the whole viewport space minus reservedSpace
@@ -58,8 +58,8 @@ public:
     ColumnViewAttached(QObject *parent = nullptr);
     ~ColumnViewAttached();
 
-    void setLevel(int level);
-    int  level() const;
+    void setIndex(int index);
+    int  index() const;
 
     void setFillWidth(bool fill);
     bool fillWidth() const;
@@ -71,13 +71,13 @@ public:
     void setView(ColumnView *view);
 
 Q_SIGNALS:
-    void levelChanged();
+    void indexChanged();
     void fillWidthChanged();
     void reservedSpaceChanged();
     void viewChanged();
 
 private:
-    int m_level = -1;
+    int m_index = -1;
     bool m_fillWidth = false;
     qreal m_reservedSpace = 0;
     QPointer<ColumnView> m_view;

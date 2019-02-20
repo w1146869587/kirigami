@@ -96,27 +96,27 @@ ColumnViewAttached::ColumnViewAttached(QObject *parent)
 ColumnViewAttached::~ColumnViewAttached()
 {}
 
-void ColumnViewAttached::setLevel(int level)
+void ColumnViewAttached::setIndex(int index)
 {
     if (!m_customFillWidth && m_view) {
         const bool oldFillWidth = m_fillWidth;
-        m_fillWidth = level == m_view->count() - 1;
+        m_fillWidth = index == m_view->count() - 1;
         if (oldFillWidth != m_fillWidth) {
             emit fillWidthChanged();
         }
     }
 
-    if (level == m_level) {
+    if (index == m_index) {
         return;
     }
 
-    m_level = level;
-    emit levelChanged();
+    m_index = index;
+    emit indexChanged();
 }
 
-int ColumnViewAttached::level() const
+int ColumnViewAttached::index() const
 {
-    return m_level;
+    return m_index;
 }
 
 void ColumnViewAttached::setFillWidth(bool fill)
@@ -176,9 +176,9 @@ void ColumnViewAttached::setView(ColumnView *view)
     m_view = view;
 
     if (!m_customFillWidth && m_view) {
-        m_fillWidth = m_level == m_view->count() - 1;
+        m_fillWidth = m_index == m_view->count() - 1;
         connect(m_view.data(), &ColumnView::countChanged, this, [this]() {
-            m_fillWidth = m_level == m_view->count() - 1;
+            m_fillWidth = m_index == m_view->count() - 1;
             emit fillWidthChanged();
         });
     }
@@ -308,7 +308,7 @@ void ContentItem::layoutItems()
             partialWidth += child->width();
         }
         ColumnViewAttached *attached = qobject_cast<ColumnViewAttached *>(qmlAttachedPropertiesObject<ColumnView>(child, true));
-        attached->setLevel(i++);
+        attached->setIndex(i++);
     }
     setWidth(partialWidth);
 
@@ -355,7 +355,7 @@ void ContentItem::forgetItem(QQuickItem *item)
 
     ColumnViewAttached *attached = qobject_cast<ColumnViewAttached *>(qmlAttachedPropertiesObject<ColumnView>(item, true));
     attached->setView(nullptr);
-    attached->setLevel(-1);
+    attached->setIndex(-1);
 
     disconnect(attached, nullptr, this, nullptr);
     disconnect(item, nullptr, this, nullptr);
