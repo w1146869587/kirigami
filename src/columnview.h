@@ -288,6 +288,7 @@ public Q_SLOTS:
      * Items will be reparented to their old parent.
      * If they have JavaScript ownership and they didn't have an old parent, they will be destroyed
      * @param item the item which will be the new last one of the row.
+     * @returns the last item that has been removed
      */
     QQuickItem *pop(QQuickItem *item);
 

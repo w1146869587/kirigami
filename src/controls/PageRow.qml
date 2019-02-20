@@ -234,8 +234,9 @@ T.Control {
             return;
         }
 
-        columnView.pop(page)
-        pageRemoved(page)
+        var item = columnView.pop(page);
+        pageRemoved(page);
+        return item;
     }
 
     /**
