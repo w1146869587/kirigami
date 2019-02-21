@@ -29,6 +29,7 @@ class ColumnView;
 /**
  * This is an attached property to every item that is inserted in the ColumnView,
  * used to access the view and page information such as the position and informations for layouting, such as fillWidth
+ * @since 2.7
  */
 class ColumnViewAttached : public QObject
 {
@@ -94,6 +95,17 @@ private:
     bool m_shouldDeleteOnRemove = true;
 };
 
+
+/**
+ * ColumnView is a container that lays out items horizontally in a row,
+ * when not all items fit in the ColumnView, it will behave ike a Flickable and will be a scrollable view which shows only a determined number of columns.
+ * The columns can either all have the same fixed size (recommended),
+ * size themselves with implicitWidth, or automatically expand to take all the available width: by default the last column will always be the expanding one.
+ * Items inside the Columnview can access info of the view and set layouting hints via the Columnview attached property.
+ *
+ * This is the base for the implementation of PageRow
+ * @since 2.7
+ */
 class ColumnView : public QQuickItem
 {
     Q_OBJECT
