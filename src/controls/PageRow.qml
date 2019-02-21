@@ -177,7 +177,9 @@ T.Control {
      * @return The new created page (or the last one if it was an array)
      */
     function push(page, properties) {
-        return insertPage(depth, page, properties);
+        var item = insertPage(depth, page, properties);
+        currentIndex = depth - 1;
+        return item;
     }
 
     /**
@@ -259,7 +261,7 @@ T.Control {
         var pageItem = pagesLogic.initAndInsertPage(position, page, properties);
 
         pagePushed(pageItem);
-        currentIndex = depth - 1;
+
         return pageItem;
     }
 
