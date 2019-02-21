@@ -160,6 +160,7 @@ T.Control {
      * If an item is used then the page will get re-parented.
      * If a string is used then it is interpreted as a url that is used to load a page 
      * component.
+     * The last pushed page will become the current item.
      *
      * @param page The page can also be given as an array of pages.
      *     In this case all those pages will
@@ -173,14 +174,44 @@ T.Control {
      *
      * @param properties The properties argument is optional and allows defining a
      * map of properties to set on the page. If page is actually an array of pages, properties should also be an array of key/value maps
-     * @return The new created page
+     * @return The new created page (or the last one if it was an array)
      */
     function push(page, properties) {
+        return insertPage(depth, page, properties);
+    }
+
+    /**
+     * Inserts a new page or a list of new at an arbitrary position
+     * The page can be defined as a component, item or string.
+     * If an item is used then the page will get re-parented.
+     * If a string is used then it is interpreted as a url that is used to load a page 
+     * component.
+     * The current Page will not be changed, currentIndex will be adjusted
+     * accordingly if needed to keep the same current page.
+     *
+     * @param page The page can also be given as an array of pages.
+     *     In this case all those pages will
+     *     be pushed onto the stack. The items in the stack can be components, items or
+     *     strings just like for single pages.
+     *     Additionally an object can be used, which specifies a page and an optional
+     *     properties property.
+     *     This can be used to push multiple pages while still giving each of
+     *     them properties.
+     *     When an array is used the transition animation will only be to the last page.
+     *
+     * @param properties The properties argument is optional and allows defining a
+     * map of properties to set on the page. If page is actually an array of pages, properties should also be an array of key/value maps
+     * @return The new created page (or the last one if it was an array)
+     * @since 2.7
+     */
+    function insertPage(position, page, properties) {
         //don't push again things already there
         if (page.createObject === undefined && typeof page != "string" && columnView.containsItem(page)) {
             print("The item " + page + " is already in the PageRow");
-            return;
+            return null;
         }
+
+        position = Math.max(0, Math.min(depth, position));
 
         columnView.pop(columnView.currentItem);
 
@@ -211,7 +242,7 @@ T.Control {
                 var tProps = propsArray[i];
                 //compatibility with pre-qqc1 api, can probably be removed
                 if (tPage.createObject === undefined && tPage.parent === undefined && typeof tPage != "string") {
-                    if (pagesLogic.containsPage(tPage)) {
+                    if (columnView.containsItem(tPage)) {
                         print("The item " + page + " is already in the PageRow");
                         continue;
                     }
@@ -219,16 +250,41 @@ T.Control {
                     tPage = tPage.page;
                 }
 
-                var pageItem = pagesLogic.initPage(tPage, tProps);
+                var pageItem = pagesLogic.initAndInsertPage(position, tPage, tProps);
+                ++position;
             }
         }
 
         // initialize the page
-        var pageItem = pagesLogic.initPage(page, properties);
+        var pageItem = pagesLogic.initAndInsertPage(position, page, properties);
 
         pagePushed(pageItem);
         currentIndex = depth - 1;
         return pageItem;
+    }
+
+    /**
+     * Move the page at position fromPos to the new position toPos
+     * If needed, currentIndex will be adjusted
+     * in order to keep the same current page.
+     * @since 2.7
+     */
+    function movePage(fromPos, toPos) {
+        columnView.moveItem(fromPos, toPos);
+    }
+
+    /**
+     * Remove the given page 
+     * @param page The page can be given both as integer position or by reference
+     * @return The page that has just been removed
+     * @since 2.7
+     */
+    function removePage(page) {
+        if (depth == 0) {
+            return null;
+        }
+
+        return columnView.removeItem(page);
     }
 
     /**
@@ -240,16 +296,22 @@ T.Control {
      */
     function pop(page) {
         if (depth == 0) {
-            return;
+            return null;
         }
 
-        var item = columnView.pop(page);
-        pageRemoved(page);
-        return item;
+        return columnView.pop(page);
     }
 
     /**
-     * Emitted when a page has been pushed
+     * Emitted when a page has been inserted anywhere
+     * @param position where the page has been inserted
+     * @param page the new page
+     * @since 2.7
+     */
+    signal pageInserted(int position, Item page)
+
+    /**
+     * Emitted when a page has been pushed to the bottom
      * @param page the new page
      * @since 2.5
      */
@@ -467,11 +529,10 @@ T.Control {
     QtObject {
         id: pagesLogic
         readonly property var componentCache: new Array()
-        readonly property int roundedDefaultColumnWidth: root.width < root.defaultColumnWidth*2 ? root.width : root.defaultColumnWidth
 
-        function initPage(page, properties) {
-
+        function initAndInsertPage(position, page, properties) {
             var pageComp;
+
             if (page.createObject) {
                 // page defined as component
                 pageComp = page;
@@ -486,7 +547,7 @@ T.Control {
                 // instantiate page from component
                 // FIXME: parent directly to columnView or root?
                 page = pageComp.createObject(null, properties || {});
-                columnView.addItem(page);
+                columnView.insertItem(position, page);
 
                 if (pageComp.status === Component.Error) {
                     throw new Error("Error while loading page: " + pageComp.errorString());
@@ -498,19 +559,10 @@ T.Control {
                         page[prop] = properties[prop];
                     }
                 }
-                columnView.addItem(page);
+                columnView.insertItem(position, page);
             }
 
             return page;
-        }
-        function containsPage(page) {
-            for (var i = 0; i < pagesLogic.count; ++i) {
-                var candidate = pagesLogic.get(i);
-                if (candidate.page === page) {
-                    print("The item " + page + " is already in the PageRow");
-                    return;
-                }
-            }
         }
     }
 
@@ -521,6 +573,10 @@ T.Control {
         columnResizeMode: root.wideMode ? ColumnView.FixedColumns : ColumnView.SingleColumn
         columnWidth: root.defaultColumnWidth
         opacity: layersStack.depth < 2
+
+        onItemInserted: root.pageInserted(position, item);
+        onItemRemoved: root.pageRemoved(item);
+
         Behavior on opacity {
             OpacityAnimator {
                 duration: Units.longDuration

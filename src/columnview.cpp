@@ -778,6 +778,14 @@ void ColumnView::insertItem(int pos, QQuickItem *item)
     m_contentItem->m_shouldAnimate = false;
     m_contentItem->layoutItems();
     emit contentChildrenChanged();
+
+    // In order to keep the same current item we need to increase the current index if displaced
+    if (m_currentIndex >= pos) {
+        ++m_currentIndex;
+        emit currentIndexChanged();
+    }
+
+    emit itemInserted(pos, item);
 }
 
 void ColumnView::moveItem(int from, int to)
@@ -790,6 +798,18 @@ void ColumnView::moveItem(int from, int to)
 
     m_contentItem->m_items.move(from, to);
     m_contentItem->m_shouldAnimate = true;
+
+    if (from == m_currentIndex) {
+        m_currentIndex = to;
+        emit currentIndexChanged();
+    } else if (from < m_currentIndex && to > m_currentIndex) {
+        --m_currentIndex;
+        emit currentIndexChanged();
+    } else if (from > m_currentIndex && to <= m_currentIndex) {
+        ++m_currentIndex;
+        emit currentIndexChanged();
+    }
+
     polish();
 }
 
@@ -810,6 +830,14 @@ QQuickItem *ColumnView::removeItem(QQuickItem *item)
         return nullptr;
     }
 
+    const int index = m_contentItem->m_items.indexOf(item);
+
+    // In order to keep the same current item we need to increase the current index if displaced
+    if (m_currentIndex >= index) {
+        --m_currentIndex;
+        emit currentIndexChanged();
+    }
+
     m_contentItem->forgetItem(item);
 
     ColumnViewAttached *attached = qobject_cast<ColumnViewAttached *>(qmlAttachedPropertiesObject<ColumnView>(item, false));
@@ -819,6 +847,9 @@ QQuickItem *ColumnView::removeItem(QQuickItem *item)
     } else {
         item->setParentItem(attached ? attached->originalParent() : nullptr);
     }
+
+    emit itemRemoved(item);
+
     return item;
 }
 

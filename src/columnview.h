@@ -261,14 +261,17 @@ public Q_SLOTS:
     void addItem(QQuickItem *item);
 
     /**
-     * Inserts a new item in the view at a given position
+     * Inserts a new item in the view at a given position.
+     * The current Item will not be changed, currentIndex will be adjusted
+     * accordingly if needed to keep the same current item.
      * @param pos the position we want the new item to be inserted in
      * @param item the new item which will be reparented and managed
      */
     void insertItem(int pos, QQuickItem *item);
 
     /**
-     * Move an item inside the view
+     * Move an item inside the view.
+     * The currentIndex property may be changed in order to keep currentItem the same.
      * @param from the old position
      * @param to the new position
      */
@@ -277,7 +280,8 @@ public Q_SLOTS:
     /**
      * Removes an item from the view.
      * Items will be reparented to their old parent.
-     * If they have JavaScript ownership and they didn't have an old parent, they will be destroyed
+     * If they have JavaScript ownership and they didn't have an old parent, they will be destroyed.
+     * CurrentIndex may be changed in order to keep the same currentItem
      * @param item it can either be a pointer of an item or an integer specifying the position to remove
      * @returns the item that has just been removed
      */
@@ -317,6 +321,20 @@ protected:
     void mouseUngrabEvent() override;
 
 Q_SIGNALS:
+    /**
+     * A new item has been inserted
+     * @param position where the page has been inserted
+     * @param item a pointer to the new item
+     */
+    void itemInserted(int position, QQuickItem *item);
+
+    /**
+     * An item has just been removed from the view
+     * @param item a pointer to the item that has just been removed
+     */
+    void itemRemoved(QQuickItem *item);
+
+    // Property notifiers
     void contentChildrenChanged();
     void columnResizeModeChanged();
     void columnWidthChanged();
