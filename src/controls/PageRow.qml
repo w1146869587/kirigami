@@ -227,6 +227,7 @@ T.Control {
         var pageItem = pagesLogic.initPage(page, properties);
 
         pagePushed(pageItem);
+        currentIndex = depth - 1;
         return pageItem;
     }
 
@@ -500,7 +501,6 @@ T.Control {
                 columnView.addItem(page);
             }
 
-            columnView.currentIndex = page.ColumnView.index;
             return page;
         }
         function containsPage(page) {

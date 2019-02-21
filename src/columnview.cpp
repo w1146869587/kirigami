@@ -259,6 +259,7 @@ void ContentItem::animateX(qreal newX)
 
     const qreal to = qRound(qBound(qMin(0.0, -width()+parentItem()->width()), newX, 0.0));
 
+    m_slideAnim->stop();
     m_slideAnim->setStartValue(x());
     m_slideAnim->setEndValue(to);
     m_slideAnim->start();
@@ -578,7 +579,7 @@ int ColumnView::currentIndex() const
 
 void ColumnView::setCurrentIndex(int index)
 {
-    if (!parentItem() || m_currentIndex == index || index < -1 || index >= m_contentItem->m_items.count()) {
+    if (m_currentIndex == index || index < -1 || index >= m_contentItem->m_items.count()) {
         return;
     }
 
@@ -586,16 +587,32 @@ void ColumnView::setCurrentIndex(int index)
 
     if (index == -1) {
         m_currentItem.clear();
+
     } else {
         m_currentItem = m_contentItem->m_items[index];
         Q_ASSERT(m_currentItem);
         m_currentItem->forceActiveFocus();
 
         // If the current item is not on view, scroll
-        QRectF mapped = m_currentItem->mapRectToItem(parentItem(), QRectF(m_currentItem->position(), m_currentItem->size()));
-        if (!QRectF(QPointF(0, 0), parentItem()->size()).intersects(mapped)) {
+        QRectF mappedCurrent = m_currentItem->mapRectToItem(this,
+                                            QRectF(QPointF(0, 0),
+                                                   m_currentItem->size()));
+
+        if (m_contentItem->m_slideAnim->state() == QAbstractAnimation::Running) {
+            mappedCurrent.moveLeft(mappedCurrent.left() + m_contentItem->x() + m_contentItem->m_slideAnim->endValue().toInt());
+        }
+
+        //m_contentItem->m_slideAnim->stop();
+
+        QRectF contentsRect(QPointF(0, 0), size());
+
+        m_contentItem->m_shouldAnimate = true;
+
+        if (!contentsRect.contains(mappedCurrent)) {
             m_contentItem->m_viewAnchorItem = m_currentItem;
             m_contentItem->animateX(-m_currentItem->x());
+        } else {
+            m_contentItem->snapToItem();
         }
     }
 
@@ -750,8 +767,6 @@ void ColumnView::insertItem(int pos, QQuickItem *item)
     }
 
     m_contentItem->m_items.insert(qBound(0, pos, m_contentItem->m_items.length()), item);
-    m_contentItem->m_viewAnchorItem = item;
-    setCurrentIndex(pos);
 
     ColumnViewAttached *attached = qobject_cast<ColumnViewAttached *>(qmlAttachedPropertiesObject<ColumnView>(item, true));
     attached->setOriginalParent(item->parentItem());
@@ -759,6 +774,9 @@ void ColumnView::insertItem(int pos, QQuickItem *item)
     item->setParentItem(m_contentItem);
 
     item->forceActiveFocus();
+    // We layout immediately to be sure all geometries are final after the return of this call
+    m_contentItem->m_shouldAnimate = false;
+    m_contentItem->layoutItems();
     emit contentChildrenChanged();
 }
 
