@@ -409,6 +409,7 @@ void ContentItem::forgetItem(QQuickItem *item)
     m_visibleItems.removeAll(item);
     m_shouldAnimate = true;
     m_view->polish();
+    item->setVisible(false);
 
     if (index <= m_view->currentIndex()) {
         m_view->setCurrentIndex(qBound(0, index - 1, m_items.count() - 1));
@@ -447,6 +448,8 @@ void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
              
         });
         connect(attached, &ColumnViewAttached::reservedSpaceChanged, m_view, &ColumnView::polish);
+
+        value.item->setVisible(true);
 
         if (!m_items.contains(value.item)) {
             connect(value.item, &QQuickItem::widthChanged, m_view, &ColumnView::polish);
