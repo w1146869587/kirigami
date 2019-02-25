@@ -213,6 +213,21 @@ void ColumnViewAttached::setShouldDeleteOnRemove(bool del)
     m_shouldDeleteOnRemove = del;
 }
 
+bool ColumnViewAttached::preventStealing() const
+{
+    return m_preventStealing;
+}
+
+void ColumnViewAttached::setPreventStealing(bool prevent)
+{
+    if (prevent == m_preventStealing) {
+        return;
+    }
+
+    m_preventStealing = prevent;
+    emit preventStealingChanged();
+}
+
 
 
 /////////
@@ -940,6 +955,7 @@ bool ColumnView::childMouseEventFilter(QQuickItem *item, QEvent *event)
         if (candidateItem->parentItem() == m_contentItem) {
             setCurrentIndex(m_contentItem->m_items.indexOf(candidateItem));
         }
+        
         break;
     }
     case QEvent::MouseMove: {
@@ -947,6 +963,18 @@ bool ColumnView::childMouseEventFilter(QQuickItem *item, QEvent *event)
             m_contentItem->snapToItem();
             return false;
         }
+
+        QQuickItem *candidateItem = item;
+        while (candidateItem->parentItem() && candidateItem->parentItem() != m_contentItem) {
+            candidateItem = candidateItem->parentItem();
+        }
+        if (candidateItem->parentItem() == m_contentItem) {
+            ColumnViewAttached *attached = qobject_cast<ColumnViewAttached *>(qmlAttachedPropertiesObject<ColumnView>(item, true));
+            if (attached->preventStealing()) {
+                return false;
+            }
+        }
+
         QMouseEvent *me = static_cast<QMouseEvent *>(event);
         const QPointF pos = mapFromItem(item, me->localPos());
 

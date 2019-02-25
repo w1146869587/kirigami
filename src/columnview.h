@@ -51,6 +51,13 @@ class ColumnViewAttached : public QObject
     Q_PROPERTY(qreal reservedSpace READ reservedSpace WRITE setReservedSpace NOTIFY reservedSpaceChanged)
 
     /**
+     * Like the same property of MouseArea, when this is true, the column view won't 
+     * try to manage events by itself when filtering from a child, not
+     * disturbing user interaction
+     */
+    Q_PROPERTY(bool preventStealing READ preventStealing WRITE setPreventStealing NOTIFY preventStealingChanged)
+
+    /**
      * The view this column belongs to
      */
     Q_PROPERTY(ColumnView *view READ view NOTIFY viewChanged)
@@ -78,11 +85,15 @@ public:
     bool shouldDeleteOnRemove() const;
     void setShouldDeleteOnRemove(bool del);
 
+    bool preventStealing() const;
+    void setPreventStealing(bool prevent);
+
 Q_SIGNALS:
     void indexChanged();
     void fillWidthChanged();
     void reservedSpaceChanged();
     void viewChanged();
+    void preventStealingChanged();
 
 private:
     int m_index = -1;
@@ -93,6 +104,7 @@ private:
     bool m_customFillWidth = false;
     bool m_customReservedSpace = false;
     bool m_shouldDeleteOnRemove = true;
+    bool m_preventStealing = false;
 };
 
 
