@@ -952,7 +952,7 @@ bool ColumnView::childMouseEventFilter(QQuickItem *item, QEvent *event)
 
         const bool wasDragging = m_dragging;
         // If a drag happened, start to steal all events, use startDragDistance * 2 to give time to widgets to take the mouse grab by themselves
-        m_dragging = keepMouseGrab() || qAbs(mapFromItem(item, me->localPos()).x() - m_startMouseX) > qApp->styleHints()->startDragDistance() * 2;
+        m_dragging = keepMouseGrab() || qAbs(mapFromItem(item, me->localPos()).x() - m_startMouseX) > qApp->styleHints()->startDragDistance() * 3;
 
         if (m_dragging != wasDragging) {
             m_moving = true;
