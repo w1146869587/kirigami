@@ -100,10 +100,12 @@ protected:
     void handleFinished(QNetworkAccessManager* qnam, QNetworkReply* reply);
     void handleReadyRead(QNetworkReply* reply);
     QIcon::Mode iconMode() const;
+    bool guessMonochrome(const QImage &img);
 
 private:
     Kirigami::PlatformTheme *m_theme = nullptr;
     QPointer<QNetworkReply> m_networkReply;
+    QHash<int, bool> m_monochromeHeuristics;
     QVariant m_source;
     bool m_smooth;
     bool m_changed;

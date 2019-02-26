@@ -156,6 +156,7 @@ void DesktopIcon::setSource(const QVariant &icon)
     }
     m_source = icon;
     m_changed = true;
+    m_monochromeHeuristics.clear();
 
     if (!m_theme) {
         m_theme = static_cast<Kirigami::PlatformTheme *>(qmlAttachedPropertiesObject<Kirigami::PlatformTheme>(this, true));
@@ -489,71 +490,10 @@ QImage DesktopIcon::findIcon(const QSize &size)
         }
         if (!icon.isNull()) {
             img = icon.pixmap(size, iconMode(), QIcon::On).toImage();
-            qreal ratio = 1;
-            if (window() && window()->screen()) {
-                ratio = window()->screen()->devicePixelRatio();
-            }
 
             const QColor tintColor = !m_color.isValid() || m_color == Qt::transparent ? (m_selected ? m_theme->highlightedTextColor() : m_theme->textColor()) : m_color;
 
-            /*
-            int darkPixels = 0;
-            int transparentPixels = 0;
-            const int threshold = 64;
-            for(int x=0; x<img.width(); x++) {
-                for(int y=0; y<img.height(); y++) {
-                    QRgb rgb = img.pixel(x, y);
-                    if (qAlpha(rgb) == 0) {
-                        ++transparentPixels;
-                    } else if (qGray(rgb) < threshold) {
-                        ++darkPixels;
-                    }
-                }
-            }
-            qWarning()<<"AAAA"<<m_source<<darkPixels<<transparentPixels<<size.width()*size.height()<<(darkPixels >= (size.width()*size.height() - transparentPixels)*0.8);
-            */
-            QHash<int, int> dist;
-            int transparentPixels = 0;
-            int saturatedPixels = 0;
-            for(int x=0; x<img.width(); x++) {
-                for(int y=0; y<img.height(); y++) {
-                    //QRgb rgb = qUnpremultiply(img.pixel(x, y));
-                    QColor rgb = QColor::fromRgba(qUnpremultiply(img.pixel(x, y)));
-                    if (rgb.alpha() < 100) {
-                        ++transparentPixels;
-                        continue;
-                    } else if (rgb.saturation() > 84) {
-                        ++saturatedPixels;
-                    }
-                    rgb.setAlpha(255);
-                    //rgb = qRgb(qRed(rgb/32*32), qGreen(rgb/32*32), qBlue(rgb/32*32));
-                    dist[rgb.value()]++;
-                }
-            }
-
-            int i = 0;
-            QMultiMap<int, int> reverseDist;
-            auto it = dist.constBegin();
-            std::vector<qreal> probabilities(dist.size());
-            qreal entropy = 0;
-            while (it != dist.constEnd()) {
-                reverseDist.insertMulti(it.value(), it.key());
-                qreal probability = (qreal)it.value()/(qreal)(size.width()*size.height() - transparentPixels);
-                entropy -= probability * log(probability)/log(255);
-                ++it;
-            }
-            
-            qWarning()<<"AAAA"<<m_source<<entropy<<saturatedPixels<<(size.width()*size.height() - transparentPixels)<<transparentPixels;
-/*
-            if (m_isMask ||
-                //this is an heuristic to decide when to tint and when to just draw
-                //(fullcolor icons) in reality on basic styles the only colored icons should be -symbolic, this heuristic is the most compatible middle ground
-                icon.isMask() ||
-                //if symbolic color based on tintColor
-                (iconSource.endsWith(QLatin1String("-symbolic")) && tintColor.isValid() && tintColor != Qt::transparent) ||
-                //if path color based on m_color
-                (isPath && m_color.isValid() && m_color != Qt::transparent)) {*/
-if (saturatedPixels <= (size.width()*size.height() - transparentPixels)*0.3 && entropy <= 0.3) {
+            if (guessMonochrome(img)) {
                 QPainter p(&img);
                 p.setCompositionMode(QPainter::CompositionMode_SourceIn);
                 p.fillRect(img.rect(), tintColor);
@@ -574,6 +514,65 @@ QIcon::Mode DesktopIcon::iconMode() const
         return QIcon::Active;
     }
     return QIcon::Normal;
+}
+
+bool DesktopIcon::guessMonochrome(const QImage &img)
+{
+    // round size to a standard size. hardcode as we can't use KIconLoader
+    int stdSize;
+    if (img.width() <= 16) {
+        stdSize = 16;
+    } else if (img.width() <= 22) {
+        stdSize = 22;
+    } else if (img.width() <= 24) {
+        stdSize = 24;
+    } else if (img.width() <= 32) {
+        stdSize = 32;
+    } else if (img.width() <= 48) {
+        stdSize = 48;
+    } else if (img.width() <= 64) {
+        stdSize = 64;
+    } else {
+        stdSize = 128;
+    }
+
+    auto findIt = m_monochromeHeuristics.constFind(stdSize);
+    if (findIt != m_monochromeHeuristics.constEnd()) {
+        return findIt.value();
+    }
+
+    QHash<int, int> dist;
+    int transparentPixels = 0;
+    int saturatedPixels = 0;
+    for(int x=0; x<img.width(); x++) {
+        for(int y=0; y<img.height(); y++) {
+            //QRgb rgb = qUnpremultiply(img.pixel(x, y));
+            QColor rgb = QColor::fromRgba(qUnpremultiply(img.pixel(x, y)));
+            if (rgb.alpha() < 100) {
+                ++transparentPixels;
+                continue;
+            } else if (rgb.saturation() > 84) {
+                ++saturatedPixels;
+            }
+            rgb.setAlpha(255);
+            //rgb = qRgb(qRed(rgb/32*32), qGreen(rgb/32*32), qBlue(rgb/32*32));
+            dist[rgb.value()]++;
+        }
+    }
+
+    QMultiMap<int, int> reverseDist;
+    auto it = dist.constBegin();
+    std::vector<qreal> probabilities(dist.size());
+    qreal entropy = 0;
+    while (it != dist.constEnd()) {
+        reverseDist.insertMulti(it.value(), it.key());
+        qreal probability = (qreal)it.value()/(qreal)(img.size().width()*img.size().height() - transparentPixels);
+        entropy -= probability * log(probability)/log(255);
+        ++it;
+    }
+
+    m_monochromeHeuristics[stdSize] = saturatedPixels <= (img.size().width()*img.size().height() - transparentPixels)*0.3 && entropy <= 0.3;
+    return m_monochromeHeuristics[stdSize];
 }
 
 QString DesktopIcon::fallback() const
