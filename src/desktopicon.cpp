@@ -549,17 +549,14 @@ bool DesktopIcon::guessMonochrome(const QImage &img)
     int saturatedPixels = 0;
     for(int x=0; x<img.width(); x++) {
         for(int y=0; y<img.height(); y++) {
-            //QRgb rgb = qUnpremultiply(img.pixel(x, y));
-            QColor rgb = QColor::fromRgba(qUnpremultiply(img.pixel(x, y)));
-            if (rgb.alpha() < 100) {
+            QColor color = QColor::fromRgba(qUnpremultiply(img.pixel(x, y)));
+            if (color.alpha() < 100) {
                 ++transparentPixels;
                 continue;
-            } else if (rgb.saturation() > 84) {
+            } else if (color.saturation() > 84) {
                 ++saturatedPixels;
             }
-            rgb.setAlpha(255);
-            //rgb = qRgb(qRed(rgb/32*32), qGreen(rgb/32*32), qBlue(rgb/32*32));
-            dist[rgb.value()]++;
+            dist[qGray(color.rgb())]++;
         }
     }
 
@@ -574,6 +571,7 @@ bool DesktopIcon::guessMonochrome(const QImage &img)
         ++it;
     }
 
+    // Arbitrarly low values of entropy and colored pixels
     m_monochromeHeuristics[stdSize] = saturatedPixels <= (img.size().width()*img.size().height() - transparentPixels)*0.3 && entropy <= 0.3;
     return m_monochromeHeuristics[stdSize];
 }
