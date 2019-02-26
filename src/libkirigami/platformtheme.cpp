@@ -695,7 +695,7 @@ void PlatformTheme::setPalette(const QPalette &palette)
 QIcon PlatformTheme::iconFromTheme(const QString &name, const QColor &customColor)
 {
     QIcon icon = QIcon::fromTheme(name);
-    if (!icon.isNull() && (name.endsWith(QLatin1String("-symbolic")) || customColor != Qt::transparent)) {
+    if (!icon.isNull() && name.endsWith(QLatin1String("-symbolic"))) {
         icon.setIsMask(true);
     }
     return icon;
