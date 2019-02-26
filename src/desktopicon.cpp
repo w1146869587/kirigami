@@ -493,7 +493,7 @@ QImage DesktopIcon::findIcon(const QSize &size)
 
             const QColor tintColor = !m_color.isValid() || m_color == Qt::transparent ? (m_selected ? m_theme->highlightedTextColor() : m_theme->textColor()) : m_color;
 
-            if (m_isMask || icon.isMask() || guessMonochrome(img)) {
+            if (m_isMask || icon.isMask() || iconSource.endsWith(QStringLiteral("-symbolic")) || guessMonochrome(img)) {
                 QPainter p(&img);
                 p.setCompositionMode(QPainter::CompositionMode_SourceIn);
                 p.fillRect(img.rect(), tintColor);
