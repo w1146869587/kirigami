@@ -493,7 +493,7 @@ QImage DesktopIcon::findIcon(const QSize &size)
 
             const QColor tintColor = !m_color.isValid() || m_color == Qt::transparent ? (m_selected ? m_theme->highlightedTextColor() : m_theme->textColor()) : m_color;
 
-            if ((m_color.isValid() && m_color.alpha() > 0) || iconSource.endsWith(QLatin1String("-symbolic")) || guessMonochrome(img)) {
+            if ((m_color.isValid() && m_color.alpha() > 0) && (m_isMask || icon.isMask() || guessMonochrome(img))) {
                 QPainter p(&img);
                 p.setCompositionMode(QPainter::CompositionMode_SourceIn);
                 p.fillRect(img.rect(), tintColor);
@@ -518,6 +518,9 @@ QIcon::Mode DesktopIcon::iconMode() const
 
 bool DesktopIcon::guessMonochrome(const QImage &img)
 {
+    if (m_theme->supportsIconColoring()) {
+        return false;
+    }
     // round size to a standard size. hardcode as we can't use KIconLoader
     int stdSize;
     if (img.width() <= 16) {

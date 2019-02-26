@@ -93,6 +93,7 @@ public:
     QFont font;
     bool m_inherit = true;
     bool m_init = true;
+    bool m_supportsIconColoring = false;
 
     static KirigamiPluginFactory *s_pluginFactory;
 };
@@ -700,6 +701,15 @@ QIcon PlatformTheme::iconFromTheme(const QString &name, const QColor &customColo
     return icon;
 }
 
+bool PlatformTheme::supportsIconColoring() const
+{
+    return d->m_supportsIconColoring;
+}
+
+void PlatformTheme::setSupportsIconColoring(bool support)
+{
+    d->m_supportsIconColoring = support;
+}
 
 
 PlatformTheme *PlatformTheme::qmlAttachedProperties(QObject *object)
