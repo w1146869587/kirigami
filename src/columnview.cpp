@@ -406,7 +406,7 @@ void ContentItem::forgetItem(QQuickItem *item)
 
     const int index = m_items.indexOf(item);
     m_items.removeAll(item);
-    m_visibleItems.removeAll(item);
+    updateVisibleItems();
     m_shouldAnimate = true;
     m_view->polish();
     item->setVisible(false);
