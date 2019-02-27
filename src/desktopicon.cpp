@@ -518,7 +518,8 @@ QIcon::Mode DesktopIcon::iconMode() const
 
 bool DesktopIcon::guessMonochrome(const QImage &img)
 {
-    if (m_theme->supportsIconColoring()) {
+    //don't try for too big images
+    if (img.width() > 256 || m_theme->supportsIconColoring()) {
         return false;
     }
     // round size to a standard size. hardcode as we can't use KIconLoader
