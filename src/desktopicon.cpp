@@ -493,7 +493,7 @@ QImage DesktopIcon::findIcon(const QSize &size)
 
             const QColor tintColor = !m_color.isValid() || m_color == Qt::transparent ? (m_selected ? m_theme->highlightedTextColor() : m_theme->textColor()) : m_color;
 
-            if (m_isMask || icon.isMask() || iconSource.endsWith(QStringLiteral("-symbolic")) || guessMonochrome(img)) {
+            if (m_isMask || icon.isMask() || iconSource.endsWith(QStringLiteral("-symbolic")) || iconSource.endsWith(QStringLiteral("-symbolic-rtl")) || iconSource.endsWith(QStringLiteral("-symbolic-ltr")) || guessMonochrome(img)) {
                 QPainter p(&img);
                 p.setCompositionMode(QPainter::CompositionMode_SourceIn);
                 p.fillRect(img.rect(), tintColor);
@@ -519,7 +519,7 @@ QIcon::Mode DesktopIcon::iconMode() const
 bool DesktopIcon::guessMonochrome(const QImage &img)
 {
     //don't try for too big images
-    if (img.width() > 256 || m_theme->supportsIconColoring()) {
+    if (img.width() >= 256 || m_theme->supportsIconColoring()) {
         return false;
     }
     // round size to a standard size. hardcode as we can't use KIconLoader
@@ -548,8 +548,8 @@ bool DesktopIcon::guessMonochrome(const QImage &img)
     QHash<int, int> dist;
     int transparentPixels = 0;
     int saturatedPixels = 0;
-    for(int x=0; x<img.width(); x++) {
-        for(int y=0; y<img.height(); y++) {
+    for(int x=0; x < img.width(); x++) {
+        for(int y=0; y < img.height(); y++) {
             QColor color = QColor::fromRgba(qUnpremultiply(img.pixel(x, y)));
             if (color.alpha() < 100) {
                 ++transparentPixels;
@@ -567,13 +567,13 @@ bool DesktopIcon::guessMonochrome(const QImage &img)
     qreal entropy = 0;
     while (it != dist.constEnd()) {
         reverseDist.insertMulti(it.value(), it.key());
-        qreal probability = (qreal)it.value()/(qreal)(img.size().width()*img.size().height() - transparentPixels);
-        entropy -= probability * log(probability)/log(255);
+        qreal probability = qreal(it.value()) / qreal(img.size().width() * img.size().height() - transparentPixels);
+        entropy -= probability * log(probability) / log(255);
         ++it;
     }
 
     // Arbitrarly low values of entropy and colored pixels
-    m_monochromeHeuristics[stdSize] = saturatedPixels <= (img.size().width()*img.size().height() - transparentPixels)*0.3 && entropy <= 0.3;
+    m_monochromeHeuristics[stdSize] = saturatedPixels <= (img.size().width()*img.size().height() - transparentPixels) * 0.3 && entropy <= 0.3;
     return m_monochromeHeuristics[stdSize];
 }
 
