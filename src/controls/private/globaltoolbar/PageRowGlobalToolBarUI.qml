@@ -57,18 +57,16 @@ Kirigami.AbstractApplicationHeader {
             id: buttonsLayout
             Layout.fillHeight: true
 
-            Layout.leftMargin: Kirigami.Units.largeSpacing
+            Layout.leftMargin: leftHandleAnchor.visible ? Kirigami.Units.largeSpacing : 0
 
             visible: (globalToolBar.showNavigationButtons || root.layers.depth > 1) && (globalToolBar.actualStyle != Kirigami.ApplicationHeaderStyle.None)
 
             TemplatesPrivate.BackButton {
                 id: backButton
                 Layout.leftMargin: leftHandleAnchor.visible ? 0 : Kirigami.Units.smallSpacing
-                Layout.preferredHeight: Math.min(implicitHeight, parent.height)
                 Layout.preferredWidth: height
             }
             TemplatesPrivate.ForwardButton {
-                Layout.preferredHeight: Math.min(implicitHeight, parent.height)
                 Layout.preferredWidth: height
             }
             Kirigami.Separator {

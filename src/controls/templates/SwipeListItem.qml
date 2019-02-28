@@ -197,6 +197,7 @@ T2.ItemDelegate {
         }
         EdgeShadow {
             edge: Qt.TopEdge
+            visible: background.x != 0
             anchors {
                 right: parent.right
                 left: parent.left
@@ -206,6 +207,7 @@ T2.ItemDelegate {
         EdgeShadow {
             edge: LayoutMirroring.enabled ? Qt.RightEdge : Qt.LeftEdge
             x: LayoutMirroring.enabled ? listItem.background.x - width : (listItem.background.x + listItem.background.width)
+            visible: background.x != 0
             anchors {
                 top: parent.top
                 bottom: parent.bottom
@@ -257,8 +259,8 @@ T2.ItemDelegate {
                 }
                 delegate: Controls.ToolButton {
                     anchors.verticalCenter: parent.verticalCenter
-                    icon.name: modelData.iconName !== "" ? modelData.iconName : undefined
-                    icon.source: modelData.iconSource !== "" ? modelData.iconSource : undefined
+                    icon.name: modelData.iconName !== "" ? modelData.iconName : ""
+                    icon.source: modelData.iconSource !== "" ? modelData.iconSource : ""
                     enabled: (modelData && modelData.enabled !== undefined) ? modelData.enabled : true;
                     visible: (modelData && modelData.visible !== undefined) ? modelData.visible : true;
                     onVisibleChanged: {
