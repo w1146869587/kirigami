@@ -798,6 +798,7 @@ void ColumnView::insertItem(int pos, QQuickItem *item)
     emit contentChildrenChanged();
 
     // In order to keep the same current item we need to increase the current index if displaced
+    // NOTE: just updating m_currentIndex does *not* update currentItem (which is what we need atm) while setCurrentIndex will update also currentItem
     if (m_currentIndex >= pos) {
         ++m_currentIndex;
         emit currentIndexChanged();
@@ -852,8 +853,7 @@ QQuickItem *ColumnView::removeItem(QQuickItem *item)
 
     // In order to keep the same current item we need to increase the current index if displaced
     if (m_currentIndex >= index) {
-        --m_currentIndex;
-        emit currentIndexChanged();
+        setCurrentIndex(m_currentIndex - 1);
     }
 
     m_contentItem->forgetItem(item);
