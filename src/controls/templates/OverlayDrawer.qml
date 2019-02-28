@@ -100,7 +100,11 @@ T2.Drawer {
      * For OverlayDrawer the default is view-right-close or view-left-close depending on the drawer location
      * @since 2.5
      */
-    readonly property QtObject handleOpenIcon: IconPropertiesGroup {source: root.edge === Qt.RightEdge ? "view-right-close" : "view-left-close"}
+    property alias handleOpenIcon: handleOpenIconGroup
+    IconPropertiesGroup {
+        id: handleOpenIconGroup
+        source: root.edge === Qt.RightEdge ? "view-right-close" : "view-left-close"
+    }
 
     /**
      * A grouped property describing an optional icon.
@@ -113,7 +117,11 @@ T2.Drawer {
      * For OverlayDrawer the default is view-right-new or view-left-new depending on the drawer location
      * @since 2.5
      */
-    readonly property QtObject handleClosedIcon: IconPropertiesGroup {source: root.edge === Qt.RightEdge ? "view-right-new" : "view-left-new"}
+    property alias handleClosedIcon: handleClosedIconGroup
+    IconPropertiesGroup {
+        id: handleClosedIconGroup
+        source: root.edge === Qt.RightEdge ? "view-right-new" : "view-left-new"
+    }
 
     /**
      * handleVisible: bool
@@ -273,7 +281,7 @@ T2.Drawer {
 
     y: modal ? 0 : ((T2.ApplicationWindow.menuBar ? T2.ApplicationWindow.menuBar.height : 0) + (T2.ApplicationWindow.header ? T2.ApplicationWindow.header.height : 0))
 
-    height: modal ? parent.height : (parent.height - y - (T2.ApplicationWindow.footer ? T2.ApplicationWindow.footer.height : 0))
+    height: root.edge == Qt.LeftEdge || root.edge == Qt.RightEdge ? (modal ? parent.height : (parent.height - y - (T2.ApplicationWindow.footer ? T2.ApplicationWindow.footer.height : 0))) : implicitHeight
 
     parent: modal || edge === Qt.LeftEdge || edge === Qt.RightEdge ? T2.ApplicationWindow.overlay : T2.ApplicationWindow.contentItem
 

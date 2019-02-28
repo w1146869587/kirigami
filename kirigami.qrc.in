@@ -17,6 +17,7 @@
         <file alias="templates/InlineMessage.qml">@kirigami_QML_DIR@/src/controls/templates/InlineMessage.qml</file>
         <file alias="InlineMessage.qml">@kirigami_QML_DIR@/src/controls/InlineMessage.qml</file>
         <file alias="ToolBarApplicationHeader.qml">@kirigami_QML_DIR@/src/controls/ToolBarApplicationHeader.qml</file>
+        <file alias="ActionTextField.qml">@kirigami_QML_DIR@/src/controls/ActionTextField.qml</file>
         <file alias="private/PrivateActionToolButton.qml">@kirigami_QML_DIR@/src/controls/private/PrivateActionToolButton.qml</file>
         <file alias="private/GlobalDrawerActionItem.qml">@kirigami_QML_DIR@/src/controls/private/GlobalDrawerActionItem.qml</file>
         <file alias="private/ContextDrawerActionItem.qml">@kirigami_QML_DIR@/src/controls/private/ContextDrawerActionItem.qml</file>
@@ -38,8 +39,7 @@
         <file alias="private/globaltoolbar/TitlesPageHeader.qml">@kirigami_QML_DIR@/src/controls/private/globaltoolbar/TitlesPageHeader.qml</file>
         <file alias="private/globaltoolbar/ToolBarPageHeader.qml">@kirigami_QML_DIR@/src/controls/private/globaltoolbar/ToolBarPageHeader.qml</file>
         <file alias="private/ActionsMenu.qml">@kirigami_QML_DIR@/src/controls/private/ActionsMenu.qml</file>
-        <file alias="private/ActionMenuItem.qml">@kirigami_QML_DIR@/src/controls/private/@kirigami_ActionMenuItem@</file>
-        <file alias="private/ActionMenuItemBase.qml">@kirigami_QML_DIR@/src/controls/private/ActionMenuItemBase.qml</file>
+        <file alias="private/ActionMenuItemBase.qml">@kirigami_QML_DIR@/src/controls/private/ActionMenuItem.qml</file>
         <file alias="Separator.qml">@kirigami_QML_DIR@/src/controls/Separator.qml</file>
         <file alias="OverlayDrawer.qml">@kirigami_QML_DIR@/src/controls/OverlayDrawer.qml</file>
         <file alias="OverlaySheet.qml">@kirigami_QML_DIR@/src/controls/OverlaySheet.qml</file>

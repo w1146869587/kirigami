@@ -180,6 +180,8 @@ void KirigamiPlugin::registerTypes(const char *uri)
 
     //2.7
     qmlRegisterType<ColumnView>(uri, 2, 7, "ColumnView");
+    qmlRegisterType(componentUrl(QStringLiteral("ActionTextField.qml")), uri, 2, 7, "ActionTextField");
+
     qmlProtectModule(uri, 2);
 }
 

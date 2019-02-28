@@ -53,13 +53,8 @@ Controls.ToolButton {
         if (kirigamiAction) {
             kirigamiAction.trigger();
         }
-        //fallbacks needed for Qt 5.9
         if (kirigamiAction.children.length > 0 && !menu.visible) {
-            if (menu.hasOwnProperty("popup")) {
-                menu.popup(control, 0, control.height)
-            } else {
-                menu.visible = true;
-            }
+            menu.popup(control, 0, control.height)
         }
     }
 
@@ -108,7 +103,7 @@ Controls.ToolButton {
         }
     }
     Controls.ToolTip {
-        visible: control.hovered && text.length > 0
+        visible: control.hovered && text.length > 0 && !menu.visible
         text: kirigamiAction ? (kirigamiAction.tooltip.length ? kirigamiAction.tooltip : kirigamiAction.text) : ""
         delay: 1000
         timeout: 5000
