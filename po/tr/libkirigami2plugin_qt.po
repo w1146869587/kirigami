@@ -1,0 +1,94 @@
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2017-10-23 09:50+0000\n"
+"Last-Translator: Kaan <kaanozdincer@gmail.com>\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Pootle 2.5.1.1\n"
+"X-Qt-Contexts: true\n"
+"X-POOTLE-MTIME: 1497529432.000000\n"
+
+#: controls/AboutPage.qml:79
+msgctxt "AboutPage|"
+msgid "About"
+msgstr ""
+
+#: controls/AboutPage.qml:107
+#, qt-format
+msgctxt "AboutPage|"
+msgid "%1 <%2>"
+msgstr ""
+
+#: controls/AboutPage.qml:142
+msgctxt "AboutPage|"
+msgid "Copyright"
+msgstr ""
+
+#: controls/AboutPage.qml:164
+msgctxt "AboutPage|"
+msgid "License:"
+msgstr ""
+
+#: controls/AboutPage.qml:173
+msgctxt "AboutPage|"
+msgid "Libraries in use"
+msgstr ""
+
+#: controls/AboutPage.qml:186
+msgctxt "AboutPage|"
+msgid "Authors"
+msgstr ""
+
+#: controls/AboutPage.qml:194
+msgctxt "AboutPage|"
+msgid "Credits"
+msgstr ""
+
+#: controls/AboutPage.qml:203
+msgctxt "AboutPage|"
+msgid "Translators"
+msgstr ""
+
+#: controls/ContextDrawer.qml:78
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "Eylemler"
+
+#: controls/GlobalDrawer.qml:446
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "Geri"
+
+#: controls/private/globaltoolbar/ToolBarPageHeader.qml:105
+#, fuzzy
+#| msgctxt "ContextDrawer|"
+#| msgid "Actions"
+msgctxt "ToolBarPageHeader|"
+msgid "More Actions"
+msgstr "Eylemler"
+
+#: controls/templates/private/BackButton.qml:50
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "Geriye Git"
+
+#: controls/templates/private/ForwardButton.qml:46
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "İleri Git"
+
+#: controls/ToolBarApplicationHeader.qml:126
+#, fuzzy
+#| msgctxt "ContextDrawer|"
+#| msgid "Actions"
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "Eylemler"
+
+#: controls/UrlButton.qml:51
+msgctxt "UrlButton|"
+msgid "Copy link address"
+msgstr ""

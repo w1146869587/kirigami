@@ -1,0 +1,90 @@
+# Shinjo Park <kde@peremen.name>, 2017, 2018.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2018-08-14 23:16+0100\n"
+"Last-Translator: Shinjo Park <kde@peremen.name>\n"
+"Language-Team: Korean <kde-i18n-doc@kde.org>\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Lokalize 2.0\n"
+"X-Qt-Contexts: true\n"
+
+#: controls/AboutPage.qml:79
+msgctxt "AboutPage|"
+msgid "About"
+msgstr ""
+
+#: controls/AboutPage.qml:107
+#, qt-format
+msgctxt "AboutPage|"
+msgid "%1 <%2>"
+msgstr ""
+
+#: controls/AboutPage.qml:142
+msgctxt "AboutPage|"
+msgid "Copyright"
+msgstr ""
+
+#: controls/AboutPage.qml:164
+msgctxt "AboutPage|"
+msgid "License:"
+msgstr ""
+
+#: controls/AboutPage.qml:173
+msgctxt "AboutPage|"
+msgid "Libraries in use"
+msgstr ""
+
+#: controls/AboutPage.qml:186
+msgctxt "AboutPage|"
+msgid "Authors"
+msgstr ""
+
+#: controls/AboutPage.qml:194
+msgctxt "AboutPage|"
+msgid "Credits"
+msgstr ""
+
+#: controls/AboutPage.qml:203
+msgctxt "AboutPage|"
+msgid "Translators"
+msgstr ""
+
+#: controls/ContextDrawer.qml:78
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "동작"
+
+#: controls/GlobalDrawer.qml:446
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "뒤로"
+
+#: controls/private/globaltoolbar/ToolBarPageHeader.qml:105
+msgctxt "ToolBarPageHeader|"
+msgid "More Actions"
+msgstr "더 많은 동작"
+
+#: controls/templates/private/BackButton.qml:50
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "이전 탐색"
+
+#: controls/templates/private/ForwardButton.qml:46
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "다음 탐색"
+
+#: controls/ToolBarApplicationHeader.qml:126
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "더 많은 동작"
+
+#: controls/UrlButton.qml:51
+msgctxt "UrlButton|"
+msgid "Copy link address"
+msgstr ""
