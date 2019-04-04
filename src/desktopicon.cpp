@@ -168,6 +168,14 @@ void DesktopIcon::setSource(const QVariant &icon)
         });
     }
 
+    if (icon.type() == QVariant::String) {
+        const QString iconSource = icon.toString();
+        m_isMaskHeuristic = (iconSource.endsWith(QStringLiteral("-symbolic"))
+                            || iconSource.endsWith(QStringLiteral("-symbolic-rtl"))
+                            || iconSource.endsWith(QStringLiteral("-symbolic-ltr")));
+        emit isMaskChanged();
+    }
+
     if (m_networkReply) {
         //if there was a network query going on, interrupt it
         m_networkReply->close();
@@ -238,6 +246,7 @@ void DesktopIcon::setIsMask(bool mask)
     }
 
     m_isMask = mask;
+    m_isMaskHeuristic = mask;
     m_changed = true;
     update();
     emit isMaskChanged();
@@ -245,7 +254,7 @@ void DesktopIcon::setIsMask(bool mask)
 
 bool DesktopIcon::isMask() const
 {
-    return m_isMask;
+    return m_isMask || m_isMaskHeuristic;
 }
 
 void DesktopIcon::setColor(const QColor &color)
@@ -339,12 +348,22 @@ QSGNode* DesktopIcon::updatePaintNode(QSGNode* node, QQuickItem::UpdatePaintNode
                 img = QImage(size, QImage::Format_Alpha8);
                 img.fill(Qt::transparent);
             }
-            if (img.size() != size){
+            if (img.size() != size) {
                 // At this point, the image will already be scaled, but we need to output it in
                 // the correct aspect ratio, painted centered in the viewport. So:
                 QRect destination(QPoint(0, 0), img.size().scaled(itemSize, Qt::KeepAspectRatio));
                 destination.moveCenter(nodeRect.center());
                 nodeRect = destination;
+            }
+            
+            const QColor tintColor = !m_color.isValid() || m_color == Qt::transparent ? (m_selected ? m_theme->highlightedTextColor() : m_theme->textColor()) : m_color;
+
+            //TODO: initialize m_isMask with icon.isMask()
+            if (tintColor.alpha() > 0 && (isMask() || guessMonochrome(img))) {
+                QPainter p(&img);
+                p.setCompositionMode(QPainter::CompositionMode_SourceIn);
+                p.fillRect(img.rect(), tintColor);
+                p.end();
             }
         }
         m_changed = false;
@@ -491,14 +510,14 @@ QImage DesktopIcon::findIcon(const QSize &size)
         if (!icon.isNull()) {
             img = icon.pixmap(size, iconMode(), QIcon::On).toImage();
 
-            const QColor tintColor = !m_color.isValid() || m_color == Qt::transparent ? (m_selected ? m_theme->highlightedTextColor() : m_theme->textColor()) : m_color;
+            /*const QColor tintColor = !m_color.isValid() || m_color == Qt::transparent ? (m_selected ? m_theme->highlightedTextColor() : m_theme->textColor()) : m_color;
 
             if (m_isMask || icon.isMask() || iconSource.endsWith(QStringLiteral("-symbolic")) || iconSource.endsWith(QStringLiteral("-symbolic-rtl")) || iconSource.endsWith(QStringLiteral("-symbolic-ltr")) || guessMonochrome(img)) {
                 QPainter p(&img);
                 p.setCompositionMode(QPainter::CompositionMode_SourceIn);
                 p.fillRect(img.rect(), tintColor);
                 p.end();
-            }
+            }*/
         }
     }
     return img;

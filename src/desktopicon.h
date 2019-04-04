@@ -112,6 +112,7 @@ private:
     bool m_active;
     bool m_selected;
     bool m_isMask;
+    bool m_isMaskHeuristic = false;
     QImage m_loadedImage;
     QColor m_color = Qt::transparent;
     QString m_fallback = QStringLiteral("unknown");
