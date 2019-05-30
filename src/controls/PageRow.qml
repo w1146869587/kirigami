@@ -157,6 +157,24 @@ T.Control {
 //END PROPERTIES
 
 //BEGIN FUNCTIONS
+    function uniquePageForUrl(page, properties) {
+        for (var i in pagesLogic) {
+            print(i+pagesLogic[i])
+        }
+
+        if (pagesLogic.uniquePageForUrl.hasOwnProperty(page)) {
+            // copy properties to the page
+            for (var prop in properties) {
+                if (properties.hasOwnProperty(prop)) {
+                    pagesLogic.uniquePageForUrl[page][prop] = properties[prop];
+                }
+            }
+        } else {
+            pagesLogic.uniquePageForUrl[page] = pagesLogic.createPage(page, properties);
+        }
+        print(pagesLogic.uniquePageForUrl[page]);
+        return pagesLogic.uniquePageForUrl[page];
+    }
     /**
      * Pushes a page on the stack.
      * The page can be defined as a component, item or string.
@@ -180,6 +198,11 @@ T.Control {
      * @return The new created page (or the last one if it was an array)
      */
     function push(page, properties) {
+        //special case: page is a string and we're pushing the same 
+        if (typeof page === 'string' || page instanceof String) {
+            
+        }
+        columnView.pop(columnView.currentItem);
         var item = insertPage(depth, page, properties);
         currentIndex = depth - 1;
         return item;
@@ -217,8 +240,6 @@ T.Control {
         }
 
         position = Math.max(0, Math.min(depth, position));
-
-        columnView.pop(columnView.currentItem);
 
         // figure out if more than one page is being pushed
         var pages;
@@ -532,9 +553,10 @@ T.Control {
 
     QtObject {
         id: pagesLogic
-        readonly property var componentCache: new Array()
+        readonly property var componentCache: []
+        readonly property var uniquePageForUrl: new Object
 
-        function initAndInsertPage(position, page, properties) {
+        function createPage(page, properties) {
             var pageComp;
 
             if (page.createObject) {
@@ -549,9 +571,7 @@ T.Control {
             }
             if (pageComp) {
                 // instantiate page from component
-                // FIXME: parent directly to columnView or root?
                 page = pageComp.createObject(null, properties || {});
-                columnView.insertItem(position, page);
 
                 if (pageComp.status === Component.Error) {
                     throw new Error("Error while loading page: " + pageComp.errorString());
@@ -563,8 +583,13 @@ T.Control {
                         page[prop] = properties[prop];
                     }
                 }
-                columnView.insertItem(position, page);
             }
+
+            return page;
+        }
+
+        function initAndInsertPage(position, page, properties) {
+            columnView.insertItem(position, createPage(page, properties));
 
             return page;
         }
