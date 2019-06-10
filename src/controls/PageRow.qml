@@ -157,23 +157,29 @@ T.Control {
 //END PROPERTIES
 
 //BEGIN FUNCTIONS
-    function uniquePageForUrl(page, properties) {
-        for (var i in pagesLogic) {
-            print(i+pagesLogic[i])
-        }
+    function uniquePageForUrl(url, properties) {
+        //TODO: check if url is an url
 
-        if (pagesLogic.uniquePageForUrl.hasOwnProperty(page)) {
+        if (pagesLogic.uniquePageForUrl.hasOwnProperty(url)) {
             // copy properties to the page
             for (var prop in properties) {
                 if (properties.hasOwnProperty(prop)) {
-                    pagesLogic.uniquePageForUrl[page][prop] = properties[prop];
+                    pagesLogic.uniquePageForUrl[url][prop] = properties[prop];
                 }
             }
         } else {
-            pagesLogic.uniquePageForUrl[page] = pagesLogic.createPage(page, properties);
+            if (properties) {
+                properties.parent = root
+            } else {
+                properties = {parent: root}
+            }
+            pagesLogic.uniquePageForUrl[url] = pagesLogic.createPage(url, properties);
+            pagesLogic.uniquePageForUrl[url].Component.destruction.connect(function(){
+                delete pagesLogic.uniquePageForUrl[url];
+            });
         }
-        print(pagesLogic.uniquePageForUrl[page]);
-        return pagesLogic.uniquePageForUrl[page];
+        print(pagesLogic.uniquePageForUrl[url]);
+        return pagesLogic.uniquePageForUrl[url];
     }
     /**
      * Pushes a page on the stack.

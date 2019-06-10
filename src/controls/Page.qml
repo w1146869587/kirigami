@@ -389,7 +389,7 @@ T2.Page {
                     //TODO: find container reliably, remove assumption
                     {"pageRow": Qt.binding(function() {return row}),
                     "page": root,
-                    "current": Qt.binding(function() {return stack || row.currentIndex === root.Kirigami.ColumnView.level})});
+                    "current": Qt.binding(function() {return stack || (row && row.currentIndex === root.Kirigami.ColumnView.level)})});
                 }
             }
         },
