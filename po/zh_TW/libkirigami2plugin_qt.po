@@ -1,0 +1,110 @@
+# Jeff Huang <s8321414@gmail.com>, 2016.
+# Franklin Weng <franklin@goodhorse.idv.tw>, 2017.
+# pan93412 <pan93412@gmail.com>, 2018, 2019.
+msgid ""
+msgstr ""
+"Project-Id-Version: libkirigamiplugin_qt\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-09-22 20:41+0800\n"
+"PO-Revision-Date: 2019-08-06 22:36+0800\n"
+"Last-Translator: pan93412 <pan93412@gmail.com>\n"
+"Language-Team: Chinese <chinese-l10n@googlegroups.com>\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 19.07.90\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: controls/AboutPage.qml:79
+msgctxt "AboutPage|"
+msgid "About"
+msgstr "關於"
+
+#: controls/AboutPage.qml:105
+#, qt-format
+msgctxt "AboutPage|"
+msgid "%1 <%2>"
+msgstr "%1 <%2>"
+
+#: controls/AboutPage.qml:143
+msgctxt "AboutPage|"
+msgid "Copyright"
+msgstr "版權"
+
+#: controls/AboutPage.qml:166
+msgctxt "AboutPage|"
+msgid "License:"
+msgstr "授權："
+
+#: controls/AboutPage.qml:179
+#, qt-format
+msgctxt "AboutPage|"
+msgid "License: %1"
+msgstr "授權：%1"
+
+#: controls/AboutPage.qml:190
+msgctxt "AboutPage|"
+msgid "Libraries in use"
+msgstr "使用中函式庫"
+
+#: controls/AboutPage.qml:204
+msgctxt "AboutPage|"
+msgid "Authors"
+msgstr "作者"
+
+#: controls/AboutPage.qml:214
+msgctxt "AboutPage|"
+msgid "Credits"
+msgstr "幫助者"
+
+#: controls/AboutPage.qml:225
+msgctxt "AboutPage|"
+msgid "Translators"
+msgstr "翻譯者"
+
+#: controls/ContextDrawer.qml:79
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "動作"
+
+#: controls/GlobalDrawer.qml:441
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "返回"
+
+#: controls/PasswordField.qml:45
+msgctxt "PasswordField|"
+msgid "Password"
+msgstr "密碼"
+
+#: controls/private/globaltoolbar/ToolBarPageHeader.qml:116
+msgctxt "ToolBarPageHeader|"
+msgid "More Actions"
+msgstr "更多動作"
+
+#: controls/SearchField.qml:44
+msgctxt "SearchField|"
+msgid "Search..."
+msgstr "搜尋…"
+
+#: controls/templates/private/BackButton.qml:47
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "返回"
+
+#: controls/templates/private/ForwardButton.qml:43
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "往前"
+
+#: controls/ToolBarApplicationHeader.qml:126
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "更多動作"
+
+#: controls/UrlButton.qml:51
+msgctxt "UrlButton|"
+msgid "Copy link address"
+msgstr "複製連結網址"
