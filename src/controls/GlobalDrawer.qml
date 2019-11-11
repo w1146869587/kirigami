@@ -17,9 +17,9 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-import QtQuick 2.6
+import QtQuick 2.12
 import QtQuick.Templates 2.0 as T2
-import QtQuick.Controls 2.0 as QQC2
+import QtQuick.Controls 2.2 as QQC2
 import QtQuick.Layouts 1.2
 import QtGraphicalEffects 1.0
 import org.kde.kirigami 2.4
@@ -132,6 +132,9 @@ OverlayDrawer {
      */
     property list<QtObject> actions
 
+    //TODO
+    property alias header: headerToolBar.contentItem
+
     /**
      * content: list<Item> default property
      * Any random Item can be instantiated inside the drawer and
@@ -202,6 +205,9 @@ OverlayDrawer {
      */
     property bool showTopContentWhenCollapsed: false
 
+    //TODO
+    property bool showHeaderWhenCollapsed: false
+
     /**
      * resetMenuOnTriggered: bool
      *
@@ -239,104 +245,141 @@ OverlayDrawer {
         }
     }
 
-    rightPadding: !Settings.isMobile && mainFlickable.contentHeight > mainFlickable.height ? Units.gridUnit : Units.smallSpacing
+    //rightPadding: !Settings.isMobile && mainFlickable.contentHeight > mainFlickable.height ? Units.gridUnit : Units.smallSpacing
 
-    contentItem: ScrollView {
+    contentItem: QQC2.ScrollView {
         id: scrollView
         //ensure the attached property exists
         Theme.inherit: true
         anchors.fill: parent
         implicitWidth: Math.min (Units.gridUnit * 20, root.parent.width * 0.8)
-        horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
+        QQC2.ScrollBar.horizontal.policy: QQC2.ScrollBar.AlwaysOff
+        QQC2.ScrollBar.vertical.anchors {
+            top: scrollView.top
+            bottom: scrollView.bottom
+            topMargin: headerParent.height + headerParent.y
+        }
 
         Flickable {
             id: mainFlickable
             contentWidth: width
             contentHeight: mainColumn.Layout.minimumHeight
-            
+            topMargin: headerParent.height
+
+            Item {
+                id: headerParent
+                parent: mainFlickable
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                }
+                y: Math.max(headerToolBar.height, -mainFlickable.contentY) - height
+                implicitHeight: (root.collapsible 
+                        ? Math.max(collapseButton.height + Units.smallSpacing, bannerImage.Layout.preferredHeight)
+                        : bannerImage.Layout.preferredHeight) + (headerToolBar.visible ? headerToolBar.implicitHeight: 0)
+
+                Layout.fillWidth: true
+                visible: !bannerImage.empty || root.collapsible
+
+                BannerImage {
+                    id: bannerImage
+                    anchors {
+                        fill: parent
+                        bottomMargin: headerToolBar.height
+                    }
+
+                    opacity: !root.collapsed
+                    fillMode: Image.PreserveAspectCrop
+
+                    Behavior on opacity {
+                        OpacityAnimator {
+                            duration: Units.longDuration
+                            easing.type: Easing.InOutQuad
+                        }
+                    }
+                    leftPadding: root.collapsible ? collapseButton.width + Units.smallSpacing*2 : topPadding
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: root.bannerClicked()
+                    }
+                    EdgeShadow {
+                        edge: Qt.BottomEdge
+                        visible: bannerImageSource != ""
+                        anchors {
+                            left: parent.left
+                            right: parent.right
+                            bottom: parent.top
+                        }
+                    }
+                }
+                QQC2.ToolBar {
+                    id: headerToolBar
+                    Theme.colorSet: Theme.Window
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        bottom: parent.bottom
+                    }
+                    background.opacity: (bannerImage.height > 0 && bannerImage.visible) ? -headerParent.y / bannerImage.height : 1
+                    visible: contentItem && opacity > 0
+                    height: implicitHeight * opacity
+                    opacity: !root.collapsed || showHeaderWhenCollapsed
+                    Behavior on opacity {
+                        //not an animator as is binded
+                        NumberAnimation {
+                            duration: Units.longDuration
+                            easing.type: Easing.InOutQuad
+                        }
+                    }
+                }
+                PrivateActionToolButton {
+                    id: collapseButton
+                    readonly property bool noTitle: (!root.title || root.title.length===0) && (!root.titleIcon || root.title.length===0)
+                    anchors {
+                        top: parent.top
+                        left: parent.left
+                        topMargin: root.collapsed || noTitle ? 0 : Units.smallSpacing + Units.iconSizes.large/2 - height/2
+                        leftMargin: root.collapsed || noTitle ? 0 : Units.smallSpacing
+                        Behavior on leftMargin {
+                            NumberAnimation {
+                                duration: Units.longDuration
+                                easing.type: Easing.InOutQuad
+                            }
+                        }
+                        Behavior on topMargin {
+                            NumberAnimation {
+                                duration: Units.longDuration
+                                easing.type: Easing.InOutQuad
+                            }
+                        }
+                    }
+
+                    width: Units.iconSizes.smallMedium + Units.largeSpacing * 2
+                    height: width
+
+                    Behavior on y {
+                        YAnimator {
+                            duration: Units.longDuration
+                            easing.type: Easing.InOutQuad
+                        }
+                    }
+
+                    visible: root.collapsible
+                    kirigamiAction: Action {
+                        icon.name: "application-menu"
+                        checkable: true
+                        checked: !root.collapsed
+                        onCheckedChanged: root.collapsed = !checked
+                    }
+                }
+            }
+
+
             ColumnLayout {
                 id: mainColumn
                 width: mainFlickable.width
                 spacing: 0
-                height: Math.max(root.height, Layout.minimumHeight)
-
-                //TODO: cable visible of bannerimage
-                Item {
-                    implicitHeight: root.collapsible 
-                            ? Math.max(collapseButton.height + Units.smallSpacing, bannerImage.Layout.preferredHeight)
-                            : bannerImage.Layout.preferredHeight
-
-                    Layout.fillWidth: true
-                    visible: !bannerImage.empty || root.collapsible
-
-                    BannerImage {
-                        id: bannerImage
-                        anchors.fill: parent
-                        opacity: !root.collapsed
-                        fillMode: Image.PreserveAspectCrop
-
-                        Behavior on opacity {
-                            OpacityAnimator {
-                                duration: Units.longDuration
-                                easing.type: Easing.InOutQuad
-                            }
-                        }
-                        leftPadding: root.collapsible ? collapseButton.width + Units.smallSpacing*2 : topPadding
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: root.bannerClicked()
-                        }
-                        EdgeShadow {
-                            edge: Qt.BottomEdge
-                            visible: bannerImageSource != ""
-                            anchors {
-                                left: parent.left
-                                right: parent.right
-                                bottom: parent.top
-                            }
-                        }
-                    }
-                    PrivateActionToolButton {
-                        id: collapseButton
-                        readonly property bool noTitle: (!root.title || root.title.length===0) && (!root.titleIcon || root.title.length===0)
-                        anchors {
-                            top: parent.top
-                            left: parent.left
-                            topMargin: root.collapsed || noTitle ? 0 : Units.smallSpacing + Units.iconSizes.large/2 - height/2
-                            leftMargin: root.collapsed || noTitle ? 0 : Units.smallSpacing
-                            Behavior on leftMargin {
-                                NumberAnimation {
-                                    duration: Units.longDuration
-                                    easing.type: Easing.InOutQuad
-                                }
-                            }
-                            Behavior on topMargin {
-                                NumberAnimation {
-                                    duration: Units.longDuration
-                                    easing.type: Easing.InOutQuad
-                                }
-                            }
-                        }
-
-                        width: Units.iconSizes.smallMedium + Units.largeSpacing * 2
-                        height: width
-
-                        Behavior on y {
-                            YAnimator {
-                                duration: Units.longDuration
-                                easing.type: Easing.InOutQuad
-                            }
-                        }
-
-                        visible: root.collapsible
-                        kirigamiAction: Action {
-                            icon.name: "application-menu"
-                            checkable: true
-                            checked: !root.collapsed
-                            onCheckedChanged: root.collapsed = !checked
-                        }
-                    }
-                }
+                height: Math.max(root.height - headerParent.height, Layout.minimumHeight)
 
                 ColumnLayout {
                     id: topContent

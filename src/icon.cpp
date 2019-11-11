@@ -187,6 +187,7 @@ void Icon::setSource(const QVariant &icon)
     m_loadedImage = QImage();
     update();
     emit sourceChanged();
+    emit validChanged();
 }
 
 QVariant Icon::source() const
