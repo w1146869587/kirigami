@@ -45,8 +45,9 @@ QtObject {
     property int toolbarActionAlignment: Qt.AlignRight
 
     property int minimumHeight: 0
+    // FIXME: Figure out the exact standard size of a Toolbar
     property int preferredHeight: (actualStyle == Kirigami.ApplicationHeaderStyle.ToolBar
-                    ? Kirigami.Units.iconSizes.medium
+                    ? Kirigami.Units.iconSizes.medium + 2
                     : Kirigami.Units.gridUnit * 1.8) + Kirigami.Units.smallSpacing * 2
     property int maximumHeight: preferredHeight
 }
