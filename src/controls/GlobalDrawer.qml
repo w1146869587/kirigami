@@ -135,6 +135,7 @@ OverlayDrawer {
     //TODO
     property alias header: headerToolBar.contentItem
 
+    property bool bannerVisible: Settings.isMobile
     /**
      * content: list<Item> default property
      * Any random Item can be instantiated inside the drawer and
@@ -266,28 +267,24 @@ OverlayDrawer {
             contentHeight: mainColumn.Layout.minimumHeight
             topMargin: headerParent.height
 
-            Item {
+            ColumnLayout {
                 id: headerParent
                 parent: mainFlickable
                 anchors {
                     left: parent.left
                     right: parent.right
                 }
-                y: Math.max(headerToolBar.height, -mainFlickable.contentY) - height
-                implicitHeight: (root.collapsible 
-                        ? Math.max(collapseButton.height + Units.smallSpacing, bannerImage.Layout.preferredHeight)
-                        : bannerImage.Layout.preferredHeight) + (headerToolBar.visible ? headerToolBar.implicitHeight: 0)
+                spacing: 0
+                y: bannerImage.visible ? Math.max(headerToolBar.height, -mainFlickable.contentY) - height : 0
 
                 Layout.fillWidth: true
-                visible: !bannerImage.empty || root.collapsible
+                //visible: !bannerImage.empty || root.collapsible
 
                 BannerImage {
                     id: bannerImage
-                    anchors {
-                        fill: parent
-                        bottomMargin: headerToolBar.height
-                    }
 
+
+                    visible: !bannerImage.empty && opacity > 0 && root.bannerVisible
                     opacity: !root.collapsed
                     fillMode: Image.PreserveAspectCrop
 
@@ -297,7 +294,7 @@ OverlayDrawer {
                             easing.type: Easing.InOutQuad
                         }
                     }
-                    leftPadding: root.collapsible ? collapseButton.width + Units.smallSpacing*2 : topPadding
+                    //leftPadding: root.collapsible ? collapseButton.width + Units.smallSpacing*2 : topPadding
                     MouseArea {
                         anchors.fill: parent
                         onClicked: root.bannerClicked()
@@ -315,14 +312,11 @@ OverlayDrawer {
                 QQC2.ToolBar {
                     id: headerToolBar
                     Theme.colorSet: Theme.Window
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        bottom: parent.bottom
-                    }
+
+                    Layout.fillWidth: true
                     background.opacity: (bannerImage.height > 0 && bannerImage.visible) ? -headerParent.y / bannerImage.height : 1
                     visible: contentItem && opacity > 0
-                    height: implicitHeight * opacity
+                    Layout.preferredHeight: implicitHeight * opacity
                     opacity: !root.collapsed || showHeaderWhenCollapsed
                     Behavior on opacity {
                         //not an animator as is binded
@@ -330,46 +324,6 @@ OverlayDrawer {
                             duration: Units.longDuration
                             easing.type: Easing.InOutQuad
                         }
-                    }
-                }
-                PrivateActionToolButton {
-                    id: collapseButton
-                    readonly property bool noTitle: (!root.title || root.title.length===0) && (!root.titleIcon || root.title.length===0)
-                    anchors {
-                        top: parent.top
-                        left: parent.left
-                        topMargin: root.collapsed || noTitle ? 0 : Units.smallSpacing + Units.iconSizes.large/2 - height/2
-                        leftMargin: root.collapsed || noTitle ? 0 : Units.smallSpacing
-                        Behavior on leftMargin {
-                            NumberAnimation {
-                                duration: Units.longDuration
-                                easing.type: Easing.InOutQuad
-                            }
-                        }
-                        Behavior on topMargin {
-                            NumberAnimation {
-                                duration: Units.longDuration
-                                easing.type: Easing.InOutQuad
-                            }
-                        }
-                    }
-
-                    width: Units.iconSizes.smallMedium + Units.largeSpacing * 2
-                    height: width
-
-                    Behavior on y {
-                        YAnimator {
-                            duration: Units.longDuration
-                            easing.type: Easing.InOutQuad
-                        }
-                    }
-
-                    visible: root.collapsible
-                    kirigamiAction: Action {
-                        icon.name: "application-menu"
-                        checkable: true
-                        checked: !root.collapsed
-                        onCheckedChanged: root.collapsed = !checked
                     }
                 }
             }
