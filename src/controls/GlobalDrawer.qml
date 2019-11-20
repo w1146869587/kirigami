@@ -133,7 +133,7 @@ OverlayDrawer {
     property list<QtObject> actions
 
     //TODO
-    property alias header: headerToolBar.contentItem
+    property alias header: headerContainer.data
 
     property bool bannerVisible: Settings.isMobile
     /**
@@ -275,7 +275,7 @@ OverlayDrawer {
                     right: parent.right
                 }
                 spacing: 0
-                y: bannerImage.visible ? Math.max(headerToolBar.height, -mainFlickable.contentY) - height : 0
+                y: bannerImage.visible ? Math.max(headerContainer.height, -mainFlickable.contentY) - height : 0
 
                 Layout.fillWidth: true
                 //visible: !bannerImage.empty || root.collapsible
@@ -309,13 +309,12 @@ OverlayDrawer {
                         }
                     }
                 }
-                QQC2.ToolBar {
-                    id: headerToolBar
+                RowLayout {
+                    id: headerContainer
                     Theme.inherit: false
                     Theme.colorSet: Theme.Window
 
                     Layout.fillWidth: true
-                    background.opacity: (bannerImage.height > 0 && bannerImage.visible) ? -headerParent.y / bannerImage.height : 1
                     visible: contentItem && opacity > 0
                     Layout.preferredHeight: implicitHeight * opacity
                     opacity: !root.collapsed || showHeaderWhenCollapsed
