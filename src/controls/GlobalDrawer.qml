@@ -311,6 +311,7 @@ OverlayDrawer {
                 }
                 QQC2.ToolBar {
                     id: headerToolBar
+                    Theme.inherit: false
                     Theme.colorSet: Theme.Window
 
                     Layout.fillWidth: true
