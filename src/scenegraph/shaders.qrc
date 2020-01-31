@@ -1,0 +1,11 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/org/kde/kirigami/shaders">
+        <file>header_es.glsl</file>
+        <file>header_desktop.glsl</file>
+        <file>header_desktop_core.glsl</file>
+        <file>elevatedrectangle.vert</file>
+        <file>elevatedrectangle.frag</file>
+    </qresource>
+</RCC>
+

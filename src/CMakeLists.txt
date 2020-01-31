@@ -24,9 +24,14 @@ set(kirigami_SRCS
     scenepositionattached.cpp
     mnemonicattached.cpp
     wheelhandler.cpp
+    elevatedrectangle.cpp
+    scenegraph/elevatedrectanglenode.cpp
+    scenegraph/elevatedrectanglematerial.cpp
     ${kirigami_QM_LOADER}
     ${KIRIGAMI_STATIC_FILES}
     )
+
+qt5_add_resources(SHADERS scenegraph/shaders.qrc)
 
 add_subdirectory(libkirigami)
 
@@ -55,7 +60,7 @@ if(STATIC_LIBRARY)
 endif(STATIC_LIBRARY)
 
 
-add_library(kirigamiplugin ${kirigami_SRCS} ${RESOURCES})
+add_library(kirigamiplugin ${kirigami_SRCS} ${RESOURCES} ${SHADERS})
 
 if(STATIC_LIBRARY)
     SET_TARGET_PROPERTIES(kirigamiplugin PROPERTIES
