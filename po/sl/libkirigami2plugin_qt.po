@@ -1,0 +1,128 @@
+# Andrej Mernik <andrejm@ubuntu.si>, 2016, 2018.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2018-01-12 21:16+0100\n"
+"Last-Translator: Andrej Mernik <andrejm@ubuntu.si>\n"
+"Language-Team: Slovenian <lugos-slo@lugos.si>\n"
+"Language: sl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n"
+"%100==4 ? 3 : 0);\n"
+"X-Generator: Lokalize 2.0\n"
+
+#: controls/AboutPage.qml:79
+msgctxt "AboutPage|"
+msgid "About"
+msgstr ""
+
+#: controls/AboutPage.qml:105
+#, qt-format
+msgctxt "AboutPage|"
+msgid "%1 <%2>"
+msgstr ""
+
+#: controls/AboutPage.qml:143
+msgctxt "AboutPage|"
+msgid "Copyright"
+msgstr ""
+
+#: controls/AboutPage.qml:166
+msgctxt "AboutPage|"
+msgid "License:"
+msgstr ""
+
+#: controls/AboutPage.qml:179
+#, qt-format
+msgctxt "AboutPage|"
+msgid "License: %1"
+msgstr ""
+
+#: controls/AboutPage.qml:190
+msgctxt "AboutPage|"
+msgid "Libraries in use"
+msgstr ""
+
+#: controls/AboutPage.qml:204
+msgctxt "AboutPage|"
+msgid "Authors"
+msgstr ""
+
+#: controls/AboutPage.qml:214
+msgctxt "AboutPage|"
+msgid "Credits"
+msgstr ""
+
+#: controls/AboutPage.qml:225
+msgctxt "AboutPage|"
+msgid "Translators"
+msgstr ""
+
+#: controls/ContextDrawer.qml:79
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "Dejanja"
+
+#: controls/GlobalDrawer.qml:476
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "Nazaj"
+
+#: controls/GlobalDrawer.qml:513
+msgctxt "GlobalDrawer|"
+msgid "Close Sidebar"
+msgstr ""
+
+#: controls/PasswordField.qml:45
+msgctxt "PasswordField|"
+msgid "Password"
+msgstr ""
+
+#: controls/SearchField.qml:44
+msgctxt "SearchField|"
+msgid "Search..."
+msgstr ""
+
+#: controls/templates/private/BackButton.qml:47
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "Krmari nazaj"
+
+#: controls/templates/private/ForwardButton.qml:43
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "Krmari naprej"
+
+#: controls/ToolBarApplicationHeader.qml:126
+#, fuzzy
+#| msgctxt "ContextDrawer|"
+#| msgid "Actions"
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "Dejanja"
+
+#: controls/UrlButton.qml:51
+msgctxt "UrlButton|"
+msgid "Copy link address"
+msgstr ""
+
+#: settings.cpp:209
+#, qt-format
+msgctxt "Settings|"
+msgid "KDE Frameworks %1"
+msgstr ""
+
+#: settings.cpp:211
+#, qt-format
+msgctxt "Settings|"
+msgid "The %1 windowing system"
+msgstr ""
+
+#: settings.cpp:212
+#, qt-format
+msgctxt "Settings|"
+msgid "Qt %2 (built against %3)"
+msgstr ""
