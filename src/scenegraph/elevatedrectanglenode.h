@@ -39,9 +39,9 @@ public:
     void setShadowColor(const QColor &color);
     void setOffset(const QVector2D &offset);
 
-private:
     void updateGeometry();
 
+private:
     QSGGeometry *m_geometry;
     ElevatedRectangleMaterial *m_material;
 
@@ -49,6 +49,7 @@ private:
     qreal m_elevation = 0.0;
     qreal m_radius = 0.0;
     QVector2D m_offset;
+    QVector2D m_aspect;
 };
 
 #endif // ELEVATEDRECTANGLENODE_H

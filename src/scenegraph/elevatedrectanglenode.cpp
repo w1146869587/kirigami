@@ -54,9 +54,8 @@ void ElevatedRectangleNode::setRect(const QRectF& rect)
         qDebug() << newAspect;
         m_material->aspect = newAspect;
         markDirty(QSGNode::DirtyMaterial);
+        m_aspect = newAspect;
     }
-
-    updateGeometry();
 }
 
 void ElevatedRectangleNode::setElevation(qreal elevation)
@@ -68,7 +67,6 @@ void ElevatedRectangleNode::setElevation(qreal elevation)
         m_material->elevation = uniformElevation;
         markDirty(QSGNode::DirtyMaterial);
         m_elevation = elevation;
-        updateGeometry();
     }
 }
 
@@ -109,7 +107,6 @@ void ElevatedRectangleNode::setOffset(const QVector2D& offset)
         m_material->offset = uniformOffset;
         markDirty(QSGNode::DirtyMaterial);
         m_offset = offset;
-        updateGeometry();
     }
 }
 

@@ -156,6 +156,7 @@ QSGNode *ElevatedRectangle::updatePaintNode(QSGNode *node, QQuickItem::UpdatePai
     elevatedNode->setOffset(QVector2D{float(d->xOffset), float(d->yOffset)});
     elevatedNode->setColor(d->color);
     elevatedNode->setShadowColor(d->shadowColor);
+    elevatedNode->updateGeometry();
 
     return elevatedNode;
 }
