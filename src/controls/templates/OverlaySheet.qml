@@ -214,7 +214,7 @@ QtObject {
         readonly property int contentItemMaximumWidth: width > Units.gridUnit * 30 ? width * 0.95 : width
 
         property bool ownSizeUpdate: false
-        function updateContentWidth() {
+        function updateContentWidth() {return;
             if (!contentItem.contentItem) {
                 return;
             }
@@ -456,7 +456,7 @@ QtObject {
         FocusScope {
             id: flickableContents
             //anchors.horizontalCenter: parent.horizontalCenter
-            x: (mainItem.width - width) / 2
+           // x: (mainItem.width - width) / 2
 
             readonly property real listHeaderHeight: scrollView.flickableItem && root.contentItem.headerItem ? root.contentItem.headerItem.height : 0
 
@@ -486,6 +486,7 @@ QtObject {
                 }
             }
         }
+        /*
         Binding {
             when: scrollView.flickableItem != null
             target: scrollView.flickableItem
@@ -515,7 +516,7 @@ QtObject {
             property: "rightMargin"
             value: mainItem.width - flickableContents.width - flickableContents.x
         }
-
+*/
         Connections {
             target: scrollView.flickableItem
             onContentHeightChanged: {
@@ -554,11 +555,23 @@ QtObject {
                 }
             }
         }
-        ScrollView {
-            id: scrollView
+        Flickable {
             anchors.fill: parent
-            horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
-            rightPadding: 0
+            contentWidth: width
+            contentHeight: height * 2
+            ScrollView {
+                id: scrollView
+
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: mainItem.contentItemPreferredWidth <= 0 ? mainItem.width : Math.max(mainItem.width/2, Math.min(mainItem.contentItemMaximumWidth, mainItem.contentItemPreferredWidth))
+
+
+                height: Math.min(flickableContents.height, flickableItem.contentHeight) - (headerItem.visible ? headerItem.height : 0) - (footerItem.visible ? footerItem.height : 0)
+                //height: (scrollView.contentItem != flickableContents ? scrollView.flickableItem.contentHeight + listHeaderHeight : (root.contentItem.height + topPadding + bottomPadding)) + (headerItem.visible ? headerItem.height : 0) + (footerItem.visible ? footerItem.height : 0)
+                
+                //anchors.fill: parent
+                horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
+            }
         }
     }
 }
