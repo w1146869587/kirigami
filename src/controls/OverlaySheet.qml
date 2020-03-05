@@ -34,6 +34,6 @@ T.OverlaySheet {
     id: root
 
     background: DefaultCardBackground {
-        anchors.fill: parent
+       // anchors.fill: parent
     }
 }

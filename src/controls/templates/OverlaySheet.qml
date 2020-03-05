@@ -20,7 +20,7 @@
 import QtQuick 2.11
 import QtQuick.Layouts 1.2
 import QtQuick.Window 2.2
-import org.kde.kirigami 2.7
+import org.kde.kirigami 2.11
 import QtGraphicalEffects 1.0
 import QtQuick.Templates 2.0 as T2
 import "private"
@@ -138,7 +138,8 @@ QtObject {
     }
 
     onBackgroundChanged: {
-        background.parent = flickableContents;
+        background.parent = contentLayout.parent;
+        background.anchors.fill = contentLayout;
         background.z = -1;
     }
     onContentItemChanged: {
@@ -152,6 +153,7 @@ QtObject {
             contentItem.anchors.left = contentItemParent.left;
             contentItem.anchors.right = contentItemParent.right;
         }
+        scrollView.flickableItem.interactive = false;
         scrollView.flickableItem.flickableDirection = Flickable.VerticalFlick;
     }
     onSheetOpenChanged: {
@@ -282,15 +284,15 @@ QtObject {
             id: openAnimation 
             property int margins: Units.gridUnit * 5
             property int topOpenPosition: Math.min(-mainItem.height*0.15, scrollView.flickableItem.contentHeight - mainItem.height + margins)
-            property alias from: openAnimationInternal.from
-            property alias to: openAnimationInternal.to
+            property int from: openAnimationInternal.from
+            property int to: openAnimationInternal.to
             NumberAnimation {
                 id: openAnimationInternal
-                target: scrollView.flickableItem
+                target: outerFlickable
                 properties: "contentY"
-                from: -mainItem.height
-                to: openAnimation.topOpenPosition
-                duration: Units.longDuration
+                from: -outerFlickable.height
+                to: 0//openAnimation.topOpenPosition
+                duration: Units.longDuration*10
                 easing.type: Easing.OutQuad
             }
             OpacityAnimator {
@@ -307,17 +309,17 @@ QtObject {
             property int to: -mainItem.height
             ParallelAnimation {
                 NumberAnimation {
-                    target: scrollView.flickableItem
+                    target: outerFlickable
                     properties: "contentY"
                     to: closeAnimation.to
-                    duration: Units.longDuration
+                    duration: Units.longDuration*10
                     easing.type: Easing.InQuad
                 }
                 OpacityAnimator {
                     target: mainItem
                     from: 1
                     to: 0
-                    duration: Units.longDuration
+                    duration: Units.longDuration*10
                     easing.type: Easing.InQuad
                 }
             }
@@ -354,102 +356,6 @@ QtObject {
                 hoverEnabled: true
                 anchors.fill: parent
                 onClicked: root.close();
-            }
-        }
-        Rectangle {
-            id: headerItem
-            width: flickableContents.width
-            x: flickableContents.x
-            visible: root.header
-            height: Math.max(headerParent.implicitHeight, closeIcon.height) + Units.smallSpacing * 2
-            color: Theme.backgroundColor
-            //different y depending if we're a listview or a normal item
-            y: Math.max(0, -scrollView.flickableItem.contentY - (scrollView.contentItem != flickableContents ? height : 0))
-            z: 2
-            Item {
-                id: headerParent
-                implicitHeight: header ? header.implicitHeight : 0
-                anchors {
-                    fill: parent
-                    margins: Units.smallSpacing
-                    rightMargin: closeIcon.width + Units.smallSpacing
-                }
-            }
-            
-            EdgeShadow {
-                z: -2
-                edge: Qt.TopEdge
-                anchors {
-                    right: parent.right
-                    left: parent.left
-                    top: parent.bottom
-                }
-
-                opacity: parent.y == 0 ? 1 : 0
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Units.longDuration
-                        easing.type: Easing.InOutQuad
-                    }
-                }
-            }
-        }
-        Rectangle {
-            id: footerItem
-            width: flickableContents.width
-            x: flickableContents.x
-            visible: root.footer
-            height: footerParent.implicitHeight + Units.smallSpacing * 2 + extraMargin
-            color: Theme.backgroundColor
-            y: mainItem.mapFromItem(flickableContents, 0, flickableContents.height).y - height
-            onHeightChanged: y = Math.min(mainItem.height, mainItem.mapFromItem(flickableContents, 0, flickableContents.height).y) - footerItem.height;
-            //Show an extra margin when:
-            //* the application is in mobile mode (no toolbarapplicationheader)
-            //* the bottom screen controls are visible
-            //* the sheet is displayed *under* the controls
-            property int extraMargin: (!root.parent ||
-                typeof applicationWindow === "undefined" ||
-                (root.parent === applicationWindow().overlay) ||
-                !applicationWindow().controlsVisible ||
-                (applicationWindow().pageStack && applicationWindow().pageStack.globalToolBar && applicationWindow().pageStack.globalToolBar.actualStyle === ApplicationHeaderStyle.ToolBar) ||
-                (applicationWindow().header && applicationWindow().header.toString().indexOf("ToolBarApplicationHeader") === 0))
-                    ? 0 : Units.gridUnit * 3
-            Connections {
-                target: scrollView.flickableItem
-                onContentYChanged: footerItem.y = Math.min(mainItem.height, mainItem.mapFromItem(flickableContents, 0, flickableContents.height).y) - footerItem.height;
-
-                onHeightChanged: scrollView.flickableItem.contentYChanged()
-            }
-            z: 2
-            Item {
-                id: footerParent
-                implicitHeight: footer ? footer.implicitHeight : 0
-                anchors {
-                    top: parent.top
-                    left: parent.left
-                    right: parent.right
-                    margins: Units.smallSpacing
-                }
-            }
-
-            EdgeShadow {
-                z: -2
-                edge: Qt.BottomEdge
-                anchors {
-                    right: parent.right
-                    left: parent.left
-                    bottom: parent.top
-                }
-
-                opacity: parent.y + parent.height < mainItem.height ? 0 : 1
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Units.longDuration
-                        easing.type: Easing.InOutQuad
-                    }
-                }
             }
         }
 
@@ -556,21 +462,142 @@ QtObject {
             }
         }
         Flickable {
+            id: outerFlickable
             anchors.fill: parent
             contentWidth: width
-            contentHeight: height * 2
-            ScrollView {
-                id: scrollView
+            topMargin: height
+            bottomMargin: height
+            contentHeight: Math.max(height, scrollView.flickableItem.contentHeight)
 
+            readonly property int topEmptyArea: Math.max(height-scrollView.flickableItem.contentHeight, Units.gridUnit * 3)
+  
+            property int oldContentY: NaN
+            onContentYChanged: {
+                let startPos = -scrollView.flickableItem.topMargin;
+                let pos = contentY - topEmptyArea;
+                let endPos = scrollView.flickableItem.contentHeight - scrollView.flickableItem.height + scrollView.flickableItem.bottomMargin;
+
+                if (endPos - pos > 0) {
+                    contentLayout.y = Math.max(0, scrollView.flickableItem.topMargin - pos);
+                } else if (scrollView.flickableItem.topMargin - pos < 0) {
+                    contentLayout.y = endPos - pos;
+                }
+
+                scrollView.flickableItem.contentY = Math.max(
+                    startPos, Math.min(pos, endPos));
+
+                oldContentY = contentY;
+            }
+        
+
+            ColumnLayout {
+                id: contentLayout
+                spacing: 0
+                // Its events should be filtered but not scrolled
+                parent: outerFlickable
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: mainItem.contentItemPreferredWidth <= 0 ? mainItem.width : Math.max(mainItem.width/2, Math.min(mainItem.contentItemMaximumWidth, mainItem.contentItemPreferredWidth))
+                height: Math.min(implicitHeight, parent.height)
 
+                Rectangle {
+                    id: headerItem
+                    Layout.fillWidth: true
+                    visible: root.header
+                    implicitHeight: Math.max(headerParent.implicitHeight, closeIcon.height) + Units.smallSpacing * 2
+                    color: Theme.backgroundColor
+                    z: 2
+                    Item {
+                        id: headerParent
+                        implicitHeight: header ? header.implicitHeight : 0
+                        anchors {
+                            fill: parent
+                            margins: Units.smallSpacing
+                            rightMargin: closeIcon.width + Units.smallSpacing
+                        }
+                    }
+                    
+                    EdgeShadow {
+                        z: -2
+                        edge: Qt.TopEdge
+                        anchors {
+                            right: parent.right
+                            left: parent.left
+                            top: parent.bottom
+                        }
 
-                height: Math.min(flickableContents.height, flickableItem.contentHeight) - (headerItem.visible ? headerItem.height : 0) - (footerItem.visible ? footerItem.height : 0)
-                //height: (scrollView.contentItem != flickableContents ? scrollView.flickableItem.contentHeight + listHeaderHeight : (root.contentItem.height + topPadding + bottomPadding)) + (headerItem.visible ? headerItem.height : 0) + (footerItem.visible ? footerItem.height : 0)
+                        opacity: parent.y == 0 ? 1 : 0
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Units.longDuration
+                                easing.type: Easing.InOutQuad
+                            }
+                        }
+                    }
+                }
+        
+                ScrollView {
+                    id: scrollView
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    implicitHeight: flickableItem.contentHeight
+
+                    horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
+                }
                 
-                //anchors.fill: parent
-                horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
+                Rectangle {
+                    id: footerItem
+                    Layout.fillWidth: true
+                   // x: flickableContents.x
+                    visible: root.footer
+                    implicitHeight: footerParent.implicitHeight + Units.smallSpacing * 2 + extraMargin
+                    color: Theme.backgroundColor
+
+                    //Show an extra margin when:
+                    //* the application is in mobile mode (no toolbarapplicationheader)
+                    //* the bottom screen controls are visible
+                    //* the sheet is displayed *under* the controls
+                    property int extraMargin: (!root.parent ||
+                        typeof applicationWindow === "undefined" ||
+                        (root.parent === applicationWindow().overlay) ||
+                        !applicationWindow().controlsVisible ||
+                        (applicationWindow().pageStack && applicationWindow().pageStack.globalToolBar && applicationWindow().pageStack.globalToolBar.actualStyle === ApplicationHeaderStyle.ToolBar) ||
+                        (applicationWindow().header && applicationWindow().header.toString().indexOf("ToolBarApplicationHeader") === 0))
+                            ? 0 : Units.gridUnit * 3
+
+                    z: 2
+                    Item {
+                        id: footerParent
+                        implicitHeight: footer ? footer.implicitHeight : 0
+                        anchors {
+                            top: parent.top
+                            left: parent.left
+                            right: parent.right
+                            margins: Units.smallSpacing
+                        }
+                    }
+
+                    EdgeShadow {
+                        z: -2
+                        edge: Qt.BottomEdge
+                        anchors {
+                            right: parent.right
+                            left: parent.left
+                            bottom: parent.top
+                        }
+
+                        opacity: parent.y + parent.height < mainItem.height ? 0 : 1
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Units.longDuration
+                                easing.type: Easing.InOutQuad
+                            }
+                        }
+                    }
+                }
             }
         }
     }
