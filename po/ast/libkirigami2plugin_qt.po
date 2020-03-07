@@ -1,0 +1,124 @@
+# enolp <enolp@softastur.org>, 2020.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2020-02-27 19:25+0100\n"
+"Last-Translator: enolp <enolp@softastur.org>\n"
+"Language-Team: Asturian <alministradores@softastur.org>\n"
+"Language: ast\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 19.12.2\n"
+
+#: controls/AboutPage.qml:66
+msgctxt "AboutPage|"
+msgid "About"
+msgstr "Tocante a"
+
+#: controls/AboutPage.qml:92
+#, qt-format
+msgctxt "AboutPage|"
+msgid "%1 <%2>"
+msgstr "%1 <%2>"
+
+#: controls/AboutPage.qml:130
+msgctxt "AboutPage|"
+msgid "Copyright"
+msgstr "Copyright"
+
+#: controls/AboutPage.qml:153
+msgctxt "AboutPage|"
+msgid "License:"
+msgstr "Llicencia:"
+
+#: controls/AboutPage.qml:166
+#, qt-format
+msgctxt "AboutPage|"
+msgid "License: %1"
+msgstr "Llicencia: %1"
+
+#: controls/AboutPage.qml:177
+msgctxt "AboutPage|"
+msgid "Libraries in use"
+msgstr "Biblioteques n'usu"
+
+#: controls/AboutPage.qml:191
+msgctxt "AboutPage|"
+msgid "Authors"
+msgstr "Autores"
+
+#: controls/AboutPage.qml:201
+msgctxt "AboutPage|"
+msgid "Credits"
+msgstr "Creitos"
+
+#: controls/AboutPage.qml:212
+msgctxt "AboutPage|"
+msgid "Translators"
+msgstr "Traductores"
+
+#: controls/ContextDrawer.qml:66
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "Aiciones"
+
+#: controls/GlobalDrawer.qml:464
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "Atrás"
+
+#: controls/GlobalDrawer.qml:507
+msgctxt "GlobalDrawer|"
+msgid "Close Sidebar"
+msgstr "Zarrar la barra llateral"
+
+#: controls/PasswordField.qml:32
+msgctxt "PasswordField|"
+msgid "Password"
+msgstr "Contraseña"
+
+#: controls/SearchField.qml:31
+msgctxt "SearchField|"
+msgid "Search..."
+msgstr "Guetar..."
+
+#: controls/templates/private/BackButton.qml:34
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "Navega p'atrás"
+
+#: controls/templates/private/ForwardButton.qml:30
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "Navega p'alantre"
+
+#: controls/ToolBarApplicationHeader.qml:113
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "Más aiciones"
+
+#: controls/UrlButton.qml:44
+msgctxt "UrlButton|"
+msgid "Copy link address"
+msgstr "Copiar la direición del enllaz"
+
+#: settings.cpp:196
+#, qt-format
+msgctxt "Settings|"
+msgid "KDE Frameworks %1"
+msgstr "KDE Frameworks %1"
+
+#: settings.cpp:198
+#, qt-format
+msgctxt "Settings|"
+msgid "The %1 windowing system"
+msgstr "El sistema de ventanes %1"
+
+#: settings.cpp:199
+#, qt-format
+msgctxt "Settings|"
+msgid "Qt %2 (built against %3)"
+msgstr "Qt %2 (compilóse con %3)"
