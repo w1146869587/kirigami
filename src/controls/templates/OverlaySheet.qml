@@ -292,7 +292,7 @@ QtObject {
                 properties: "contentY"
                 from: -outerFlickable.height
                 to: 0//openAnimation.topOpenPosition
-                duration: Units.longDuration*10
+                duration: Units.longDuration
                 easing.type: Easing.OutQuad
             }
             OpacityAnimator {
@@ -306,20 +306,20 @@ QtObject {
 
         SequentialAnimation {
             id: closeAnimation
-            property int to: -mainItem.height
+            property int to: outerFlickable.visibleArea.yPosition > 0.5 ? -mainItem.height : mainItem.height
             ParallelAnimation {
                 NumberAnimation {
                     target: outerFlickable
                     properties: "contentY"
-                    to: closeAnimation.to
-                    duration: Units.longDuration*10
+                    to: scrollView.flickableItem.visibleArea.yPosition < (1 - scrollView.flickableItem.visibleArea.heightRatio)/2 ? -mainItem.height : outerFlickable.contentHeight
+                    duration: Units.longDuration
                     easing.type: Easing.InQuad
                 }
                 OpacityAnimator {
                     target: mainItem
                     from: 1
                     to: 0
-                    duration: Units.longDuration*10
+                    duration: Units.longDuration
                     easing.type: Easing.InQuad
                 }
             }
