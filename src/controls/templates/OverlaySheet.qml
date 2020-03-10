@@ -276,13 +276,11 @@ QtObject {
         ParallelAnimation {
             id: openAnimation 
             property int margins: Units.gridUnit * 5
-            property int topOpenPosition: Math.min(-mainItem.height*0.15, scrollView.flickableItem.contentHeight - mainItem.height + margins)
             NumberAnimation {
-                id: openAnimationInternal
                 target: outerFlickable
                 properties: "contentY"
                 from: -outerFlickable.height
-                to: 0//openAnimation.topOpenPosition
+                to: 0
                 duration: Units.longDuration
                 easing.type: Easing.OutQuad
             }
@@ -295,10 +293,20 @@ QtObject {
             }
         }
 
+        NumberAnimation {
+            id: resetAnimation
+            target: outerFlickable
+            properties: "contentY"
+            from: outerFlickable.contentY
+            to: scrollView.flickableItem.atYEnd ? outerFlickable.contentHeight - outerFlickable.height + outerFlickable.topEmptyArea + headerItem.height + footerItem.height : 0
+            duration: Units.longDuration
+            easing.type: Easing.OutQuad
+        }
+
         SequentialAnimation {
             id: closeAnimation
             ParallelAnimation {
-                NumberAnimation {
+                NumberAnimation {id: bah
                     target: outerFlickable
                     properties: "contentY"
                     to: scrollView.flickableItem.visibleArea.yPosition < (1 - scrollView.flickableItem.visibleArea.heightRatio)/2 ? -mainItem.height : outerFlickable.contentHeight
@@ -361,56 +369,13 @@ QtObject {
                 }
             }
         }
-        /*
-        Binding {
-            when: scrollView.flickableItem != null
-            target: scrollView.flickableItem
-            property: "topMargin"
-            //hack needed for smoother open anim
-            value: openAnimation.running ? -scrollView.flickableItem.contentY : -openAnimation.topOpenPosition
-        }
-        Binding {
-            when: scrollView.flickableItem != null
-            target: scrollView.flickableItem
-            property: "bottomMargin"
-            value: openAnimation.margins
-        }
 
-        Binding {
-            target: scrollView.verticalScrollBar ? scrollView.verticalScrollBar.anchors : null
-            property: "topMargin"
-            value: headerItem.y + headerItem.height
-        }
-        Binding {
-            target: scrollView.verticalScrollBar
-            property: "height"
-            value: mainItem.height - (scrollView.verticalScrollBar ? scrollView.verticalScrollBar.anchors.topMargin : 0) - (mainItem.height - footerItem.y)
-        }
-        Binding {
-            target: scrollView.verticalScrollBar ? scrollView.verticalScrollBar.anchors : null
-            property: "rightMargin"
-            value: mainItem.width - flickableContents.width - flickableContents.x
-        }
-*/
         Connections {
             target: scrollView.flickableItem
             onContentHeightChanged: {
                 if (openAnimation.running) {
                     openAnimation.running = false;
                     open();
-                }
-            }
-            onDraggingChanged: {
-                if (scrollView.flickableItem.dragging) {
-                    return;
-                }
-
-                //close
-                if ((mainItem.height + scrollView.flickableItem.contentY) < mainItem.height/2) {
-                    closeAnimation.restart();
-
-                } else if ((mainItem.height*0.6 + scrollView.flickableItem.contentY) > scrollView.flickableItem.contentHeight) {
-                    closeAnimation.restart();
                 }
             }
         }
@@ -434,11 +399,12 @@ QtObject {
             contentWidth: width
             topMargin: height
             bottomMargin: height
-            contentHeight: Math.max(height, scrollView.flickableItem.contentHeight)
+            contentHeight: Math.max(height+1, scrollView.flickableItem.contentHeight)
 
             readonly property int topEmptyArea: Math.max(height-scrollView.flickableItem.contentHeight, Units.gridUnit * 3)
   
             property int oldContentY: NaN
+            property bool lastMovementWasDown: false
             onContentYChanged: {
                 let startPos = -scrollView.flickableItem.topMargin;
                 let pos = contentY - topEmptyArea;
@@ -453,7 +419,40 @@ QtObject {
                 scrollView.flickableItem.contentY = Math.max(
                     startPos, Math.min(pos, endPos));
 
+                lastMovementWasDown = contentY < oldContentY;
                 oldContentY = contentY;
+            }
+
+            onFlickEnded: {
+                if (openAnimation.running || closeAnimation.running) {
+                    return;
+                }
+                if (scrollView.flickableItem.atYBeginning ||scrollView.flickableItem.atYEnd) {
+                    resetAnimation.restart();
+                }
+            }
+
+            onDraggingChanged: {
+                if (dragging) {
+                    return;
+                }
+
+                // close
+                if (scrollView.flickableItem.atYBeginning) {
+                    if (contentY < -Units.gridUnit * 4 && lastMovementWasDown) {
+                        closeAnimation.restart();
+                    } else {
+                        resetAnimation.restart();
+                    }
+                }
+
+                if (scrollView.flickableItem.atYEnd) {
+                    if (contentY > contentHeight - height - Units.gridUnit * 4 && !lastMovementWasDown) {
+                        closeAnimation.restart();
+                    } else {
+                        resetAnimation.restart();
+                    }
+                }
             }
 
             ColumnLayout {
