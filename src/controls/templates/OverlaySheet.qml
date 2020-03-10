@@ -121,19 +121,12 @@ QtObject {
 
 
     function open() {
-        openAnimation.from = -mainItem.height;
-        openAnimation.to = openAnimation.topOpenPosition;
         openAnimation.running = true;
         root.sheetOpen = true;
         mainItem.visible = true;
     }
 
     function close() {
-        if (scrollView.flickableItem.contentY < 0) {
-            closeAnimation.to = -height;
-        } else {
-            closeAnimation.to = scrollView.flickableItem.contentHeight;
-        }
         closeAnimation.running = true;
     }
 
@@ -284,8 +277,6 @@ QtObject {
             id: openAnimation 
             property int margins: Units.gridUnit * 5
             property int topOpenPosition: Math.min(-mainItem.height*0.15, scrollView.flickableItem.contentHeight - mainItem.height + margins)
-            property int from: openAnimationInternal.from
-            property int to: openAnimationInternal.to
             NumberAnimation {
                 id: openAnimationInternal
                 target: outerFlickable
@@ -306,7 +297,6 @@ QtObject {
 
         SequentialAnimation {
             id: closeAnimation
-            property int to: outerFlickable.visibleArea.yPosition > 0.5 ? -mainItem.height : mainItem.height
             ParallelAnimation {
                 NumberAnimation {
                     target: outerFlickable
@@ -336,27 +326,6 @@ QtObject {
             opacity: 0.6 * Math.min(
                 (Math.min(scrollView.flickableItem.contentY + scrollView.flickableItem.height, scrollView.flickableItem.height) / scrollView.flickableItem.height),
                 (2 + (scrollView.flickableItem.contentHeight - scrollView.flickableItem.contentY - scrollView.flickableItem.topMargin - scrollView.flickableItem.bottomMargin)/scrollView.flickableItem.height))
-        }
-
-        Icon {
-            id: closeIcon
-            anchors {
-                right: headerItem.right
-                margins: Units.smallSpacing
-                top: headerItem.top
-            }
-            z: 3
-            visible: !Settings.isMobile
-            width: Units.iconSizes.smallMedium
-            height: width
-            source: closeMouseArea.containsMouse ? "window-close" : "window-close-symbolic"
-            active: closeMouseArea.containsMouse
-            MouseArea {
-                id: closeMouseArea
-                hoverEnabled: true
-                anchors.fill: parent
-                onClicked: root.close();
-            }
         }
 
         FocusScope {
@@ -438,12 +407,10 @@ QtObject {
 
                 //close
                 if ((mainItem.height + scrollView.flickableItem.contentY) < mainItem.height/2) {
-                    closeAnimation.to = -mainItem.height;
-                    closeAnimation.running = true;
+                    closeAnimation.restart();
 
                 } else if ((mainItem.height*0.6 + scrollView.flickableItem.contentY) > scrollView.flickableItem.contentHeight) {
-                    closeAnimation.to = scrollView.flickableItem.contentHeight;
-                    closeAnimation.running = true;
+                    closeAnimation.restart();
                 }
             }
         }
@@ -488,7 +455,6 @@ QtObject {
 
                 oldContentY = contentY;
             }
-        
 
             ColumnLayout {
                 id: contentLayout
@@ -498,6 +464,28 @@ QtObject {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: mainItem.contentItemPreferredWidth <= 0 ? mainItem.width : Math.max(mainItem.width/2, Math.min(mainItem.contentItemMaximumWidth, mainItem.contentItemPreferredWidth))
                 height: Math.min(implicitHeight, parent.height)
+
+                Icon {
+                    id: closeIcon
+                    anchors {
+                        right: contentLayout.right
+                        margins: Units.smallSpacing
+                        top: contentLayout.top
+                    }
+                    parent: outerFlickable
+                    z: 3
+                    visible: !Settings.isMobile
+                    width: Units.iconSizes.smallMedium
+                    height: width
+                    source: closeMouseArea.containsMouse ? "window-close" : "window-close-symbolic"
+                    active: closeMouseArea.containsMouse
+                    MouseArea {
+                        id: closeMouseArea
+                        hoverEnabled: true
+                        anchors.fill: parent
+                        onClicked: root.close();
+                    }
+                }
 
                 Rectangle {
                     id: headerItem
