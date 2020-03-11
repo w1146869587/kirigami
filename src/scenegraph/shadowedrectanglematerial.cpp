@@ -18,29 +18,29 @@
  * License along with this library.  If not, see <https://www.gnu.org/licenses/>
  */
 
-#include "elevatedrectanglematerial.h"
+#include "shadowedrectanglematerial.h"
 
 #include <QOpenGLContext>
 
-ElevatedRectangleMaterial::ElevatedRectangleMaterial()
+ShadowedRectangleMaterial::ShadowedRectangleMaterial()
 {
     setFlag(QSGMaterial::Blending, true);
 }
 
-QSGMaterialShader* ElevatedRectangleMaterial::createShader() const
+QSGMaterialShader* ShadowedRectangleMaterial::createShader() const
 {
     return new ElevatedRectangleShader{};
 }
 
-QSGMaterialType* ElevatedRectangleMaterial::type() const
+QSGMaterialType* ShadowedRectangleMaterial::type() const
 {
     static QSGMaterialType type;
     return &type;
 }
 
-int ElevatedRectangleMaterial::compare(const QSGMaterial *other) const
+int ShadowedRectangleMaterial::compare(const QSGMaterial *other) const
 {
-    auto material = static_cast<const ElevatedRectangleMaterial *>(other);
+    auto material = static_cast<const ShadowedRectangleMaterial *>(other);
 
     if (material->color == color
         && material->shadowColor == shadowColor
@@ -62,12 +62,12 @@ ElevatedRectangleShader::ElevatedRectangleShader()
 
     setShaderSourceFiles(QOpenGLShader::Vertex, {
         shaderRoot + header,
-        shaderRoot + QStringLiteral("elevatedrectangle.vert")
+        shaderRoot + QStringLiteral("shadowedrectangle.vert")
     });
 
     setShaderSourceFiles(QOpenGLShader::Fragment, {
         shaderRoot + header,
-        shaderRoot + QStringLiteral("elevatedrectangle.frag")
+        shaderRoot + QStringLiteral("shadowedrectangle.frag")
     });
 }
 
@@ -103,7 +103,7 @@ void ElevatedRectangleShader::updateState(const QSGMaterialShader::RenderState& 
     }
 
     if (!oldMaterial || newMaterial->compare(oldMaterial) != 0 || state.isCachedMaterialDataDirty()) {
-        auto material = static_cast<ElevatedRectangleMaterial *>(newMaterial);
+        auto material = static_cast<ShadowedRectangleMaterial *>(newMaterial);
         p->setUniformValue(m_aspectLocation, material->aspect);
         p->setUniformValue(m_sizeLocation, material->size);
         p->setUniformValue(m_radiusLocation, material->radius);

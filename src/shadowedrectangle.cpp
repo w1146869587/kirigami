@@ -18,11 +18,11 @@
  * License along with this library.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "elevatedrectangle.h"
+#include "shadowedrectangle.h"
 
-#include "scenegraph/elevatedrectanglenode.h"
+#include "scenegraph/shadowedrectanglenode.h"
 
-class ElevatedRectangle::Private
+class ShadowedRectangle::Private
 {
 public:
     qreal size = 0.0;
@@ -33,22 +33,22 @@ public:
     QColor shadowColor = Qt::black;
 };
 
-ElevatedRectangle::ElevatedRectangle(QQuickItem *parentItem)
+ShadowedRectangle::ShadowedRectangle(QQuickItem *parentItem)
     : QQuickItem(parentItem), d(new Private)
 {
     setFlag(QQuickItem::ItemHasContents, true);
 }
 
-ElevatedRectangle::~ElevatedRectangle()
+ShadowedRectangle::~ShadowedRectangle()
 {
 }
 
-qreal ElevatedRectangle::size() const
+qreal ShadowedRectangle::size() const
 {
     return d->size;
 }
 
-void ElevatedRectangle::setSize(qreal newSize)
+void ShadowedRectangle::setSize(qreal newSize)
 {
     if (newSize == d->size) {
         return;
@@ -59,12 +59,12 @@ void ElevatedRectangle::setSize(qreal newSize)
     Q_EMIT sizeChanged();
 }
 
-qreal ElevatedRectangle::radius() const
+qreal ShadowedRectangle::radius() const
 {
     return d->radius;
 }
 
-void ElevatedRectangle::setRadius(qreal newRadius)
+void ShadowedRectangle::setRadius(qreal newRadius)
 {
     if (newRadius == d->radius) {
         return;
@@ -75,12 +75,12 @@ void ElevatedRectangle::setRadius(qreal newRadius)
     Q_EMIT radiusChanged();
 }
 
-qreal ElevatedRectangle::xOffset() const
+qreal ShadowedRectangle::xOffset() const
 {
     return d->xOffset;
 }
 
-void ElevatedRectangle::setXOffset(qreal newXOffset)
+void ShadowedRectangle::setXOffset(qreal newXOffset)
 {
     if (newXOffset == d->xOffset) {
         return;
@@ -91,12 +91,12 @@ void ElevatedRectangle::setXOffset(qreal newXOffset)
     Q_EMIT xOffsetChanged();
 }
 
-qreal ElevatedRectangle::yOffset() const
+qreal ShadowedRectangle::yOffset() const
 {
     return d->yOffset;
 }
 
-void ElevatedRectangle::setYOffset(qreal newYOffset)
+void ShadowedRectangle::setYOffset(qreal newYOffset)
 {
     if (newYOffset == d->yOffset) {
         return;
@@ -107,12 +107,12 @@ void ElevatedRectangle::setYOffset(qreal newYOffset)
     Q_EMIT yOffsetChanged();
 }
 
-QColor ElevatedRectangle::color() const
+QColor ShadowedRectangle::color() const
 {
     return d->color;
 }
 
-void ElevatedRectangle::setColor(const QColor & newColor)
+void ShadowedRectangle::setColor(const QColor & newColor)
 {
     if (newColor == d->color) {
         return;
@@ -123,12 +123,12 @@ void ElevatedRectangle::setColor(const QColor & newColor)
     Q_EMIT colorChanged();
 }
 
-QColor ElevatedRectangle::shadowColor() const
+QColor ShadowedRectangle::shadowColor() const
 {
     return d->shadowColor;
 }
 
-void ElevatedRectangle::setShadowColor(const QColor &newShadowColor)
+void ShadowedRectangle::setShadowColor(const QColor &newShadowColor)
 {
     if (newShadowColor == d->shadowColor) {
         return;
@@ -139,15 +139,15 @@ void ElevatedRectangle::setShadowColor(const QColor &newShadowColor)
     Q_EMIT shadowColorChanged();
 }
 
-QSGNode *ElevatedRectangle::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData *data)
+QSGNode *ShadowedRectangle::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData *data)
 {
     Q_UNUSED(data);
 
     if (!node) {
-        node = new ElevatedRectangleNode;
+        node = new ShadowedRectangleNode;
     }
 
-    auto elevatedNode = static_cast<ElevatedRectangleNode*>(node);
+    auto elevatedNode = static_cast<ShadowedRectangleNode*>(node);
     elevatedNode->setRect(boundingRect());
     elevatedNode->setSize(d->size);
     elevatedNode->setRadius(d->radius);

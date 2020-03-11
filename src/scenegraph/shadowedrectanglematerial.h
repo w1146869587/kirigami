@@ -18,16 +18,15 @@
  * License along with this library.  If not, see <https://www.gnu.org/licenses/>
  */
 
-#ifndef ELEVATEDRECTANGLEMATERIAL_H
-#define ELEVATEDRECTANGLEMATERIAL_H
+#pragma once
 
 #include <QSGMaterial>
 #include <QSGMaterialShader>
 
-class ElevatedRectangleMaterial : public QSGMaterial
+class ShadowedRectangleMaterial : public QSGMaterial
 {
 public:
-    ElevatedRectangleMaterial();
+    ShadowedRectangleMaterial();
 
     QSGMaterialShader* createShader() const override;
     QSGMaterialType* type() const override;
@@ -61,5 +60,3 @@ private:
     int m_shadowColorLocation = -1;
     int m_offsetLocation = -1;
 };
-
-#endif // ELEVATEDRECTANGLEMATERIAL_H

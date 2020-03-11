@@ -24,9 +24,9 @@ set(kirigami_SRCS
     scenepositionattached.cpp
     mnemonicattached.cpp
     wheelhandler.cpp
-    elevatedrectangle.cpp
-    scenegraph/elevatedrectanglenode.cpp
-    scenegraph/elevatedrectanglematerial.cpp
+    shadowedrectangle.cpp
+    scenegraph/shadowedrectanglenode.cpp
+    scenegraph/shadowedrectanglematerial.cpp
     ${kirigami_QM_LOADER}
     ${KIRIGAMI_STATIC_FILES}
     )

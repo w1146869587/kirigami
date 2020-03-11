@@ -4,8 +4,8 @@
         <file>header_es.glsl</file>
         <file>header_desktop.glsl</file>
         <file>header_desktop_core.glsl</file>
-        <file>elevatedrectangle.vert</file>
-        <file>elevatedrectangle.frag</file>
+        <file>shadowedrectangle.vert</file>
+        <file>shadowedrectangle.frag</file>
     </qresource>
 </RCC>
 

@@ -18,13 +18,12 @@
  * License along with this library.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef ELEVATEDRECTANGLE_H
-#define ELEVATEDRECTANGLE_H
+#pragma once
 
 #include <memory>
 #include <QQuickItem>
 
-class ElevatedRectangle : public QQuickItem
+class ShadowedRectangle : public QQuickItem
 {
     Q_OBJECT
     Q_PROPERTY(qreal size READ size WRITE setSize NOTIFY sizeChanged)
@@ -35,8 +34,8 @@ class ElevatedRectangle : public QQuickItem
     Q_PROPERTY(QColor shadowColor READ shadowColor WRITE setShadowColor NOTIFY shadowColorChanged)
 
 public:
-    ElevatedRectangle(QQuickItem *parent = nullptr);
-    ~ElevatedRectangle() override;
+    ShadowedRectangle(QQuickItem *parent = nullptr);
+    ~ShadowedRectangle() override;
 
     qreal size() const;
     void setSize(qreal newSize);
@@ -69,5 +68,3 @@ private:
     class Private;
     const std::unique_ptr<Private> d;
 };
-
-#endif // ELEVATEDRECTANGLE_H

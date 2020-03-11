@@ -18,19 +18,18 @@
  * License along with this library.  If not, see <https://www.gnu.org/licenses/>
  */
 
-#ifndef ELEVATEDRECTANGLENODE_H
-#define ELEVATEDRECTANGLENODE_H
+#pragma once
 
 #include <QSGGeometryNode>
 #include <QColor>
 #include <QVector2D>
 
-class ElevatedRectangleMaterial;
+class ShadowedRectangleMaterial;
 
-class ElevatedRectangleNode : public QSGGeometryNode
+class ShadowedRectangleNode : public QSGGeometryNode
 {
 public:
-    ElevatedRectangleNode(const QRectF &rect = QRectF{});
+    ShadowedRectangleNode(const QRectF &rect = QRectF{});
 
     void setRect(const QRectF &rect);
     void setSize(qreal size);
@@ -43,7 +42,7 @@ public:
 
 private:
     QSGGeometry *m_geometry;
-    ElevatedRectangleMaterial *m_material;
+    ShadowedRectangleMaterial *m_material;
 
     QRectF m_rect;
     qreal m_size = 0.0;
@@ -51,5 +50,3 @@ private:
     QVector2D m_offset;
     QVector2D m_aspect;
 };
-
-#endif // ELEVATEDRECTANGLENODE_H

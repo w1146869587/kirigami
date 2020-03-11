@@ -17,7 +17,7 @@
 #include "pagepool.h"
 #include "scenepositionattached.h"
 #include "wheelhandler.h"
-#include "elevatedrectangle.h"
+#include "shadowedrectangle.h"
 
 #include <QQmlEngine>
 #include <QQmlContext>
@@ -237,7 +237,7 @@ void KirigamiPlugin::registerTypes(const char *uri)
     qmlRegisterType(componentUrl(QStringLiteral("SwipeListItem2.qml")), uri, 2, 11, "SwipeListItem2");
 
     // 2.12
-    qmlRegisterType<ElevatedRectangle>(uri, 2, 12, "ElevatedRectangle");
+    qmlRegisterType<ShadowedRectangle>(uri, 2, 12, "ShadowedRectangle");
 
     qmlProtectModule(uri, 2);
 }

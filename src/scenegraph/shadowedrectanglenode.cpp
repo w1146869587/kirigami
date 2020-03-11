@@ -18,11 +18,8 @@
  * License along with this library.  If not, see <https://www.gnu.org/licenses/>
  */
 
-#include "elevatedrectanglenode.h"
-
-#include "elevatedrectanglematerial.h"
-
-#include <QDebug>
+#include "shadowedrectanglenode.h"
+#include "shadowedrectanglematerial.h"
 
 QColor premultiply(const QColor &color)
 {
@@ -34,19 +31,19 @@ QColor premultiply(const QColor &color)
     );
 }
 
-ElevatedRectangleNode::ElevatedRectangleNode(const QRectF& rect)
+ShadowedRectangleNode::ShadowedRectangleNode(const QRectF& rect)
 {
     m_geometry = new QSGGeometry{QSGGeometry::defaultAttributes_TexturedPoint2D(), 4};
     setGeometry(m_geometry);
     setRect(rect);
 
-    m_material = new ElevatedRectangleMaterial{};
+    m_material = new ShadowedRectangleMaterial{};
     setMaterial(m_material);
 
     setFlags(QSGNode::OwnsGeometry | QSGNode::OwnsMaterial);
 }
 
-void ElevatedRectangleNode::setRect(const QRectF& rect)
+void ShadowedRectangleNode::setRect(const QRectF& rect)
 {
     if (rect == m_rect) {
         return;
@@ -67,7 +64,7 @@ void ElevatedRectangleNode::setRect(const QRectF& rect)
     }
 }
 
-void ElevatedRectangleNode::setSize(qreal size)
+void ShadowedRectangleNode::setSize(qreal size)
 {
     auto minDimension = std::min(m_rect.width(), m_rect.height());
     float uniformSize = (size / minDimension) * 2.0;
@@ -79,7 +76,7 @@ void ElevatedRectangleNode::setSize(qreal size)
     }
 }
 
-void ElevatedRectangleNode::setRadius(qreal radius)
+void ShadowedRectangleNode::setRadius(qreal radius)
 {
     auto minDimension = std::min(m_rect.width(), m_rect.height());
     float uniformRadius = radius * 2.0 / minDimension;
@@ -91,7 +88,7 @@ void ElevatedRectangleNode::setRadius(qreal radius)
     }
 }
 
-void ElevatedRectangleNode::setColor(const QColor &color)
+void ShadowedRectangleNode::setColor(const QColor &color)
 {
     if (m_material->color != color) {
         m_material->color = premultiply(color);
@@ -99,7 +96,7 @@ void ElevatedRectangleNode::setColor(const QColor &color)
     }
 }
 
-void ElevatedRectangleNode::setShadowColor(const QColor& color)
+void ShadowedRectangleNode::setShadowColor(const QColor& color)
 {
     if (m_material->shadowColor != color) {
         m_material->shadowColor = premultiply(color);
@@ -107,7 +104,7 @@ void ElevatedRectangleNode::setShadowColor(const QColor& color)
     }
 }
 
-void ElevatedRectangleNode::setOffset(const QVector2D& offset)
+void ShadowedRectangleNode::setOffset(const QVector2D& offset)
 {
     auto minDimension = std::min(m_rect.width(), m_rect.height());
     auto uniformOffset = offset * 2.0 / minDimension;
@@ -119,7 +116,7 @@ void ElevatedRectangleNode::setOffset(const QVector2D& offset)
     }
 }
 
-void ElevatedRectangleNode::updateGeometry()
+void ShadowedRectangleNode::updateGeometry()
 {
     auto rect = m_rect.adjusted(-m_size * m_aspect.x(), -m_size * m_aspect.y(),
                                 m_size * m_aspect.x(), m_size * m_aspect.y());
