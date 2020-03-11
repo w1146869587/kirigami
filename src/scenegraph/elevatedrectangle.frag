@@ -66,9 +66,15 @@ void main()
 
     // Calculate the main rectangle distance field.
     lowp float rect = sdf_rounded_rectangle(uv, aspect * inverse_scale, vec2(0.0), vec4(radius * inverse_scale));
-    // Render it as a normal rectangle.
+
     lowp float g = fwidth(rect);
+
+    // First, remove anything that was rendered by the shadow if it is inside the rectangle.
+    // This allows us to use colors with alpha without rendering artifacts.
+    col = mix(col, vec4(0.0), 1.0 - smoothstep(0.001 - g, 0.001 + g, rect));
+
+    // Then, render it again but this time with the proper color and properly alpha blended.
     col = mix(col, color, color.a * (1.0 - smoothstep(0.001 - g, 0.001 + g, rect)));
 
-    gl_FragColor = col;
+    gl_FragColor = col * opacity;
 }
