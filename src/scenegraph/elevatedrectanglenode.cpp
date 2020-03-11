@@ -51,7 +51,6 @@ void ElevatedRectangleNode::setRect(const QRectF& rect)
         newAspect.setY(m_rect.height() / m_rect.width());
     }
     if (m_material->aspect != newAspect) {
-        qDebug() << newAspect;
         m_material->aspect = newAspect;
         markDirty(QSGNode::DirtyMaterial);
         m_aspect = newAspect;
@@ -112,22 +111,15 @@ void ElevatedRectangleNode::setOffset(const QVector2D& offset)
 
 void ElevatedRectangleNode::updateGeometry()
 {
-//     auto rect = m_rect.adjusted(-m_elevation, -m_elevation, m_elevation, m_elevation);
-    auto rect = m_rect;
+    auto rect = m_rect.adjusted(-m_elevation * m_aspect.x(), -m_elevation * m_aspect.y(),
+                                m_elevation * m_aspect.x(), m_elevation * m_aspect.y());
 
-    if (m_offset.x() < 0.0f) {
-        rect.setLeft(rect.left() + m_offset.x());
-    } else {
-        rect.setRight(rect.right() + m_offset.x());
-    }
+    auto offsetLength = m_offset.length();
 
-    if (m_offset.y() < 0.0f) {
-        rect.setTop(rect.top() + m_offset.y());
-    } else {
-        rect.setBottom(rect.bottom() + m_offset.y());
-    }
+    rect = rect.adjusted(-offsetLength * m_aspect.x(), -offsetLength * m_aspect.y(),
+                         offsetLength * m_aspect.x(), offsetLength * m_aspect.y());
 
-    QSGGeometry::updateTexturedRectGeometry(m_geometry, rect, QRectF{0, 0, 1, 1});
+    QSGGeometry::updateTexturedRectGeometry(m_geometry, rect, QRectF{0.0, 0.0, 1.0, 1.0});
     markDirty(QSGNode::DirtyGeometry);
 }
 

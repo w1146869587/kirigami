@@ -150,7 +150,7 @@ QSGNode *ElevatedRectangle::updatePaintNode(QSGNode *node, QQuickItem::UpdatePai
     }
 
     auto elevatedNode = static_cast<ElevatedRectangleNode*>(node);
-    elevatedNode->setRect(boundingRect().adjusted(-d->elevation, -d->elevation, d->elevation, d->elevation));
+    elevatedNode->setRect(boundingRect());
     elevatedNode->setElevation(d->elevation);
     elevatedNode->setRadius(d->radius);
     elevatedNode->setOffset(QVector2D{float(d->xOffset), float(d->yOffset)});
