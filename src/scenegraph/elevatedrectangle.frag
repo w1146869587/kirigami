@@ -27,32 +27,28 @@ uniform lowp vec2 aspect;
 
 varying lowp vec2 uv;
 
-lowp float sdf_rectangle(in lowp vec2 point, in lowp vec2 rect, in lowp vec2 translation, in lowp float radius)
+lowp float sdf_rounded_rectangle(in lowp vec2 point, in lowp vec2 rect, in lowp vec2 translation, in lowp vec4 radius)
 {
-    lowp vec2 d = abs(point - translation) - rect;
-    return (length(max(d, vec2(0.0))) + min(max(d.x, d.y), 0.0)) - radius;
-}
-
-lowp vec4 sdf_render(in lowp float sdf, in lowp vec4 sourceColor, in lowp vec4 sdfColor, in lowp float smoothing)
-{
-    lowp float g = fwidth(sdf);
-    return mix(sourceColor, sdfColor, sdfColor.a * (1.0 - smoothstep(smoothing - g, smoothing + g, sdf)));
+    radius.xy = (point.x > 0.0) ? radius.xy : radius.zw;
+    radius.x = (point.y > 0.0) ? radius.x : radius.y;
+    lowp vec2 d = abs(point - translation) - rect + radius.x;
+    return min(max(d.x, d.y), 0.0) + length(max(d, 0.0)) - radius.x;
 }
 
 void main()
 {
+    lowp float inverse_scale = 1.0 / (1.0 + elevation + length(offset * 2.0));
+
     lowp float shadowRadius = radius + elevation * (0.25 * (0.1 / max(radius, 0.1)));
-    lowp vec2 aspectOffset = aspect - vec2(1.0);
 
-    lowp vec4 col = vec4(0.0);
-    if (elevation > 0.0) {
-        lowp float shadow = sdf_rectangle(uv, aspect - shadowRadius - elevation, aspectOffset + offset / 2.0, shadowRadius);
-        col = mix(col, shadowColor, 1.0 - smoothstep(-elevation * 0.5, elevation * 0.5, shadow));
-    }
+    lowp vec4 col = vec4(0.0); //, 1.0, 0.0, 1.0);
 
-    lowp float rect = sdf_rectangle(uv, aspect - radius - elevation, aspectOffset - offset / 2.0, radius);
-    col = sdf_render(rect, col, color, 0.001);
+    lowp float shadow = sdf_rounded_rectangle(uv, aspect * inverse_scale, offset * inverse_scale, vec4(shadowRadius * inverse_scale));
+    col = mix(col, shadowColor * sign(elevation), shadowColor.a * (1.0 - smoothstep(-elevation * 0.5, elevation * 0.5, shadow)));
+
+    lowp float rect = sdf_rounded_rectangle(uv, aspect * inverse_scale, vec2(0.0), vec4(radius * inverse_scale));
+    lowp float g = fwidth(rect);
+    col = mix(col, color, color.a * (1.0 - smoothstep(0.001 - g, 0.001 + g, rect)));
 
     gl_FragColor = col;
 }
-
