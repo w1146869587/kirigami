@@ -137,23 +137,23 @@ QtObject {
     }
     onContentItemChanged: {
         if (contentItem instanceof Flickable) {
-            flickableParent.flickableItem = contentItem;
-            contentItem.parent = flickableParent;
-            contentItem.anchors.fill = flickableParent;
-            flickableParent.contentItem = contentItem;
+            scrollView.flickableItem = contentItem;
+            contentItem.parent = scrollView;
+            contentItem.anchors.fill = scrollView;
+            scrollView.contentItem = contentItem;
         } else {
-            if (!flickableParent.flickableItem || flickableParent.flickableItem == flickableParent.contentItem) {
-                flickableParent.flickableItem = flickableComponent.createObject(flickableParent);
+            if (!scrollView.flickableItem || scrollView.flickableItem == scrollView.contentItem) {
+                scrollView.flickableItem = flickableComponent.createObject(scrollView);
             }
 
             contentItem.parent = contentItemParent;
-            flickableContents.parent = flickableParent.flickableItem.contentItem;
-            flickableParent.contentItem = flickableContents;
+            flickableContents.parent = scrollView.flickableItem.contentItem;
+            scrollView.contentItem = flickableContents;
             contentItem.anchors.left = contentItemParent.left;
             contentItem.anchors.right = contentItemParent.right;
         }
-        flickableParent.flickableItem.interactive = false;
-        flickableParent.flickableItem.flickableDirection = Flickable.VerticalFlick;
+        scrollView.flickableItem.interactive = false;
+        scrollView.flickableItem.flickableDirection = Flickable.VerticalFlick;
     }
     onSheetOpenChanged: {
         if (sheetOpen) {
@@ -222,8 +222,8 @@ QtObject {
 
             var newWidth = Math.min(contentItemMaximumWidth, Math.max(mainItem.width/2, Math.min(mainItem.width, mainItem.contentItemPreferredWidth)));
 
-            if (flickableParent.verticalScrollBar && flickableParent.verticalScrollBar.interactive) {
-                newWidth -= flickableParent.verticalScrollBar.width;
+            if (scrollView.verticalScrollBar && scrollView.verticalScrollBar.interactive) {
+                newWidth -= scrollView.verticalScrollBar.width;
             }
 
             ownSizeUpdate = true;
@@ -273,10 +273,10 @@ QtObject {
             
             var pos = focusItem.mapToItem(flickableContents, 0, cursorY - Units.gridUnit*3);
             //focused item already visible? add some margin for the space of the action buttons
-            if (pos.y >= flickableParent.flickableItem.contentY && pos.y <= flickableParent.flickableItem.contentY + flickableParent.flickableItem.height - Units.gridUnit * 8) {
+            if (pos.y >= scrollView.flickableItem.contentY && pos.y <= scrollView.flickableItem.contentY + scrollView.flickableItem.height - Units.gridUnit * 8) {
                 return;
             }
-            flickableParent.flickableItem.contentY = pos.y;
+            scrollView.flickableItem.contentY = pos.y;
         }
 
         ParallelAnimation {
@@ -304,7 +304,7 @@ QtObject {
             target: outerFlickable
             properties: "contentY"
             from: outerFlickable.contentY
-            to: flickableParent.flickableItem.atYEnd ? outerFlickable.contentHeight - outerFlickable.height + outerFlickable.topEmptyArea + headerItem.height + footerItem.height : 0
+            to: scrollView.flickableItem.atYEnd ? outerFlickable.contentHeight - outerFlickable.height + outerFlickable.topEmptyArea + headerItem.height + footerItem.height : 0
             duration: Units.longDuration
             easing.type: Easing.OutQuad
         }
@@ -315,7 +315,7 @@ QtObject {
                 NumberAnimation {id: bah
                     target: outerFlickable
                     properties: "contentY"
-                    to: flickableParent.flickableItem.visibleArea.yPosition < (1 - flickableParent.flickableItem.visibleArea.heightRatio)/2 ? -mainItem.height : outerFlickable.contentHeight
+                    to: scrollView.flickableItem.visibleArea.yPosition < (1 - scrollView.flickableItem.visibleArea.heightRatio)/2 ? -mainItem.height : outerFlickable.contentHeight
                     duration: Units.longDuration
                     easing.type: Easing.InQuad
                 }
@@ -329,7 +329,7 @@ QtObject {
             }
             ScriptAction {
                 script: {
-                    flickableParent.flickableItem.contentY = -mainItem.height;
+                    scrollView.flickableItem.contentY = -mainItem.height;
                     mainItem.visible = root.sheetOpen = false;
                 }
             }
@@ -338,8 +338,8 @@ QtObject {
             anchors.fill: parent
             color: "black"
             opacity: 0.6 * Math.min(
-                (Math.min(flickableParent.flickableItem.contentY + flickableParent.flickableItem.height, flickableParent.flickableItem.height) / flickableParent.flickableItem.height),
-                (2 + (flickableParent.flickableItem.contentHeight - flickableParent.flickableItem.contentY - flickableParent.flickableItem.topMargin - flickableParent.flickableItem.bottomMargin)/flickableParent.flickableItem.height))
+                (Math.min(scrollView.flickableItem.contentY + scrollView.flickableItem.height, scrollView.flickableItem.height) / scrollView.flickableItem.height),
+                (2 + (scrollView.flickableItem.contentHeight - scrollView.flickableItem.contentY - scrollView.flickableItem.topMargin - scrollView.flickableItem.bottomMargin)/scrollView.flickableItem.height))
         }
 
         FocusScope {
@@ -347,19 +347,19 @@ QtObject {
             //anchors.horizontalCenter: parent.horizontalCenter
            // x: (mainItem.width - width) / 2
 
-            readonly property real listHeaderHeight: flickableParent.flickableItem && root.contentItem.headerItem ? root.contentItem.headerItem.height : 0
+            readonly property real listHeaderHeight: scrollView.flickableItem && root.contentItem.headerItem ? root.contentItem.headerItem.height : 0
 
-            y: (flickableParent.contentItem != flickableContents ? -flickableParent.flickableItem.contentY - listHeaderHeight  - (headerItem.visible ? headerItem.height : 0): 0)
+            y: (scrollView.contentItem != flickableContents ? -scrollView.flickableItem.contentY - listHeaderHeight  - (headerItem.visible ? headerItem.height : 0): 0)
 
             width: mainItem.contentItemPreferredWidth <= 0 ? mainItem.width : Math.max(mainItem.width/2, Math.min(mainItem.contentItemMaximumWidth, mainItem.contentItemPreferredWidth))
 
-            height: flickableParent.contentItem == flickableContents ? (root.contentItem.height + topPadding + bottomPadding) + (headerItem.visible ? headerItem.height : 0) + (footerItem.visible ? footerItem.height : 0) : flickableParent.flickableItem.contentHeight
+            height: scrollView.contentItem == flickableContents ? (root.contentItem.height + topPadding + bottomPadding) + (headerItem.visible ? headerItem.height : 0) + (footerItem.visible ? footerItem.height : 0) : 0
             Connections {
                 target: enabled ? flickableContents.Window.activeFocusItem : null
                 enabled: flickableContents.focus && flickableContents.Window.activeFocusItem && flickableContents.Window.activeFocusItem.hasOwnProperty("text")
                 onTextChanged: {
                     if (Qt.inputMethod.cursorRectangle.y + Qt.inputMethod.cursorRectangle.height > mainItem.Window.height) {
-                        flickableParent.flickableItem.contentY += (Qt.inputMethod.cursorRectangle.y + Qt.inputMethod.cursorRectangle.height) - mainItem.Window.height
+                        scrollView.flickableItem.contentY += (Qt.inputMethod.cursorRectangle.y + Qt.inputMethod.cursorRectangle.height) - mainItem.Window.height
                     }
                 }
             }
@@ -370,14 +370,14 @@ QtObject {
                     fill: parent
                     leftMargin: leftPadding
                     topMargin: topPadding + (headerItem.visible ? headerItem.height : 0)
-                    rightMargin: rightPadding + (flickableParent.verticalScrollBar && flickableParent.verticalScrollBar.interactive ? flickableParent.verticalScrollBar.width : 0)
+                    rightMargin: rightPadding + (scrollView.verticalScrollBar && scrollView.verticalScrollBar.interactive ? scrollView.verticalScrollBar.width : 0)
                     bottomMargin: bottomPadding + (footerItem.visible ? footerItem.height : 0)
                 }
             }
         }
 
         Connections {
-            target: flickableParent.flickableItem
+            target: scrollView.flickableItem
             onContentHeightChanged: {
                 if (openAnimation.running) {
                     openAnimation.running = false;
@@ -392,24 +392,24 @@ QtObject {
             contentWidth: width
             topMargin: height
             bottomMargin: height
-            contentHeight: Math.max(height+1, flickableParent.flickableItem.contentHeight)
+            contentHeight: Math.max(height+1, scrollView.flickableItem.contentHeight)
 
-            readonly property int topEmptyArea: Math.max(height-flickableParent.flickableItem.contentHeight, Units.gridUnit * 3)
+            readonly property int topEmptyArea: Math.max(height-scrollView.flickableItem.contentHeight, Units.gridUnit * 3)
   
             property int oldContentY: NaN
             property bool lastMovementWasDown: false
             onContentYChanged: {
-                let startPos = -flickableParent.flickableItem.topMargin;
+                let startPos = -scrollView.flickableItem.topMargin;
                 let pos = contentY - topEmptyArea;
-                let endPos = flickableParent.flickableItem.contentHeight - flickableParent.flickableItem.height + flickableParent.flickableItem.bottomMargin;
+                let endPos = scrollView.flickableItem.contentHeight - scrollView.flickableItem.height + scrollView.flickableItem.bottomMargin;
 
                 if (endPos - pos > 0) {
-                    contentLayout.y = Math.max(0, flickableParent.flickableItem.topMargin - pos);
-                } else if (flickableParent.flickableItem.topMargin - pos < 0) {
+                    contentLayout.y = Math.max(0, scrollView.flickableItem.topMargin - pos);
+                } else if (scrollView.flickableItem.topMargin - pos < 0) {
                     contentLayout.y = endPos - pos;
                 }
 
-                flickableParent.flickableItem.contentY = Math.max(
+                scrollView.flickableItem.contentY = Math.max(
                     startPos, Math.min(pos, endPos));
 
                 lastMovementWasDown = contentY < oldContentY;
@@ -420,7 +420,7 @@ QtObject {
                 if (openAnimation.running || closeAnimation.running) {
                     return;
                 }
-                if (flickableParent.flickableItem.atYBeginning ||flickableParent.flickableItem.atYEnd) {
+                if (scrollView.flickableItem.atYBeginning ||scrollView.flickableItem.atYEnd) {
                     resetAnimation.restart();
                 }
             }
@@ -431,7 +431,7 @@ QtObject {
                 }
 
                 // close
-                if (flickableParent.flickableItem.atYBeginning) {
+                if (scrollView.flickableItem.atYBeginning) {
                     if (contentY < -Units.gridUnit * 4 && lastMovementWasDown) {
                         closeAnimation.restart();
                     } else {
@@ -439,7 +439,7 @@ QtObject {
                     }
                 }
 
-                if (flickableParent.flickableItem.atYEnd) {
+                if (scrollView.flickableItem.atYEnd) {
                     if (contentY > contentHeight - height - Units.gridUnit * 4 && !lastMovementWasDown) {
                         closeAnimation.restart();
                     } else {
@@ -517,7 +517,7 @@ QtObject {
                 }
         
                 Item {
-                    id: flickableParent
+                    id: scrollView
 
                     property Item contentItem
                     property Flickable flickableItem
@@ -531,7 +531,7 @@ QtObject {
                         id: flickableComponent
                         Flickable {
                             anchors.fill: parent
-                            parent: flickableParent
+                            parent: scrollView
                             contentWidth:width
                             contentHeight: flickableContents.height
                         }
