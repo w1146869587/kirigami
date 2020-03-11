@@ -27,8 +27,6 @@ attribute mediump vec2 in_uv;
 varying mediump vec2 uv;
 
 void main() {
-    lowp vec2 topLeft = vec2(-1.0) - abs(offset) / 2.0;
-    lowp vec2 bottomRight = vec2(1.0) + abs(offset) / 2.0;
-    uv = topLeft + (bottomRight - topLeft) * in_uv * aspect;
+    uv = (-1.0 + 2.0 * in_uv) * aspect;
     gl_Position = matrix * in_vertex;
 }
