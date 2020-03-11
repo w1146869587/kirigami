@@ -75,7 +75,7 @@ void ElevatedRectangleNode::setRadius(qreal radius)
     float uniformRadius = radius * 2.0 / minDimension;
 
     if (!qFuzzyCompare(m_material->radius, uniformRadius)) {
-        m_material->radius = uniformRadius;
+        m_material->radius = std::min(uniformRadius, 1.0f);
         markDirty(QSGNode::DirtyMaterial);
         m_radius = radius;
     }

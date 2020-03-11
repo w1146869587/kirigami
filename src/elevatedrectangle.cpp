@@ -66,8 +66,6 @@ qreal ElevatedRectangle::radius() const
 
 void ElevatedRectangle::setRadius(qreal newRadius)
 {
-    newRadius = std::min(newRadius, std::min(width(), height()));
-
     if (newRadius == d->radius) {
         return;
     }
