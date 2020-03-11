@@ -461,6 +461,7 @@ QtObject {
                         right: contentLayout.right
                         margins: Units.smallSpacing
                         top: contentLayout.top
+                        rightMargin: (!headerItem.visible &&  scrollView.verticalScrollBar.visible ? scrollView.verticalScrollBar.width : 0) + Units.smallSpacing
                     }
                     parent: outerFlickable
                     z: 3
