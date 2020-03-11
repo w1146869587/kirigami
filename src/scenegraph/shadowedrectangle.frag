@@ -48,7 +48,7 @@ lowp float sdf_rounded_rectangle(in lowp vec2 point, in lowp vec2 rect, in lowp 
 void main()
 {
     // Scaling factor that is the inverse of the amount of scaling applied to the geometry.
-    lowp float inverse_scale = 1.0 / (1.0 + size + length(offset * 2.0));
+    lowp float inverse_scale = 1.0 / (1.0 + size + length(offset) * 2.0);
 
     // Correction factor to round the corners of a larger shadow.
     // We want to account for size in regards to shadow radius, so that a larger shadow is

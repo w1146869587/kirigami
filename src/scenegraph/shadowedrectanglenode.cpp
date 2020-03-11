@@ -107,7 +107,7 @@ void ShadowedRectangleNode::setShadowColor(const QColor& color)
 void ShadowedRectangleNode::setOffset(const QVector2D& offset)
 {
     auto minDimension = std::min(m_rect.width(), m_rect.height());
-    auto uniformOffset = offset * 2.0 / minDimension;
+    auto uniformOffset = offset / minDimension;
 
     if (m_material->offset != uniformOffset) {
         m_material->offset = uniformOffset;
