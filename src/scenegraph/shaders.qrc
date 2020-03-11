@@ -5,7 +5,9 @@
         <file>header_desktop.glsl</file>
         <file>header_desktop_core.glsl</file>
         <file>shadowedrectangle.vert</file>
+        <file>shadowedrectangle_core.vert</file>
         <file>shadowedrectangle.frag</file>
+        <file>shadowedrectangle_core.frag</file>
     </qresource>
 </RCC>
 
