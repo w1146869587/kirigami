@@ -142,12 +142,7 @@ QtObject {
             contentItem.anchors.fill = scrollView;
             scrollView.contentItem = contentItem;
         } else {
-            if (!scrollView.flickableItem || scrollView.flickableItem == scrollView.contentItem) {
-                scrollView.flickableItem = flickableComponent.createObject(scrollView);
-            }
-
             contentItem.parent = contentItemParent;
-            flickableContents.parent = scrollView.flickableItem.contentItem;
             scrollView.contentItem = flickableContents;
             contentItem.anchors.left = contentItemParent.left;
             contentItem.anchors.right = contentItemParent.right;
@@ -399,6 +394,9 @@ QtObject {
             property int oldContentY: NaN
             property bool lastMovementWasDown: false
             onContentYChanged: {
+                if (scrollView.userInteracting) {
+                    return;
+                }
                 let startPos = -scrollView.flickableItem.topMargin;
                 let pos = contentY - topEmptyArea;
                 let endPos = scrollView.flickableItem.contentHeight - scrollView.flickableItem.height + scrollView.flickableItem.bottomMargin;
@@ -496,97 +494,94 @@ QtObject {
                         }
                     }
                     
-                    EdgeShadow {
-                        z: -2
-                        edge: Qt.TopEdge
+                    Separator {
                         anchors {
                             right: parent.right
                             left: parent.left
                             top: parent.bottom
                         }
-
-                        opacity: parent.y == 0 ? 1 : 0
-
-                        Behavior on opacity {
-                            NumberAnimation {
-                                duration: Units.longDuration
-                                easing.type: Easing.InOutQuad
-                            }
-                        }
                     }
                 }
         
-                Item {
+                ScrollView {
                     id: scrollView
 
-                    property Item contentItem
-                    property Flickable flickableItem
-
+                    property bool userInteracting: false
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
                     implicitHeight: flickableItem.contentHeight
-
-                    Component {
-                        id: flickableComponent
-                        Flickable {
-                            anchors.fill: parent
-                            parent: scrollView
-                            contentWidth:width
-                            contentHeight: flickableContents.height
+                }
+                Connections {
+                    target: scrollView.flickableItem
+                    property real oldContentY: 0
+                    onContentYChanged: {
+                        if (outerFlickable.moving) {
+                            oldContentY = scrollView.flickableItem.contentY;
+                            return;
                         }
+                        scrollView.userInteracting = true;
+                        
+                        let diff = scrollView.flickableItem.contentY - oldContentY
+                        
+                        if (diff > 0) {
+                            contentLayout.y = Math.max(0,  contentLayout.y - diff);
+                        } else {
+                            contentLayout.y = Math.min(outerFlickable.topEmptyArea,  contentLayout.y + (contentLayout.y - diff));
+                        }
+                        
+                        outerFlickable.contentY = outerFlickable.contentY + diff;
+            
+
+                        oldContentY = scrollView.flickableItem.contentY;
+                        scrollView.userInteracting = false;
                     }
                 }
-                
-                Rectangle {
-                    id: footerItem
-                    Layout.fillWidth: true
-                   // x: flickableContents.x
-                    visible: root.footer
-                    implicitHeight: footerParent.implicitHeight + Units.smallSpacing * 2 + extraMargin
-                    color: Theme.backgroundColor
+                Item {
+                    implicitHeight: footerItem.height
+                }
+            }
 
-                    //Show an extra margin when:
-                    //* the application is in mobile mode (no toolbarapplicationheader)
-                    //* the bottom screen controls are visible
-                    //* the sheet is displayed *under* the controls
-                    property int extraMargin: (!root.parent ||
-                        typeof applicationWindow === "undefined" ||
-                        (root.parent === applicationWindow().overlay) ||
-                        !applicationWindow().controlsVisible ||
-                        (applicationWindow().pageStack && applicationWindow().pageStack.globalToolBar && applicationWindow().pageStack.globalToolBar.actualStyle === ApplicationHeaderStyle.ToolBar) ||
-                        (applicationWindow().header && applicationWindow().header.toString().indexOf("ToolBarApplicationHeader") === 0))
-                            ? 0 : Units.gridUnit * 3
+            // footer item is outside the layout as it should never scroll away
+            Rectangle {
+                id: footerItem
+                width: contentLayout.width
+                parent: outerFlickable
+                x: contentLayout.x
+                y: Math.min(parent.height, contentLayout.y + contentLayout.height) - height
+                visible: root.footer
+                implicitHeight: footerParent.implicitHeight + Units.smallSpacing * 2 + extraMargin
+                color: Theme.backgroundColor
 
-                    z: 2
-                    Item {
-                        id: footerParent
-                        implicitHeight: footer ? footer.implicitHeight : 0
-                        anchors {
-                            top: parent.top
-                            left: parent.left
-                            right: parent.right
-                            margins: Units.smallSpacing
-                        }
+                //Show an extra margin when:
+                //* the application is in mobile mode (no toolbarapplicationheader)
+                //* the bottom screen controls are visible
+                //* the sheet is displayed *under* the controls
+                property int extraMargin: (!root.parent ||
+                    typeof applicationWindow === "undefined" ||
+                    (root.parent === applicationWindow().overlay) ||
+                    !applicationWindow().controlsVisible ||
+                    (applicationWindow().pageStack && applicationWindow().pageStack.globalToolBar && applicationWindow().pageStack.globalToolBar.actualStyle === ApplicationHeaderStyle.ToolBar) ||
+                    (applicationWindow().header && applicationWindow().header.toString().indexOf("ToolBarApplicationHeader") === 0))
+                        ? 0 : Units.gridUnit * 3
+
+                z: 2
+                Item {
+                    id: footerParent
+                    implicitHeight: footer ? footer.implicitHeight : 0
+                    anchors {
+                        top: parent.top
+                        left: parent.left
+                        right: parent.right
+                        margins: Units.smallSpacing
                     }
+                }
 
-                    EdgeShadow {
-                        z: -2
-                        edge: Qt.BottomEdge
-                        anchors {
-                            right: parent.right
-                            left: parent.left
-                            bottom: parent.top
-                        }
-
-                        opacity: parent.y + parent.height < mainItem.height ? 0 : 1
-
-                        Behavior on opacity {
-                            NumberAnimation {
-                                duration: Units.longDuration
-                                easing.type: Easing.InOutQuad
-                            }
-                        }
+                Separator {
+                    anchors {
+                        right: parent.right
+                        left: parent.left
+                        bottom: parent.top
                     }
                 }
             }
