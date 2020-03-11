@@ -21,7 +21,7 @@
 // https://iquilezles.org/www/articles/distfunctions2d/distfunctions2d.htm
 
 uniform lowp float opacity;
-uniform lowp float elevation;
+uniform lowp float size;
 uniform lowp float radius;
 uniform lowp vec4 color;
 uniform lowp vec4 shadowColor;
@@ -48,21 +48,21 @@ lowp float sdf_rounded_rectangle(in lowp vec2 point, in lowp vec2 rect, in lowp 
 void main()
 {
     // Scaling factor that is the inverse of the amount of scaling applied to the geometry.
-    lowp float inverse_scale = 1.0 / (1.0 + elevation + length(offset * 2.0));
+    lowp float inverse_scale = 1.0 / (1.0 + size + length(offset * 2.0));
 
     // Correction factor to round the corners of a larger shadow.
-    // We want to account for elevation in regards to shadow radius, so that a larger shadow is
+    // We want to account for size in regards to shadow radius, so that a larger shadow is
     // more rounded, but only if we are not already rounding the corners due to corner radius.
-    lowp float elevation_factor = 0.5 * (minimum_shadow_radius / max(radius, minimum_shadow_radius));
+    lowp float size_factor = 0.5 * (minimum_shadow_radius / max(radius, minimum_shadow_radius));
 
-    lowp float shadowRadius = radius + elevation * elevation_factor;
+    lowp float shadowRadius = radius + size * size_factor;
 
     lowp vec4 col = vec4(0.0);
 
     // Calculate the shadow's distance field.
     lowp float shadow = sdf_rounded_rectangle(uv, aspect * inverse_scale, offset * inverse_scale, vec4(shadowRadius * inverse_scale));
     // Render it, interpolating the color over the distance.
-    col = mix(col, shadowColor * sign(elevation), shadowColor.a * (1.0 - smoothstep(-elevation * 0.5, elevation * 0.5, shadow)));
+    col = mix(col, shadowColor * sign(size), shadowColor.a * (1.0 - smoothstep(-size * 0.5, size * 0.5, shadow)));
 
     // Calculate the main rectangle distance field.
     lowp float rect = sdf_rounded_rectangle(uv, aspect * inverse_scale, vec2(0.0), vec4(radius * inverse_scale));

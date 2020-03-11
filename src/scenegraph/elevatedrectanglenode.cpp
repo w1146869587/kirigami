@@ -57,15 +57,15 @@ void ElevatedRectangleNode::setRect(const QRectF& rect)
     }
 }
 
-void ElevatedRectangleNode::setElevation(qreal elevation)
+void ElevatedRectangleNode::setSize(qreal size)
 {
     auto minDimension = std::min(m_rect.width(), m_rect.height());
-    float uniformElevation = (elevation / minDimension) * 2.0;
+    float uniformSize = (size / minDimension) * 2.0;
 
-    if (!qFuzzyCompare(m_material->elevation, uniformElevation)) {
-        m_material->elevation = uniformElevation;
+    if (!qFuzzyCompare(m_material->size, uniformSize)) {
+        m_material->size = uniformSize;
         markDirty(QSGNode::DirtyMaterial);
-        m_elevation = elevation;
+        m_size = size;
     }
 }
 
@@ -111,8 +111,8 @@ void ElevatedRectangleNode::setOffset(const QVector2D& offset)
 
 void ElevatedRectangleNode::updateGeometry()
 {
-    auto rect = m_rect.adjusted(-m_elevation * m_aspect.x(), -m_elevation * m_aspect.y(),
-                                m_elevation * m_aspect.x(), m_elevation * m_aspect.y());
+    auto rect = m_rect.adjusted(-m_size * m_aspect.x(), -m_size * m_aspect.y(),
+                                m_size * m_aspect.x(), m_size * m_aspect.y());
 
     auto offsetLength = m_offset.length();
 

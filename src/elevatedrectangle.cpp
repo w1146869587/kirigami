@@ -25,7 +25,7 @@
 class ElevatedRectangle::Private
 {
 public:
-    qreal elevation = 0.0;
+    qreal size = 0.0;
     qreal radius = 0.0;
     qreal xOffset = 0.0;
     qreal yOffset = 0.0;
@@ -43,20 +43,20 @@ ElevatedRectangle::~ElevatedRectangle()
 {
 }
 
-qreal ElevatedRectangle::elevation() const
+qreal ElevatedRectangle::size() const
 {
-    return d->elevation;
+    return d->size;
 }
 
-void ElevatedRectangle::setElevation(qreal newElevation)
+void ElevatedRectangle::setSize(qreal newSize)
 {
-    if (newElevation == d->elevation) {
+    if (newSize == d->size) {
         return;
     }
 
-    d->elevation = newElevation;
+    d->size = newSize;
     update();
-    Q_EMIT elevationChanged();
+    Q_EMIT sizeChanged();
 }
 
 qreal ElevatedRectangle::radius() const
@@ -149,7 +149,7 @@ QSGNode *ElevatedRectangle::updatePaintNode(QSGNode *node, QQuickItem::UpdatePai
 
     auto elevatedNode = static_cast<ElevatedRectangleNode*>(node);
     elevatedNode->setRect(boundingRect());
-    elevatedNode->setElevation(d->elevation);
+    elevatedNode->setSize(d->size);
     elevatedNode->setRadius(d->radius);
     elevatedNode->setOffset(QVector2D{float(d->xOffset), float(d->yOffset)});
     elevatedNode->setColor(d->color);

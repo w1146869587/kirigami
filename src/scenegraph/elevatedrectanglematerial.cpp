@@ -43,7 +43,10 @@ int ElevatedRectangleMaterial::compare(const QSGMaterial *other) const
     auto material = static_cast<const ElevatedRectangleMaterial *>(other);
 
     if (material->color == color
-        && qFuzzyCompare(material->elevation, elevation)
+        && material->shadowColor == shadowColor
+        && material->offset == offset
+        && material->aspect == aspect
+        && qFuzzyCompare(material->size, size)
         && qFuzzyCompare(material->radius, radius)) {
         return 0;
     }
@@ -80,7 +83,7 @@ void ElevatedRectangleShader::initialize()
     m_matrixLocation = program()->uniformLocation("matrix");
     m_aspectLocation = program()->uniformLocation("aspect");
     m_opacityLocation = program()->uniformLocation("opacity");
-    m_elevationLocation = program()->uniformLocation("elevation");
+    m_sizeLocation = program()->uniformLocation("size");
     m_radiusLocation = program()->uniformLocation("radius");
     m_colorLocation = program()->uniformLocation("color");
     m_shadowColorLocation = program()->uniformLocation("shadowColor");
@@ -102,7 +105,7 @@ void ElevatedRectangleShader::updateState(const QSGMaterialShader::RenderState& 
     if (!oldMaterial || newMaterial->compare(oldMaterial) != 0 || state.isCachedMaterialDataDirty()) {
         auto material = static_cast<ElevatedRectangleMaterial *>(newMaterial);
         p->setUniformValue(m_aspectLocation, material->aspect);
-        p->setUniformValue(m_elevationLocation, material->elevation);
+        p->setUniformValue(m_sizeLocation, material->size);
         p->setUniformValue(m_radiusLocation, material->radius);
         p->setUniformValue(m_colorLocation, material->color);
         p->setUniformValue(m_shadowColorLocation, material->shadowColor);

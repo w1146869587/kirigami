@@ -27,7 +27,7 @@
 class ElevatedRectangle : public QQuickItem
 {
     Q_OBJECT
-    Q_PROPERTY(qreal elevation READ elevation WRITE setElevation NOTIFY elevationChanged)
+    Q_PROPERTY(qreal size READ size WRITE setSize NOTIFY sizeChanged)
     Q_PROPERTY(qreal radius READ radius WRITE setRadius NOTIFY radiusChanged)
     Q_PROPERTY(qreal xOffset READ xOffset WRITE setXOffset NOTIFY xOffsetChanged)
     Q_PROPERTY(qreal yOffset READ yOffset WRITE setYOffset NOTIFY yOffsetChanged)
@@ -38,9 +38,9 @@ public:
     ElevatedRectangle(QQuickItem *parent = nullptr);
     ~ElevatedRectangle() override;
 
-    qreal elevation() const;
-    void setElevation(qreal newElevation);
-    Q_SIGNAL void elevationChanged();
+    qreal size() const;
+    void setSize(qreal newSize);
+    Q_SIGNAL void sizeChanged();
 
     qreal radius() const;
     void setRadius(qreal newRadius);

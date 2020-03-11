@@ -34,7 +34,7 @@ public:
     int compare(const QSGMaterial* other) const override;
 
     QVector2D aspect = QVector2D{1.0, 1.0};
-    float elevation = 0.0;
+    float size = 0.0;
     float radius = 0.0;
     QColor color = Qt::white;
     QColor shadowColor = Qt::black;
@@ -55,7 +55,7 @@ private:
     int m_matrixLocation = -1;
     int m_opacityLocation = -1;
     int m_aspectLocation = -1;
-    int m_elevationLocation = -1;
+    int m_sizeLocation = -1;
     int m_radiusLocation = -1;
     int m_colorLocation = -1;
     int m_shadowColorLocation = -1;

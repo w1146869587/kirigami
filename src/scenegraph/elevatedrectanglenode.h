@@ -33,7 +33,7 @@ public:
     ElevatedRectangleNode(const QRectF &rect = QRectF{});
 
     void setRect(const QRectF &rect);
-    void setElevation(qreal elevation);
+    void setSize(qreal size);
     void setRadius(qreal radius);
     void setColor(const QColor &color);
     void setShadowColor(const QColor &color);
@@ -46,7 +46,7 @@ private:
     ElevatedRectangleMaterial *m_material;
 
     QRectF m_rect;
-    qreal m_elevation = 0.0;
+    qreal m_size = 0.0;
     qreal m_radius = 0.0;
     QVector2D m_offset;
     QVector2D m_aspect;
