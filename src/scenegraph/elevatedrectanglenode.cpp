@@ -24,6 +24,16 @@
 
 #include <QDebug>
 
+QColor premultiply(const QColor &color)
+{
+    return QColor::fromRgbF(
+        color.redF() * color.alphaF(),
+        color.greenF() * color.greenF(),
+        color.blueF() * color.blueF(),
+        color.alphaF()
+    );
+}
+
 ElevatedRectangleNode::ElevatedRectangleNode(const QRectF& rect)
 {
     m_geometry = new QSGGeometry{QSGGeometry::defaultAttributes_TexturedPoint2D(), 4};
@@ -84,7 +94,7 @@ void ElevatedRectangleNode::setRadius(qreal radius)
 void ElevatedRectangleNode::setColor(const QColor &color)
 {
     if (m_material->color != color) {
-        m_material->color = color;
+        m_material->color = premultiply(color);
         markDirty(QSGNode::DirtyMaterial);
     }
 }
@@ -92,7 +102,7 @@ void ElevatedRectangleNode::setColor(const QColor &color)
 void ElevatedRectangleNode::setShadowColor(const QColor& color)
 {
     if (m_material->shadowColor != color) {
-        m_material->shadowColor = color;
+        m_material->shadowColor = premultiply(color);
         markDirty(QSGNode::DirtyMaterial);
     }
 }
