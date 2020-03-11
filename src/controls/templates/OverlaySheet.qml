@@ -136,12 +136,18 @@ QtObject {
         background.z = -1;
     }
     onContentItemChanged: {
-        if (contentItem.hasOwnProperty("contentY") && // Check if flickable
-            contentItem.hasOwnProperty("contentHeight")) {
+        if (contentItem instanceof Flickable) {
+            scrollView.flickableItem = contentItem;
             contentItem.parent = scrollView;
+            contentItem.anchors.fill = scrollView;
             scrollView.contentItem = contentItem;
         } else {
+            if (!scrollView.flickableItem || scrollView.flickableItem == scrollView.contentItem) {
+                scrollView.flickableItem = flickableComponent.createObject(scrollView);
+            }
+
             contentItem.parent = contentItemParent;
+            flickableContents.parent = scrollView.flickableItem.contentItem;
             scrollView.contentItem = flickableContents;
             contentItem.anchors.left = contentItemParent.left;
             contentItem.anchors.right = contentItemParent.right;
@@ -347,7 +353,7 @@ QtObject {
 
             width: mainItem.contentItemPreferredWidth <= 0 ? mainItem.width : Math.max(mainItem.width/2, Math.min(mainItem.contentItemMaximumWidth, mainItem.contentItemPreferredWidth))
 
-            height: (scrollView.contentItem != flickableContents ? scrollView.flickableItem.contentHeight + listHeaderHeight : (root.contentItem.height + topPadding + bottomPadding)) + (headerItem.visible ? headerItem.height : 0) + (footerItem.visible ? footerItem.height : 0)
+            height: scrollView.contentItem == flickableContents ? (root.contentItem.height + topPadding + bottomPadding) + (headerItem.visible ? headerItem.height : 0) + (footerItem.visible ? footerItem.height : 0) : 0
             Connections {
                 target: enabled ? flickableContents.Window.activeFocusItem : null
                 enabled: flickableContents.focus && flickableContents.Window.activeFocusItem && flickableContents.Window.activeFocusItem.hasOwnProperty("text")
@@ -380,19 +386,6 @@ QtObject {
             }
         }
 
-        Binding {
-            target: scrollView.verticalScrollBar
-            property: "visible"
-            value: scrollView.flickableItem.contentHeight > mainItem.height*0.8
-        }
-        Connections {
-            target: scrollView.verticalScrollBar
-            onActiveChanged: {
-                if (!scrollView.verticalScrollBar.active) {
-                    scrollView.flickableItem.movementEnded();
-                }
-            }
-        }
         Flickable {
             id: outerFlickable
             anchors.fill: parent
@@ -523,15 +516,26 @@ QtObject {
                     }
                 }
         
-                ScrollView {
+                Item {
                     id: scrollView
+
+                    property Item contentItem
+                    property Flickable flickableItem
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
                     implicitHeight: flickableItem.contentHeight
 
-                    horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
+                    Component {
+                        id: flickableComponent
+                        Flickable {
+                            anchors.fill: parent
+                            parent: scrollView
+                            contentWidth:width
+                            contentHeight: flickableContents.height
+                        }
+                    }
                 }
                 
                 Rectangle {
