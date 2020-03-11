@@ -27,6 +27,8 @@ uniform lowp vec2 aspect;
 
 varying lowp vec2 uv;
 
+const lowp float minimum_shadow_radius = 0.05;
+
 lowp float sdf_rounded_rectangle(in lowp vec2 point, in lowp vec2 rect, in lowp vec2 translation, in lowp vec4 radius)
 {
     radius.xy = (point.x > 0.0) ? radius.xy : radius.zw;
@@ -39,9 +41,11 @@ void main()
 {
     lowp float inverse_scale = 1.0 / (1.0 + elevation + length(offset * 2.0));
 
-    lowp float shadowRadius = radius + elevation * (0.25 * (0.1 / max(radius, 0.1)));
+    lowp float elevation_factor = 0.5 * (minimum_shadow_radius / max(radius, minimum_shadow_radius));
 
-    lowp vec4 col = vec4(0.0); //, 1.0, 0.0, 1.0);
+    lowp float shadowRadius = radius + elevation * elevation_factor;
+
+    lowp vec4 col = vec4(0.0);
 
     lowp float shadow = sdf_rounded_rectangle(uv, aspect * inverse_scale, offset * inverse_scale, vec4(shadowRadius * inverse_scale));
     col = mix(col, shadowColor * sign(elevation), shadowColor.a * (1.0 - smoothstep(-elevation * 0.5, elevation * 0.5, shadow)));
