@@ -397,7 +397,11 @@ QtObject {
                 if (scrollView.userInteracting) {
                     return;
                 }
-                let startPos = -scrollView.flickableItem.topMargin;
+                let extraHeader = 0;
+                if (scrollView.flickableItem.hasOwnProperty("headerItem") && scrollView.flickableItem.headerItem) {
+                    extraHeader = scrollView.flickableItem.headerItem.height;
+                }
+                let startPos = -scrollView.flickableItem.topMargin - extraHeader;
                 let pos = contentY - topEmptyArea;
                 let endPos = scrollView.flickableItem.contentHeight - scrollView.flickableItem.height + scrollView.flickableItem.bottomMargin;
 
@@ -532,9 +536,6 @@ QtObject {
                         } else if (scrollView.flickableItem.contentY < outerFlickable.topEmptyArea + headerItem.height) {
                             contentLayout.y = Math.min(outerFlickable.topEmptyArea,  contentLayout.y + (contentLayout.y - diff));
                         }
-
-                        
-
 
                         oldContentY = scrollView.flickableItem.contentY;
                         scrollView.userInteracting = false;
