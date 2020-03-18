@@ -133,7 +133,7 @@ Item {
     function showPassiveNotification(message, timeout, actionText, callBack) {
         if (!internal.__passiveNotification) {
             var component = Qt.createComponent("templates/PassiveNotification.qml");
-            internal.__passiveNotification = component.createObject(overlay.parent);
+            internal.__passiveNotification = component.createObject(root);
         }
 
         internal.__passiveNotification.showNotification(message, timeout, actionText, callBack);
@@ -351,6 +351,6 @@ Item {
 
     QtObject {
         id: internal
-        property Item __passiveNotification
+        property QtObject __passiveNotification
     }
 }
