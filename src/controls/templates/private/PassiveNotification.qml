@@ -23,7 +23,7 @@ notifications in the app.
 Controls.Popup {
     id: root
 
-    x: parent.width/2 - width/2
+    x: Math.round(parent.width/2 - width/2)
     y: parent.height - height - Kirigami.Units.smallSpacing
     implicitWidth: Math.max(background ? background.implicitWidth : 0,
                             contentWidth + leftPadding + rightPadding) + leftInset + rightInset
@@ -59,15 +59,17 @@ Controls.Popup {
 
         open();
 
-        if (outerLayout.children.length > 3) {
-            outerLayout.children[0].close();
+        for (let i = 0; i < outerLayout.children.length - 3; ++i) {
+            outerLayout.children[i].close();
         }
+
         let delegate = delegateComponent.createObject(outerLayout, {
             "text": message,
             "actionText": actionText || "",
             "callBack": callBack || (function(){}),
             "interval": interval
         });
+
         // Reorder items to have the last on top
         let children = outerLayout.children;
         for (let i in children) {
@@ -96,7 +98,7 @@ Controls.Popup {
             Layout.bottomMargin: -delegate.height
             opacity: 0
             function close() {
-                closeAnim.restart();
+                closeAnim.running = true;
             }
 
             Component.onCompleted: openAnim.restart()
