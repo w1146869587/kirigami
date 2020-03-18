@@ -91,8 +91,8 @@ QQC2.ApplicationWindow {
      */
     function showPassiveNotification(message, timeout, actionText, callBack) {
         if (!internal.__passiveNotification) {
-            internal.__passiveNotification = Qt.createQmlObject("import QtQuick 2.11;import org.kde.kirigami 2.12 as Kirigami;PassiveNotification{}", overlay.parent);
-            //internal.__passiveNotification = component.createObject(overlay.parent);
+            var component = Qt.createComponent("templates/private/PassiveNotification.qml");
+            internal.__passiveNotification = component.createObject(overlay.parent);
         }
 
         internal.__passiveNotification.showNotification(message, timeout, actionText, callBack);

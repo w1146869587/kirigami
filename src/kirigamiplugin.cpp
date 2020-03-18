@@ -240,7 +240,6 @@ void KirigamiPlugin::registerTypes(const char *uri)
     qmlRegisterType<ShadowedRectangle>(uri, 2, 12, "ShadowedRectangle");
     qmlRegisterUncreatableType<BorderGroup>(uri, 2, 12, "BorderGroup", QStringLiteral("Used as grouped property"));
     qmlRegisterUncreatableType<ShadowGroup>(uri, 2, 12, "ShadowGroup", QStringLiteral("Used as grouped property"));
-    qmlRegisterType(componentUrl(QStringLiteral("PassiveNotification.qml")), uri, 2, 12, "PassiveNotification");
 
     qmlProtectModule(uri, 2);
 }
