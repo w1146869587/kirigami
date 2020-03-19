@@ -307,7 +307,7 @@ QtObject {
         SequentialAnimation {
             id: closeAnimation
             ParallelAnimation {
-                NumberAnimation {id: bah
+                NumberAnimation {
                     target: outerFlickable
                     properties: "contentY"
                     to: scrollView.flickableItem.visibleArea.yPosition < (1 - scrollView.flickableItem.visibleArea.heightRatio)/2 ? -mainItem.height : outerFlickable.contentHeight
@@ -344,7 +344,7 @@ QtObject {
 
             readonly property real listHeaderHeight: scrollView.flickableItem && root.contentItem.headerItem ? root.contentItem.headerItem.height : 0
 
-            y: (scrollView.contentItem != flickableContents ? -scrollView.flickableItem.contentY - listHeaderHeight  - (headerItem.visible ? headerItem.height : 0): 0)
+            y: (scrollView.contentItem != flickableContents ? -scrollView.flickableItem.contentY /*- listHeaderHeight*/  - (headerItem.visible ? headerItem.height : 0): 0)
 
             width: mainItem.contentItemPreferredWidth <= 0 ? mainItem.width : Math.max(mainItem.width/2, Math.min(mainItem.contentItemMaximumWidth, mainItem.contentItemPreferredWidth))
 
@@ -400,7 +400,7 @@ QtObject {
 
                 let startPos = -scrollView.flickableItem.topMargin - flickableContents.listHeaderHeight;
                 let pos = contentY - topEmptyArea - flickableContents.listHeaderHeight;
-                let endPos = scrollView.flickableItem.contentHeight - scrollView.flickableItem.height + scrollView.flickableItem.bottomMargin;
+                let endPos = scrollView.flickableItem.contentHeight - scrollView.flickableItem.height + scrollView.flickableItem.bottomMargin - flickableContents.listHeaderHeight;
 
                 if (endPos - pos > 0) {
                     contentLayout.y = Math.max(0, scrollView.flickableItem.topMargin - pos);
