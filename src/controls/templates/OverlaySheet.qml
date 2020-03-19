@@ -344,7 +344,7 @@ QtObject {
 
             readonly property real listHeaderHeight: scrollView.flickableItem && root.contentItem.headerItem ? root.contentItem.headerItem.height : 0
 
-            y: (scrollView.contentItem != flickableContents ? -scrollView.flickableItem.contentY /*- listHeaderHeight*/  - (headerItem.visible ? headerItem.height : 0): 0)
+            y: (scrollView.contentItem != flickableContents ? -scrollView.flickableItem.contentY - listHeaderHeight  - (headerItem.visible ? headerItem.height : 0): 0)
 
             width: mainItem.contentItemPreferredWidth <= 0 ? mainItem.width : Math.max(mainItem.width/2, Math.min(mainItem.contentItemMaximumWidth, mainItem.contentItemPreferredWidth))
 
@@ -403,7 +403,7 @@ QtObject {
                 let endPos = scrollView.flickableItem.contentHeight - scrollView.flickableItem.height + scrollView.flickableItem.bottomMargin - flickableContents.listHeaderHeight;
 
                 if (endPos - pos > 0) {
-                    contentLayout.y = Math.max(0, scrollView.flickableItem.topMargin - pos);
+                    contentLayout.y = Math.max(0, scrollView.flickableItem.topMargin - pos - flickableContents.listHeaderHeight);
                 } else if (scrollView.flickableItem.topMargin - pos < 0) {
                     contentLayout.y = endPos - pos;
                 }
