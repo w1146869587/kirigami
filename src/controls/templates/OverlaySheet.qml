@@ -387,12 +387,13 @@ QtObject {
             contentWidth: width
             topMargin: height
             bottomMargin: height
-            contentHeight: Math.max(height+1, scrollView.flickableItem.contentHeight)
+            contentHeight: Math.max(height+1, scrollView.flickableItem.contentHeight + topEmptyArea)
 
             readonly property int topEmptyArea: Math.max(height-scrollView.flickableItem.contentHeight, Units.gridUnit * 3)
   
             property int oldContentY: NaN
             property bool lastMovementWasDown: false
+            property real startDraggingPos
             onContentYChanged: {
                 if (scrollView.userInteracting) {
                     return;
@@ -426,12 +427,15 @@ QtObject {
 
             onDraggingChanged: {
                 if (dragging) {
+                    startDraggingPos = contentY;
                     return;
                 }
 
                 // close
                 if (scrollView.flickableItem.atYBeginning) {
-                    if (contentY < -Units.gridUnit * 4 && lastMovementWasDown) {
+                    if (startDraggingPos - contentY > Units.gridUnit * 4 &&
+                        contentY < -Units.gridUnit * 4 &&
+                        lastMovementWasDown) {
                         closeAnimation.restart();
                     } else {
                         resetAnimation.restart();
@@ -439,7 +443,9 @@ QtObject {
                 }
 
                 if (scrollView.flickableItem.atYEnd) {
-                    if (contentY > contentHeight - height - Units.gridUnit * 4 && !lastMovementWasDown) {
+                    if (contentY - startDraggingPos > Units.gridUnit * 4 &&
+                        contentY > contentHeight - height + Units.gridUnit * 4  &&
+                        !lastMovementWasDown) {
                         closeAnimation.restart();
                     } else {
                         resetAnimation.restart();
