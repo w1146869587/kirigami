@@ -18,6 +18,7 @@
 #include "scenepositionattached.h"
 #include "wheelhandler.h"
 #include "shadowedrectangle.h"
+#include "pagerouter.h"
 
 #include <QQmlEngine>
 #include <QQmlContext>
@@ -240,6 +241,7 @@ void KirigamiPlugin::registerTypes(const char *uri)
     qmlRegisterType<ShadowedRectangle>(uri, 2, 12, "ShadowedRectangle");
     qmlRegisterUncreatableType<BorderGroup>(uri, 2, 12, "BorderGroup", QStringLiteral("Used as grouped property"));
     qmlRegisterUncreatableType<ShadowGroup>(uri, 2, 12, "ShadowGroup", QStringLiteral("Used as grouped property"));
+    qmlRegisterType<PageRouter>(uri, 2, 12, "PageRouter");
 
     qmlProtectModule(uri, 2);
 }

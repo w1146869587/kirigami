@@ -25,6 +25,7 @@ set(kirigami_SRCS
     mnemonicattached.cpp
     wheelhandler.cpp
     shadowedrectangle.cpp
+    pagerouter.cpp
     scenegraph/shadowedrectanglenode.cpp
     scenegraph/shadowedrectanglematerial.cpp
     scenegraph/shadowedborderrectanglematerial.cpp
