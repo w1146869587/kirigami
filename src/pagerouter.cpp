@@ -28,8 +28,12 @@ QList<ParsedRoute> parseRoutes(QJSValue values)
                     route.toString(),
                     QVariant()
                 };
-            } else {
-                ret << parseRoute(route.value<QJSValue>());
+            } else if (route.canConvert<QVariantMap>()) {
+                auto map = route.value<QVariantMap>();
+                ret << ParsedRoute{
+                    map.value(QStringLiteral("route")).toString(),
+                    map.value(QStringLiteral("data"))
+                };
             }
         }
     } else {
@@ -91,6 +95,7 @@ void PageRouter::push(ParsedRoute route)
         auto item = component->create(context);
         // TODO: pester mart about seeing if he knows
         // how to utilise an attached property instead
+        item->setParent(this);
         item->setProperty("routeData", route.data);
         QMetaObject::invokeMethod(m_pageRow, "push", Q_ARG(QVariant, QVariant::fromValue(item)), Q_ARG(QVariant, QVariant()));
         m_currentRoutes << route;
@@ -101,6 +106,7 @@ void PageRouter::push(ParsedRoute route)
             }
             auto item = component->create(context);
             // TODO: See above
+            item->setParent(this);
             item->setProperty("routeData", route.data);
             QMetaObject::invokeMethod(m_pageRow, "push", Q_ARG(QVariant, QVariant::fromValue(item)), Q_ARG(QVariant, QVariant()));
             m_currentRoutes << route;
@@ -115,7 +121,7 @@ QJSValue PageRouter::routes() const
     return m_routes;
 }
 
-void PageRouter::setRoutes(const QJSValue &routes)
+void PageRouter::setRoutes(QJSValue routes)
 {
     m_routes = routes;
 }
@@ -162,3 +168,23 @@ void PageRouter::popRoute()
 {
     QMetaObject::invokeMethod(m_pageRow, "pop");
 }
+
+PageRouterAttached* PageRouter::qmlAttachedProperties(QObject *object)
+{
+    auto attached = new PageRouterAttached(object);
+    auto pointer = object;
+    while (pointer != nullptr) {
+        auto casted = qobject_cast<PageRouter*>(pointer);
+        if (casted != nullptr) {
+            attached->m_router = casted;
+            break;
+        }
+        pointer = pointer->parent();
+    }
+    if (attached->m_router.isNull()) {
+        qCritical() << "PageRouterAttached could not find a parent PageRouter";
+    }
+    return attached;
+}
+
+PageRouterAttached::PageRouterAttached(QObject *parent) : QObject(parent) {}
