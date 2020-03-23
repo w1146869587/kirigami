@@ -1,3 +1,4 @@
+#include <QQmlProperty>
 #include "pagerouter.h"
 
 ParsedRoute parseRoute(QJSValue value)
@@ -17,11 +18,23 @@ ParsedRoute parseRoute(QJSValue value)
     }
 }
 
-QList<ParsedRoute> parseRoutes(QList<QJSValue> values)
+QList<ParsedRoute> parseRoutes(QJSValue values)
 {
     QList<ParsedRoute> ret;
-    for (auto route : values)
-        ret << parseRoute(route);
+    if (values.isArray()) {
+        for (auto route : values.toVariant().toList()) {
+            if (route.toString() != QString()) {
+                ret << ParsedRoute{
+                    route.toString(),
+                    QVariant()
+                };
+            } else {
+                ret << parseRoute(route.value<QJSValue>());
+            }
+        }
+    } else {
+        ret << parseRoute(values);
+    }
     return ret;
 }
 
@@ -36,31 +49,50 @@ void PageRouter::classBegin()
 {
     QQmlComponent *component = new QQmlComponent(qmlEngine(this), this);
     component->setData(
-        QByteArrayLiteral("import QtQuick 2.0; import org.kde.Kirigami 2.7 as Kirigami; PageRow {}"),
+        QByteArrayLiteral("import QtQuick 2.0; import org.kde.kirigami 2.7 as Kirigami; Kirigami.PageRow { anchors.fill: parent }"),
         QUrl(QStringLiteral("pagerouter.cpp"))
     );
     m_pageRow = static_cast<QQuickItem*>(component->create(qmlContext(this)));
+    QQmlProperty::write(m_pageRow, QStringLiteral("parent"), QVariant::fromValue(this));
     connect(this, &PageRouter::initialRouteChanged,
             [=]() {
                 QMetaObject::invokeMethod(m_pageRow, "clear");
+                m_currentRoutes.clear();
                 push(parseRoute(initialRoute()));
             });
 }
 
+void PageRouter::componentComplete()
+{
+    QMetaObject::invokeMethod(m_pageRow, "clear");
+    m_currentRoutes.clear();
+    push(parseRoute(initialRoute()));
+}
+
+bool PageRouter::routesContainsKey(const QString &key)
+{
+    return m_routes.hasProperty(key);
+}
+
+QQmlComponent* PageRouter::routesValueForKey(const QString &key)
+{
+    return m_routes.property(key).toVariant().value<QQmlComponent*>();
+}
+
 void PageRouter::push(ParsedRoute route)
 {
-    if (!m_routes.keys().contains(route.name)) {
+    if (!routesContainsKey(route.name)) {
         qCritical() << "Route" << route.name << "not defined";
         return;
     }
     auto context = qmlContext(this);
-    auto component = m_routes.value(route.name);
+    auto component = routesValueForKey(route.name);
     if (component->status() == QQmlComponent::Ready) {
         auto item = component->create(context);
         // TODO: pester mart about seeing if he knows
         // how to utilise an attached property instead
         item->setProperty("routeData", route.data);
-        QMetaObject::invokeMethod(m_pageRow, "push", Q_ARG(QObject*, item));
+        QMetaObject::invokeMethod(m_pageRow, "push", Q_ARG(QVariant, QVariant::fromValue(item)), Q_ARG(QVariant, QVariant()));
         m_currentRoutes << route;
     } else if (component->status() == QQmlComponent::Loading) {
         connect(component, &QQmlComponent::statusChanged, [=](QQmlComponent::Status status) {
@@ -70,7 +102,7 @@ void PageRouter::push(ParsedRoute route)
             auto item = component->create(context);
             // TODO: See above
             item->setProperty("routeData", route.data);
-            QMetaObject::invokeMethod(m_pageRow, "push", Q_ARG(QObject*, item));
+            QMetaObject::invokeMethod(m_pageRow, "push", Q_ARG(QVariant, QVariant::fromValue(item)), Q_ARG(QVariant, QVariant()));
             m_currentRoutes << route;
         });
     } else {
@@ -78,12 +110,12 @@ void PageRouter::push(ParsedRoute route)
     }
 }
 
-ComponentMap PageRouter::routes() const
+QJSValue PageRouter::routes() const
 {
     return m_routes;
 }
 
-void PageRouter::setRoutes(const ComponentMap &routes)
+void PageRouter::setRoutes(const QJSValue &routes)
 {
     m_routes = routes;
 }
@@ -98,15 +130,16 @@ void PageRouter::setInitialRoute(QJSValue value)
     m_initialRoute = value;
 }
 
-void PageRouter::navigateToRoute(QList<QJSValue> route)
+void PageRouter::navigateToRoute(QJSValue route)
 {
     QMetaObject::invokeMethod(m_pageRow, "clear");
+    m_currentRoutes.clear();
     for (auto route : parseRoutes(route)) {
         push(route);
     }
 }
 
-bool PageRouter::isNavigatedToRoute(QList<QJSValue> route)
+bool PageRouter::isNavigatedToRoute(QJSValue route)
 {
     auto parsed = parseRoutes(route);
     if (parsed.length() > m_currentRoutes.length()) {
