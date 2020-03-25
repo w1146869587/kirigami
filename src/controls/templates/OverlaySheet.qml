@@ -281,7 +281,7 @@ QtObject {
                 target: outerFlickable
                 properties: "contentY"
                 from: -outerFlickable.height
-                to: 0
+                to: Math.max(0, outerFlickable.height - outerFlickable.contentHeight + Units.gridUnit * 2)
                 duration: Units.longDuration
                 easing.type: Easing.OutQuad
             }
@@ -299,8 +299,10 @@ QtObject {
             target: outerFlickable
             properties: "contentY"
             from: outerFlickable.contentY
-            to: scrollView.flickableItem.atYEnd ? outerFlickable.contentHeight - outerFlickable.height + outerFlickable.topEmptyArea + headerItem.height + footerItem.height : 0
-            duration: Units.longDuration
+            to: outerFlickable.visibleArea.yPosition < (1 - outerFlickable.visibleArea.heightRatio)/2 || scrollView.flickableItem.contentHeight < outerFlickable.height
+                ? Math.max(0, outerFlickable.height - outerFlickable.contentHeight + Units.gridUnit * 2)
+                : outerFlickable.contentHeight - outerFlickable.height + outerFlickable.topEmptyArea + headerItem.height + footerItem.height
+            duration: Units.longDuration*10
             easing.type: Easing.OutQuad
         }
 
@@ -310,7 +312,7 @@ QtObject {
                 NumberAnimation {
                     target: outerFlickable
                     properties: "contentY"
-                    to: scrollView.flickableItem.visibleArea.yPosition < (1 - scrollView.flickableItem.visibleArea.heightRatio)/2 ? -mainItem.height : outerFlickable.contentHeight
+                    to: outerFlickable.visibleArea.yPosition < (1 - outerFlickable.visibleArea.heightRatio)/2 ? -mainItem.height : outerFlickable.contentHeight
                     duration: Units.longDuration
                     easing.type: Easing.InQuad
                 }
@@ -339,8 +341,6 @@ QtObject {
 
         FocusScope {
             id: flickableContents
-            //anchors.horizontalCenter: parent.horizontalCenter
-           // x: (mainItem.width - width) / 2
 
             readonly property real listHeaderHeight: scrollView.flickableItem ? -scrollView.flickableItem.originY : 0
 
@@ -431,14 +431,14 @@ QtObject {
                     return;
                 }
 
+                let shouldClose = false;
+
                 // close
                 if (scrollView.flickableItem.atYBeginning) {
                     if (startDraggingPos - contentY > Units.gridUnit * 4 &&
                         contentY < -Units.gridUnit * 4 &&
                         lastMovementWasDown) {
-                        closeAnimation.restart();
-                    } else {
-                        resetAnimation.restart();
+                        shouldClose = true;
                     }
                 }
 
@@ -446,10 +446,14 @@ QtObject {
                     if (contentY - startDraggingPos > Units.gridUnit * 4 &&
                         contentY > contentHeight - height + Units.gridUnit * 4  &&
                         !lastMovementWasDown) {
-                        closeAnimation.restart();
-                    } else {
-                        resetAnimation.restart();
+                        shouldClose = true;
                     }
+                }
+
+                if (shouldClose) {
+                    closeAnimation.restart();
+                } else if (scrollView.flickableItem.atYBeginning || scrollView.flickableItem.atYEnd) {
+                    resetAnimation.restart();
                 }
             }
 
