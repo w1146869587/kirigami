@@ -209,33 +209,6 @@ QtObject {
 
         readonly property int contentItemMaximumWidth: width > Units.gridUnit * 30 ? width * 0.95 : width
 
-        property bool ownSizeUpdate: false
-        function updateContentWidth() {return;
-            if (!contentItem.contentItem) {
-                return;
-            }
-
-            var newWidth = Math.min(contentItemMaximumWidth, Math.max(mainItem.width/2, Math.min(mainItem.width, mainItem.contentItemPreferredWidth)));
-
-            if (scrollView.verticalScrollBar && scrollView.verticalScrollBar.interactive) {
-                newWidth -= scrollView.verticalScrollBar.width;
-            }
-
-            ownSizeUpdate = true;
-            contentItem.contentItem.x = (mainItem.width - newWidth)/2
-            contentItem.contentItem.width = newWidth;
-            ownSizeUpdate = false;
-        }
-        onContentItemMaximumWidthChanged: updateContentWidth()
-        onWidthChanged: updateContentWidth()
-        Connections {
-            target: typeof contentItem.contentItem === "undefined" ? null : contentItem.contentItem
-            onWidthChanged: {
-                if (!mainItem.ownSizeUpdate) {
-                    mainItem.updateContentWidth();
-                }
-            }
-        }
         onHeightChanged: {
             var focusItem;
 
