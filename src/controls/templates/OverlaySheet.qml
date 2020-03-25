@@ -445,7 +445,6 @@ QtObject {
                         right: contentLayout.right
                         margins: Units.smallSpacing
                         top: contentLayout.top
-                        rightMargin: (!headerItem.visible &&  scrollView.verticalScrollBar.visible ? scrollView.verticalScrollBar.width : 0) + Units.smallSpacing
                     }
                     parent: outerFlickable
                     z: 3
@@ -459,6 +458,20 @@ QtObject {
                         hoverEnabled: true
                         anchors.fill: parent
                         onClicked: root.close();
+                    }
+                    Binding {
+                        target: scrollView.verticalScrollBar
+                        property: "anchors.topMargin"
+                        value: headerItem.visible ? 0 : closeIcon.height + closeIcon.anchors.margins * 2
+                    }
+                    Separator {
+                        visible: !headerItem.visible
+                        anchors {
+                            bottom: parent.bottom
+                            right: parent.right
+                            margins: -closeIcon.anchors.margins
+                        }
+                        width: scrollView.verticalScrollBar.width
                     }
                 }
 
