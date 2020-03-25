@@ -342,7 +342,7 @@ QtObject {
             //anchors.horizontalCenter: parent.horizontalCenter
            // x: (mainItem.width - width) / 2
 
-            readonly property real listHeaderHeight: scrollView.flickableItem && root.contentItem.headerItem ? root.contentItem.headerItem.height : 0
+            readonly property real listHeaderHeight: scrollView.flickableItem ? -scrollView.flickableItem.originY : 0
 
             y: (scrollView.contentItem != flickableContents ? -scrollView.flickableItem.contentY - listHeaderHeight  - (headerItem.visible ? headerItem.height : 0): 0)
 
