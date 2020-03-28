@@ -92,24 +92,25 @@ void PageRouter::push(ParsedRoute route)
     auto context = qmlContext(this);
     auto component = routesValueForKey(route.name);
     if (component->status() == QQmlComponent::Ready) {
-        auto item = component->create(context);
-        // TODO: pester mart about seeing if he knows
-        // how to utilise an attached property instead
+        auto item = component->beginCreate(context);
         item->setParent(this);
-        item->setProperty("routeData", route.data);
+        auto clone = route;
+        clone.item = item;
+        m_currentRoutes << clone;
+        component->completeCreate();
         QMetaObject::invokeMethod(m_pageRow, "push", Q_ARG(QVariant, QVariant::fromValue(item)), Q_ARG(QVariant, QVariant()));
-        m_currentRoutes << route;
     } else if (component->status() == QQmlComponent::Loading) {
         connect(component, &QQmlComponent::statusChanged, [=](QQmlComponent::Status status) {
             if (status != QQmlComponent::Ready) {
                 qCritical() << "Failed to push route:" << component->errors();
             }
-            auto item = component->create(context);
-            // TODO: See above
+            auto item = component->beginCreate(context);
             item->setParent(this);
-            item->setProperty("routeData", route.data);
+            auto clone = route;
+            clone.item = item;
+            m_currentRoutes << clone;
+            component->completeCreate();
             QMetaObject::invokeMethod(m_pageRow, "push", Q_ARG(QVariant, QVariant::fromValue(item)), Q_ARG(QVariant, QVariant()));
-            m_currentRoutes << route;
         });
     } else {
         qCritical() << "Failed to push route:" << component->errors();
@@ -169,6 +170,20 @@ void PageRouter::popRoute()
     QMetaObject::invokeMethod(m_pageRow, "pop");
 }
 
+QVariant PageRouter::dataFor(QObject *object)
+{
+    auto pointer = object;
+    while (pointer != nullptr) {
+        for (auto route : m_currentRoutes) {
+            if (route.item == pointer) {
+                return route.data;
+            }
+        }
+        pointer = pointer->parent();
+    }
+    return QVariant();
+}
+
 PageRouterAttached* PageRouter::qmlAttachedProperties(QObject *object)
 {
     auto attached = new PageRouterAttached(object);
@@ -185,6 +200,16 @@ PageRouterAttached* PageRouter::qmlAttachedProperties(QObject *object)
         qCritical() << "PageRouterAttached could not find a parent PageRouter";
     }
     return attached;
+}
+
+QVariant PageRouterAttached::data() const
+{
+    if (m_router) {
+        return m_router->dataFor(parent());
+    } else {
+        qCritical() << "PageRouterAttached does not have a parent PageRouter";
+        return QVariant();
+    }
 }
 
 PageRouterAttached::PageRouterAttached(QObject *parent) : QObject(parent) {}

@@ -242,6 +242,7 @@ void KirigamiPlugin::registerTypes(const char *uri)
     qmlRegisterUncreatableType<BorderGroup>(uri, 2, 12, "BorderGroup", QStringLiteral("Used as grouped property"));
     qmlRegisterUncreatableType<ShadowGroup>(uri, 2, 12, "ShadowGroup", QStringLiteral("Used as grouped property"));
     qmlRegisterType<PageRouter>(uri, 2, 12, "PageRouter");
+    qmlRegisterUncreatableType<PageRouterAttached>(uri, 2, 12, "PageRouterAttached", QStringLiteral("PageRouterAttached cannot be created"));
 
     qmlProtectModule(uri, 2);
 }

@@ -6,6 +6,7 @@
 struct ParsedRoute {
     QString name;
     QVariant data;
+    QObject* item;
 };
 
 class PageRouterAttached;
@@ -46,6 +47,7 @@ public:
     Q_INVOKABLE bool isNavigatedToRoute(QJSValue route);
     Q_INVOKABLE void pushRoute(QJSValue route);
     Q_INVOKABLE void popRoute();
+    QVariant dataFor(QObject* object);
 
     static PageRouterAttached *qmlAttachedProperties(QObject *object);
 
@@ -59,7 +61,7 @@ class PageRouterAttached : public QObject
     Q_OBJECT
 
     Q_PROPERTY(PageRouter *router READ router NOTIFY routerChanged)
-    Q_PROPERTY(QVariant data MEMBER m_data NOTIFY dataChanged)
+    Q_PROPERTY(QVariant data READ data MEMBER m_data NOTIFY dataChanged)
 
 private:
     explicit PageRouterAttached(QObject *parent = nullptr);
@@ -71,7 +73,7 @@ private:
 
 public:
     PageRouter* router() const { return m_router; };
-    QVariant data() const { return m_data; };
+    QVariant data() const;
     Q_INVOKABLE void navigateToRoute(QJSValue route) { m_router->navigateToRoute(route); };
     Q_INVOKABLE bool isNavigatedToRoute(QJSValue route) { return m_router->isNavigatedToRoute(route); };
     Q_INVOKABLE void pushRoute(QJSValue route) { m_router->pushRoute(route); };
