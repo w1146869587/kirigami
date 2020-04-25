@@ -30,6 +30,7 @@ set(kirigami_SRCS
     colorutils.cpp
     pagerouter.cpp
     avatar.cpp
+    physics.cpp
     scenegraph/shadowedrectanglenode.cpp
     scenegraph/shadowedrectanglematerial.cpp
     scenegraph/shadowedborderrectanglematerial.cpp

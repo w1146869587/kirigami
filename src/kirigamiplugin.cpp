@@ -23,6 +23,7 @@
 #include "pagerouter.h"
 #include "imagecolors.h"
 #include "avatar.h"
+#include "physics_p.h"
 
 #include <QQmlEngine>
 #include <QQmlContext>
@@ -262,6 +263,9 @@ void KirigamiPlugin::registerTypes(const char *uri)
     qmlRegisterSingletonType<AvatarPrivate>("org.kde.kirigami.private", 2, 13, "AvatarPrivate", [] (QQmlEngine*, QJSEngine*) -> QObject* { return new AvatarPrivate; });
     qmlRegisterType(componentUrl(QStringLiteral("Avatar.qml")), uri, 2, 13, "Avatar");
     qmlRegisterType(componentUrl(QStringLiteral("swipenavigator/SwipeNavigator.qml")), uri, 2, 13, "SwipeNavigator");
+
+    qmlRegisterUncreatableType<Tolerance>(uri, 2, 12, "Tolerance", QStringLiteral("Tolerance cannot be created"));
+    qmlRegisterType<DragSimulation>(uri, 2, 12, "DragSimulation");
 
     qmlProtectModule(uri, 2);
 }
