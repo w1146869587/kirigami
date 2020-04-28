@@ -408,6 +408,7 @@ Q_SIGNALS:
     void initialRouteChanged();
     void pageStackChanged();
     void currentIndexChanged();
+    void navigationChanged();
 };
 
 /**
@@ -432,12 +433,25 @@ class PageRouterAttached : public QObject
      * Accessing this property outside of a PageRouter will result in undefined behaviour.
      */
     Q_PROPERTY(bool isCurrent READ isCurrent NOTIFY isCurrentChanged)
+    
+    /**
+     * Which route this PageRouterAttached should watch for.
+     * 
+     * @include PageRouterWatchedRoute.qml
+     */
+    Q_PROPERTY(QJSValue watchedRoute READ watchedRoute WRITE setWatchedRoute NOTIFY watchedRouteChanged)
+
+    /**
+     * Whether the watchedRoute is currently active.
+     */
+    Q_PROPERTY(bool watchedRouteActive READ watchedRouteActive NOTIFY navigationChanged)
 
 private:
     explicit PageRouterAttached(QObject *parent = nullptr);
 
     QPointer<PageRouter> m_router;
     QVariant m_data;
+    QJSValue m_watchedRoute;
 
     friend class PageRouter;
 
@@ -455,11 +469,16 @@ public:
     Q_INVOKABLE void popRoute() { m_router->popRoute(); };
     // @see PageRouter::bringToView()
     Q_INVOKABLE void bringToView(QJSValue route) { m_router->bringToView(route); };
+    bool watchedRouteActive();
+    void setWatchedRoute(QJSValue route);
+    QJSValue watchedRoute();
 
 Q_SIGNALS:
     void routerChanged();
     void dataChanged();
     void isCurrentChanged();
+    void navigationChanged();
+    void watchedRouteChanged();
 };
 
 QML_DECLARE_TYPEINFO(PageRouter, QML_HAS_ATTACHED_PROPERTIES)

@@ -246,6 +246,7 @@ void PageRouter::navigateToRoute(QJSValue route)
     for (auto toPush : resolvedRoutes) {
         push(toPush);
     }
+    Q_EMIT navigationChanged();
 }
 
 void PageRouter::bringToView(QJSValue route)
@@ -289,6 +290,7 @@ bool PageRouter::routeActive(QJSValue route)
 void PageRouter::pushRoute(QJSValue route)
 {
     push(parseRoute(route));
+    Q_EMIT navigationChanged();
 }
 
 void PageRouter::popRoute()
@@ -298,6 +300,7 @@ void PageRouter::popRoute()
         m_currentRoutes.last().item->deleteLater();
     }
     m_currentRoutes.removeLast();
+    Q_EMIT navigationChanged();
 }
 
 QVariant PageRouter::dataFor(QObject *object)
@@ -338,6 +341,7 @@ PageRouterAttached* PageRouter::qmlAttachedProperties(QObject *object)
     auto seekParent = [](QObject *seek) -> PageRouter* {
         auto pointer = seek;
         while (pointer != nullptr) {
+            qDebug() << "\t" << pointer->metaObject()->className();
             auto casted = qobject_cast<PageRouter*>(pointer);
             if (casted != nullptr) {
                 return casted;
@@ -347,20 +351,25 @@ PageRouterAttached* PageRouter::qmlAttachedProperties(QObject *object)
         return nullptr;
     };
     if (asItem) {
+        qDebug() << "climbing up visual tree";
         while (asItem != nullptr) {
+            qDebug() << asItem->metaObject()->className();
             auto parent = seekParent(asItem);
             if (parent != nullptr) {
                 attached->m_router = parent;
                 connect(parent, &PageRouter::currentIndexChanged, attached, &PageRouterAttached::isCurrentChanged);
+                connect(parent, &PageRouter::navigationChanged, attached, &PageRouterAttached::navigationChanged);
                 break;
             }
             asItem = asItem->parentItem();
         }
     } else {
+        qDebug() << "climbing up object tree";
         auto parent = seekParent(object);
         if (parent != nullptr) {
             attached->m_router = parent;
             connect(parent, &PageRouter::currentIndexChanged, attached, &PageRouterAttached::isCurrentChanged);
+            connect(parent, &PageRouter::navigationChanged, attached, &PageRouterAttached::navigationChanged);
         }
     }
     if (attached->m_router.isNull()) {
@@ -387,6 +396,22 @@ bool PageRouterAttached::isCurrent() const
         qCritical() << "PageRouterAttached does not have a parent PageRouter";
         return false;
     }
+}
+
+bool PageRouterAttached::watchedRouteActive()
+{
+    return routeActive(m_watchedRoute);
+}
+
+void PageRouterAttached::setWatchedRoute(QJSValue route)
+{
+    m_watchedRoute = route;
+    Q_EMIT watchedRouteChanged();
+}
+
+QJSValue PageRouterAttached::watchedRoute()
+{
+    return m_watchedRoute;
 }
 
 QJSValue PageRouter::currentRoutes() const
