@@ -47,13 +47,12 @@ struct ImageData {
     QList<colorStat> m_clusters;
     QVariantList m_palette;
 
+    bool m_darkPalette = true;
     QColor m_dominant;
+    QColor m_dominantContrast;
     QColor m_average;
     QColor m_highlight;
 
-    
-    QColor m_suggestedContrast;
-    QColor m_mostSaturated;
     QColor m_closestToBlack;
     QColor m_closestToWhite;
 };
@@ -62,11 +61,15 @@ class ImageColors : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QVariant source READ source WRITE setSource NOTIFY sourceChanged)
+
     Q_PROPERTY(QVariantList palette READ palette NOTIFY paletteChanged)
+    Q_PROPERTY(bool isDarkPalette READ isDarkPalette NOTIFY isDarkPaletteChanged)
 
     Q_PROPERTY(QColor average READ average NOTIFY averageChanged)
-    Q_PROPERTY(QColor suggestedContrast READ suggestedContrast NOTIFY suggestedContrastChanged)
-    Q_PROPERTY(QColor mostSaturated READ mostSaturated NOTIFY mostSaturatedChanged)
+    Q_PROPERTY(QColor dominant READ dominant NOTIFY dominantChanged)
+    Q_PROPERTY(QColor dominantContrast READ dominantContrast NOTIFY dominantContrastChanged)
+
+    Q_PROPERTY(QColor highlight READ highlight NOTIFY highlightChanged)
     Q_PROPERTY(QColor closestToWhite READ closestToWhite NOTIFY closestToWhiteChanged)
     Q_PROPERTY(QColor closestToBlack READ closestToBlack NOTIFY closestToBlackChanged)
 
@@ -86,18 +89,22 @@ public:
     Q_INVOKABLE void update();
 
     QVariantList palette() const;
+    bool isDarkPalette() const;
     QColor average() const;
-    QColor suggestedContrast() const;
-    QColor mostSaturated() const;
+    QColor dominant() const;
+    QColor dominantContrast() const;
+    QColor highlight() const;
     QColor closestToWhite() const;
     QColor closestToBlack() const;
 
 Q_SIGNALS:
     void sourceChanged();
     void paletteChanged();
+    void isDarkPaletteChanged();
     void averageChanged();
-    void suggestedContrastChanged();
-    void mostSaturatedChanged();
+    void dominantChanged();
+    void dominantContrastChanged();
+    void highlightChanged();
     void closestToBlackChanged();
     void closestToWhiteChanged();
 

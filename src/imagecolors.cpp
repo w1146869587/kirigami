@@ -146,11 +146,12 @@ void ImageColors::update()
                     m_futureImageData = nullptr;
 
                     emit paletteChanged();
+                    emit isDarkPaletteChanged();
                     emit averageChanged();
-                    emit mostSaturatedChanged();
+                    emit highlightChanged();
                     emit closestToBlackChanged();
                     emit closestToWhiteChanged();
-                    emit suggestedContrastChanged();
+                    emit dominantContrastChanged();
                 });
         m_futureImageData->setFuture(future);
     };
@@ -300,7 +301,7 @@ ImageData ImageColors::generatePalette(const QImage &sourceImage)
         imageData.m_clusters.erase(i);
     }
 
-    imageData.m_mostSaturated = QColor();
+    imageData.m_highlight = QColor();
     imageData.m_dominant = QColor(imageData.m_clusters.first().centroid);
     imageData.m_closestToBlack = Qt::white;
     imageData.m_closestToWhite = Qt::black;
@@ -352,13 +353,14 @@ ImageData ImageColors::generatePalette(const QImage &sourceImage)
         entry[QStringLiteral("contrastColor")] = contrast;
 
         if (first) {
-            imageData.m_suggestedContrast = contrast;
+            imageData.m_dominantContrast = contrast;
+            imageData.m_dominant = color;
         }
         first = false;
 
 
-        if (color.saturation() + (158 - qAbs(158 - color.value())) > imageData.m_mostSaturated.saturation() + (158 - qAbs(158 - imageData.m_mostSaturated.value()))) {
-            imageData.m_mostSaturated = color;
+        if (color.saturation() + (158 - qAbs(158 - color.value())) > imageData.m_highlight.saturation() + (158 - qAbs(158 - imageData.m_highlight.value()))) {
+            imageData.m_highlight = color;
         }
 
         if (qGray(color.rgb()) > qGray(imageData.m_closestToWhite.rgb())) {
@@ -378,19 +380,29 @@ QVariantList ImageColors::palette() const
     return m_imageData.m_palette;
 }
 
+bool ImageColors::isDarkPalette() const
+{
+    return qGray(m_imageData.m_dominant.rgb()) < 128;
+}
+
 QColor ImageColors::average() const
 {
     return m_imageData.m_average;
 }
 
-QColor ImageColors::suggestedContrast() const
+QColor ImageColors::dominant() const
 {
-    return m_imageData.m_suggestedContrast;
+    return m_imageData.m_dominant;
 }
 
-QColor ImageColors::mostSaturated() const
+QColor ImageColors::dominantContrast() const
 {
-    return m_imageData.m_mostSaturated;
+    return m_imageData.m_dominantContrast;
+}
+
+QColor ImageColors::highlight() const
+{
+    return m_imageData.m_highlight;
 }
 
 QColor ImageColors::closestToWhite() const
