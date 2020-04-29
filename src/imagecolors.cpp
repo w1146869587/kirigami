@@ -292,7 +292,6 @@ ImageData ImageColors::generatePalette(const QImage &sourceImage)
     imageData.m_dominant = QColor(imageData.m_clusters.first().centroid);
     imageData.m_closestToBlack = Qt::white;
     imageData.m_closestToWhite = Qt::black;
-    int minimumDistance = 4681800; //max distance: 4*3*2*3*255*255
 
     imageData.m_palette.clear();
 
@@ -304,18 +303,40 @@ ImageData ImageColors::generatePalette(const QImage &sourceImage)
         entry[QStringLiteral("color")] = color;
         entry[QStringLiteral("ratio")] = stat.ratio;
 
-        QColor contrast = QColor(255 - imageData.m_dominant.red(), 255 - imageData.m_dominant.green(), 255 - imageData.m_dominant.blue());
+        QColor contrast = QColor(255 - color.red(), 255 - color.green(), 255 - color.blue());
         contrast.setHsl(contrast.hslHue(),
-                               contrast.hslSaturation(),
-                               128 + (128 - contrast.lightness()));
+                        contrast.hslSaturation(),
+                        128 + (128 - contrast.lightness()));
+        QColor tempContrast;
+        int minimumDistance = 4681800; //max distance: 4*3*2*3*255*255
         for (const auto &stat : imageData.m_clusters) {
             const int distance = squareDistance(contrast.rgb(), stat.centroid);
 
             if (distance < minimumDistance) {
-                contrast = QColor(stat.centroid);
+                tempContrast = QColor(stat.centroid);
                 minimumDistance = distance;
             }
         }
+
+
+        if (imageData.m_clusters.size() < 3) {
+            if (qGray(imageData.m_dominant.rgb()) < 120) {
+                contrast = QColor(230, 230, 230);
+            } else {
+                contrast = QColor(20, 20, 20);
+            }
+        // TODO: replace m_clusters.size() > 3 with entropy calculation
+        } else if (squareDistance(contrast.rgb(), tempContrast.rgb()) < s_minimumSquareDistance * 1.5) {
+            contrast = tempContrast;
+        } else {
+            contrast = tempContrast;
+            contrast.setHsl(contrast.hslHue(),
+                                contrast.hslSaturation(),
+                                contrast.lightness() > 128
+                                    ? contrast.lightness() + 20
+                                    : contrast.lightness() - 20);
+        }
+
         entry[QStringLiteral("contrastColor")] = contrast;
 
         if (first) {
@@ -323,25 +344,6 @@ ImageData ImageColors::generatePalette(const QImage &sourceImage)
         }
         first = false;
 
-/*TODO:remove?
-        // TODO: replace m_clusters.size() > 3 with entropy calculation
-        if (imageData.m_clusters.size() > 3 && squareDistance(contrast.rgb(), tempContrast.rgb()) < s_minimumSquareDistance * 1.5) {
-            contrast = tempContrast;
-        } else if (imageData.m_clusters.size() > 2) {
-            contrast = QColor(imageData.m_clusters[1].centroid);
-        } else if (imageData.m_clusters.size() > 1) {
-            contrast = QColor(imageData.m_clusters[1].centroid);
-            contrast.setHsl(contrast.hslHue(),
-                                contrast.hslSaturation(),
-                                contrast.lightness() > 128
-                                    ? contrast.lightness()+20
-                                    : contrast.lightness()-20);
-        } else if (qGray(imageData.m_dominant.rgb()) < 120) {
-            contrast = QColor(230, 230, 230);
-        } else {
-            contrast = QColor(20, 20, 20);
-        }
-*/
 
         if (color.saturation() + (158 - qAbs(158 - color.value())) > imageData.m_mostSaturated.saturation() + (158 - qAbs(158 - imageData.m_mostSaturated.value()))) {
             imageData.m_mostSaturated = color;

@@ -21,6 +21,7 @@
 #include "shadowedtexture.h"
 #include "colorutils.h"
 #include "pagerouter.h"
+#include "imagecolors.h"
 
 #include <QQmlEngine>
 #include <QQmlContext>
@@ -253,6 +254,9 @@ void KirigamiPlugin::registerTypes(const char *uri)
     qmlRegisterType<PageRouter>(uri, 2, 12, "PageRouter");
     qmlRegisterType<PageRoute>(uri, 2, 12, "PageRoute");
     qmlRegisterUncreatableType<PageRouterAttached>(uri, 2, 12, "PageRouterAttached", QStringLiteral("PageRouterAttached cannot be created"));
+
+    // 2.13
+    qmlRegisterType<ImageColors>(uri, 2, 13, "ImageColors");
 
     qmlProtectModule(uri, 2);
 }
