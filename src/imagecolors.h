@@ -64,6 +64,7 @@ class ImageColors : public QObject
     Q_PROPERTY(QVariant source READ source WRITE setSource NOTIFY sourceChanged)
     Q_PROPERTY(QVariantList palette READ palette NOTIFY paletteChanged)
 
+    Q_PROPERTY(QColor average READ average NOTIFY averageChanged)
     Q_PROPERTY(QColor suggestedContrast READ suggestedContrast NOTIFY suggestedContrastChanged)
     Q_PROPERTY(QColor mostSaturated READ mostSaturated NOTIFY mostSaturatedChanged)
     Q_PROPERTY(QColor closestToWhite READ closestToWhite NOTIFY closestToWhiteChanged)
@@ -85,6 +86,7 @@ public:
     Q_INVOKABLE void update();
 
     QVariantList palette() const;
+    QColor average() const;
     QColor suggestedContrast() const;
     QColor mostSaturated() const;
     QColor closestToWhite() const;
@@ -93,6 +95,7 @@ public:
 Q_SIGNALS:
     void sourceChanged();
     void paletteChanged();
+    void averageChanged();
     void suggestedContrastChanged();
     void mostSaturatedChanged();
     void closestToBlackChanged();

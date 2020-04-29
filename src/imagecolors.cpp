@@ -47,9 +47,9 @@ void ImageColors::setSource(const QVariant &source)
     } else if (source.canConvert<QImage>()) {
         setSourceImage(source.value<QImage>());
     } else if (source.canConvert<QIcon>()) {
-        setSourceImage(source.value<QIcon>().pixmap(32,32).toImage());
+        setSourceImage(source.value<QIcon>().pixmap(128, 128).toImage());
     } else if (source.canConvert<QString>()) {
-        setSourceImage(QIcon::fromTheme(source.toString()).pixmap(32,32).toImage());
+        setSourceImage(QIcon::fromTheme(source.toString()).pixmap(128, 128).toImage());
     } else {
         return;
     }
@@ -146,6 +146,7 @@ void ImageColors::update()
                     m_futureImageData = nullptr;
 
                     emit paletteChanged();
+                    emit averageChanged();
                     emit mostSaturatedChanged();
                     emit closestToBlackChanged();
                     emit closestToWhiteChanged();
@@ -166,7 +167,7 @@ void ImageColors::update()
         m_grabResult.clear();
     }
 
-    m_grabResult = m_sourceItem->grabToImage(QSize(32,32));
+    m_grabResult = m_sourceItem->grabToImage(QSize(128, 128));
 
     if (m_grabResult) {
         connect(m_grabResult.data(), &QQuickItemGrabResult::ready, this, [this, runUpdate]() {
@@ -218,14 +219,23 @@ ImageData ImageColors::generatePalette(const QImage &sourceImage)
     imageData.m_samples.clear();
 
     QColor sampleColor;
+    int r = 0;
+    int g = 0;
+    int b = 0;
+    int c = 0;
     for (int x = 0; x < sourceImage.width(); ++x) {
         for (int y = 0; y < sourceImage.height(); ++y) {
             sampleColor = sourceImage.pixelColor(x, y);
             if (sampleColor.alpha() == 0) {
                 continue;
             }
-            imageData.m_samples << sampleColor.rgb();
-            positionColor(sampleColor.rgb(), imageData.m_clusters);
+            QRgb rgb = sampleColor.rgb();
+            c++;
+            r += qRed(rgb);
+            g += qGreen(rgb);
+            b += qBlue(rgb);
+            imageData.m_samples << rgb;
+            positionColor(rgb, imageData.m_clusters);
         }
     }
 
@@ -233,12 +243,14 @@ ImageData ImageColors::generatePalette(const QImage &sourceImage)
         return imageData;
     }
 
+    imageData.m_average = QColor(r/c, g/c, b/c, 255);
+
     for (int iteration = 0; iteration < 5; ++iteration) {
         for (auto &stat : imageData.m_clusters) {
-            int r = 0;
-            int g = 0;
-            int b = 0;
-            int c = 0;
+            r = 0;
+            g = 0;
+            b = 0;
+            c = 0;
 
             for (auto color : stat.colors) {
                 c++;
@@ -319,7 +331,7 @@ ImageData ImageColors::generatePalette(const QImage &sourceImage)
         }
 
 
-        if (imageData.m_clusters.size() < 3) {
+        if (imageData.m_clusters.size() <= 3) {
             if (qGray(imageData.m_dominant.rgb()) < 120) {
                 contrast = QColor(230, 230, 230);
             } else {
@@ -331,10 +343,10 @@ ImageData ImageColors::generatePalette(const QImage &sourceImage)
         } else {
             contrast = tempContrast;
             contrast.setHsl(contrast.hslHue(),
-                                contrast.hslSaturation(),
-                                contrast.lightness() > 128
-                                    ? contrast.lightness() + 20
-                                    : contrast.lightness() - 20);
+                            contrast.hslSaturation(),
+                            contrast.lightness() > 128
+                                ? qMin(contrast.lightness() + 20, 255)
+                                : qMax(0, contrast.lightness() - 20));
         }
 
         entry[QStringLiteral("contrastColor")] = contrast;
@@ -364,6 +376,11 @@ ImageData ImageColors::generatePalette(const QImage &sourceImage)
 QVariantList ImageColors::palette() const
 {
     return m_imageData.m_palette;
+}
+
+QColor ImageColors::average() const
+{
+    return m_imageData.m_average;
 }
 
 QColor ImageColors::suggestedContrast() const
