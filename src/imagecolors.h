@@ -104,7 +104,9 @@ class ImageColors : public QObject
     Q_PROPERTY(QColor dominantContrast READ dominantContrast NOTIFY paletteChanged)
 
     /**
-     * An "accent" color extracted from the image, heuristically found most "vibrant" color from the cluster
+     * An "accent" color extracted from the image, heuristically found most "vibrant" color from the cluster with L*a*b Chroma
+     * https://en.wikipedia.org/wiki/Colorfulness#Chroma
+     * which is a better indication than saturation as doesn't decrease with lightness
      */
     Q_PROPERTY(QColor highlight READ highlight NOTIFY paletteChanged)
 
