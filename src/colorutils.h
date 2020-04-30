@@ -177,4 +177,6 @@ public:
      * \sa Qt.tint()
      */
     Q_INVOKABLE QColor tintWithAlpha(const QColor &targetColor, const QColor &tintColor, double alpha);
+
+    Q_INVOKABLE static qreal chroma(const QColor &color);
 };

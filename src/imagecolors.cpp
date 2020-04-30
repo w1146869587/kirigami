@@ -17,6 +17,7 @@
  */
 
 #include "imagecolors.h"
+#include "colorutils.h"
 
 #include <QColor>
 #include <QDebug>
@@ -353,7 +354,7 @@ ImageData ImageColors::generatePalette(const QImage &sourceImage)
         first = false;
 
 
-        if (color.saturation() + (158 - qAbs(158 - color.value())) > imageData.m_highlight.saturation() + (158 - qAbs(158 - imageData.m_highlight.value()))) {
+        if (!imageData.m_highlight.isValid() || ColorUtils::chroma(color) > ColorUtils::chroma(imageData.m_highlight)) {
             imageData.m_highlight = color;
         }
 
