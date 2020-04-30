@@ -60,18 +60,77 @@ struct ImageData {
 class ImageColors : public QObject
 {
     Q_OBJECT
+    /**
+     * The source which colors should be analyzed, it can be:
+     * * Any Item: it will be rendered to an image and the static grab 
+     * analyzed. It won't be updated if the item changes, but manual 
+     * calls to update() are needed.
+     * * A QImage (for example coming from a QAbstractItemModel data role)
+     * * A QIcon (for example coming from a QAbstractItemModel data role)
+     * * An icon name: an icon name present in the theme.
+     */
     Q_PROPERTY(QVariant source READ source WRITE setSource NOTIFY sourceChanged)
 
+    /**
+     * A list of the color palette extracted from the image.
+     * It uses K-means-clustering tecnique, by averaging groups of
+     * "similar" colors https://en.wikipedia.org/wiki/K-means_clustering
+     * it's a list of maps containing the following keys:
+     * * "color": the color of the cluster
+     * * "ratio": the ratio from 0 t0 1 of diffusion of the cluster in the image
+     * * "contrastingColor": another color from the clusters (if possible) that is the nearest to its negative
+     * The maps are ordered by "ratio": the first element is the dominant color of the image
+     */
     Q_PROPERTY(QVariantList palette READ palette NOTIFY paletteChanged)
-    Q_PROPERTY(bool isDarkPalette READ isDarkPalette NOTIFY isDarkPaletteChanged)
 
-    Q_PROPERTY(QColor average READ average NOTIFY averageChanged)
-    Q_PROPERTY(QColor dominant READ dominant NOTIFY dominantChanged)
-    Q_PROPERTY(QColor dominantContrast READ dominantContrast NOTIFY dominantContrastChanged)
+    /**
+     * If true, it should be considered a "Dark" color palette (this if the dominant color is darker than a 50% gray
+     */
+    Q_PROPERTY(bool isDarkPalette READ isDarkPalette NOTIFY paletteChanged)
 
-    Q_PROPERTY(QColor highlight READ highlight NOTIFY highlightChanged)
-    Q_PROPERTY(QColor closestToWhite READ closestToWhite NOTIFY closestToWhiteChanged)
-    Q_PROPERTY(QColor closestToBlack READ closestToBlack NOTIFY closestToBlackChanged)
+    /**
+     * The average color of the whole image.
+     */
+    Q_PROPERTY(QColor average READ average NOTIFY paletteChanged)
+
+    /**
+     * The dominant color of the image. This is the color of the cluster which covers the bigger area of the image
+     */
+    Q_PROPERTY(QColor dominant READ dominant NOTIFY paletteChanged)
+
+    /**
+     * Suggested "contrasting" color to the dominant one. It's the color in the palette nearest to the negative of the dominant
+     */
+    Q_PROPERTY(QColor dominantContrast READ dominantContrast NOTIFY paletteChanged)
+
+    /**
+     * An "accent" color extracted from the image, heuristically found most "vibrant" color from the cluster
+     */
+    Q_PROPERTY(QColor highlight READ highlight NOTIFY paletteChanged)
+
+    /**
+     * A color suggested for foreground items over the image
+     * * on dark palettes will be closestToWhite if light enough, or a very light gray otherwise
+     * * on light palettes will be closestToBlack if dark enough or a very dark gray
+     */
+    Q_PROPERTY(QColor foreground READ foreground NOTIFY paletteChanged)
+
+    /**
+     * A color suggested for background items over the image, like a dialog frame
+     * * on light palettes will be closestToWhite if light enough, or a very light gray otherwise
+     * * on dark palettes will be closestToBlack if dark enough or a very dark gray
+     */
+    Q_PROPERTY(QColor background READ background NOTIFY paletteChanged)
+
+    /**
+     * The lightest color that was found in clusters
+     */
+    Q_PROPERTY(QColor closestToWhite READ closestToWhite NOTIFY paletteChanged)
+
+    /**
+     * The darkest color found in clusters
+     */
+    Q_PROPERTY(QColor closestToBlack READ closestToBlack NOTIFY paletteChanged)
 
 public:
     explicit ImageColors(QObject* parent = nullptr);
@@ -94,19 +153,14 @@ public:
     QColor dominant() const;
     QColor dominantContrast() const;
     QColor highlight() const;
+    QColor foreground() const;
+    QColor background() const;
     QColor closestToWhite() const;
     QColor closestToBlack() const;
 
 Q_SIGNALS:
     void sourceChanged();
     void paletteChanged();
-    void isDarkPaletteChanged();
-    void averageChanged();
-    void dominantChanged();
-    void dominantContrastChanged();
-    void highlightChanged();
-    void closestToBlackChanged();
-    void closestToWhiteChanged();
 
 private:
     static inline void positionColor(QRgb rgb, QList<ImageData::colorStat> &clusters);

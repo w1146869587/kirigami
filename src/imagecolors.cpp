@@ -146,12 +146,6 @@ void ImageColors::update()
                     m_futureImageData = nullptr;
 
                     emit paletteChanged();
-                    emit isDarkPaletteChanged();
-                    emit averageChanged();
-                    emit highlightChanged();
-                    emit closestToBlackChanged();
-                    emit closestToWhiteChanged();
-                    emit dominantContrastChanged();
                 });
         m_futureImageData->setFuture(future);
     };
@@ -398,6 +392,36 @@ QColor ImageColors::dominant() const
 QColor ImageColors::dominantContrast() const
 {
     return m_imageData.m_dominantContrast;
+}
+
+QColor ImageColors::foreground() const
+{
+    if (isDarkPalette()) {
+        if (qGray(m_imageData.m_closestToWhite.rgb()) < 200) {
+            return QColor(230, 230, 230);
+        }
+        return m_imageData.m_closestToWhite;
+    } else {
+        if (qGray(m_imageData.m_closestToBlack.rgb()) > 80) {
+            return QColor(20, 20, 20);
+        }
+        return m_imageData.m_closestToBlack;
+    }
+}
+
+QColor ImageColors::background() const
+{
+    if (isDarkPalette()) {
+        if (qGray(m_imageData.m_closestToBlack.rgb()) > 80) {
+            return QColor(20, 20, 20);
+        }
+        return m_imageData.m_closestToBlack;
+    } else {
+        if (qGray(m_imageData.m_closestToWhite.rgb()) < 200) {
+            return QColor(230, 230, 230);
+        }
+        return m_imageData.m_closestToWhite;
+    }
 }
 
 QColor ImageColors::highlight() const
