@@ -1,0 +1,124 @@
+# Vincenzo Reale <smart2128@baslug.org>, 2017, 2018, 2019.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2019-12-13 20:09+0100\n"
+"Last-Translator: Vincenzo Reale <smart2128@baslug.org>\n"
+"Language-Team: Italian <kde-i18n-it@kde.org>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 19.12.0\n"
+"X-Qt-Contexts: true\n"
+
+#: controls/AboutPage.qml:66
+msgctxt "AboutPage|"
+msgid "About"
+msgstr "Informazioni"
+
+#: controls/AboutPage.qml:92
+#, qt-format
+msgctxt "AboutPage|"
+msgid "%1 <%2>"
+msgstr "%1 <%2>"
+
+#: controls/AboutPage.qml:130
+msgctxt "AboutPage|"
+msgid "Copyright"
+msgstr "Copyright"
+
+#: controls/AboutPage.qml:153
+msgctxt "AboutPage|"
+msgid "License:"
+msgstr "Licenza:"
+
+#: controls/AboutPage.qml:166
+#, qt-format
+msgctxt "AboutPage|"
+msgid "License: %1"
+msgstr "Licenza: %1"
+
+#: controls/AboutPage.qml:177
+msgctxt "AboutPage|"
+msgid "Libraries in use"
+msgstr "Librerie in uso"
+
+#: controls/AboutPage.qml:191
+msgctxt "AboutPage|"
+msgid "Authors"
+msgstr "Autori"
+
+#: controls/AboutPage.qml:201
+msgctxt "AboutPage|"
+msgid "Credits"
+msgstr "Ringraziamenti"
+
+#: controls/AboutPage.qml:212
+msgctxt "AboutPage|"
+msgid "Translators"
+msgstr "Traduttori"
+
+#: controls/ContextDrawer.qml:66
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "Azioni"
+
+#: controls/GlobalDrawer.qml:464
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "Indietro"
+
+#: controls/GlobalDrawer.qml:507
+msgctxt "GlobalDrawer|"
+msgid "Close Sidebar"
+msgstr "Chiudi la barra laterale"
+
+#: controls/PasswordField.qml:32
+msgctxt "PasswordField|"
+msgid "Password"
+msgstr "Password"
+
+#: controls/SearchField.qml:31
+msgctxt "SearchField|"
+msgid "Search..."
+msgstr "Cerca..."
+
+#: controls/templates/private/BackButton.qml:34
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "Naviga indietro"
+
+#: controls/templates/private/ForwardButton.qml:30
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "Naviga in avanti"
+
+#: controls/ToolBarApplicationHeader.qml:113
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "Altre azioni"
+
+#: controls/UrlButton.qml:45
+msgctxt "UrlButton|"
+msgid "Copy link address"
+msgstr "Copia indirizzo del collegamento"
+
+#: settings.cpp:196
+#, qt-format
+msgctxt "Settings|"
+msgid "KDE Frameworks %1"
+msgstr "KDE Frameworks %1"
+
+#: settings.cpp:198
+#, qt-format
+msgctxt "Settings|"
+msgid "The %1 windowing system"
+msgstr "Il sistema di gestione delle finestre %1"
+
+#: settings.cpp:199
+#, qt-format
+msgctxt "Settings|"
+msgid "Qt %2 (built against %3)"
+msgstr "Qt %2 (compilato con %3)"
