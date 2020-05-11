@@ -178,5 +178,20 @@ public:
      */
     Q_INVOKABLE QColor tintWithAlpha(const QColor &targetColor, const QColor &tintColor, double alpha);
 
+    /**
+     * Returns the Cielab "Chroma" of the color which is a slightly better quantificator for how much a color appears https://en.wikipedia.org/wiki/Colorfulness
+     * This is how much a color looks diffenent from a gray of the same
+     * brightness and is not dependent from the color light value.
+     * It's a value between 0 and arund 141.42 (sqrt(a^2+b^2) where a and b are between -100 and 100)
+     */
     Q_INVOKABLE static qreal chroma(const QColor &color);
+
+    struct LabColor {
+        qreal l = 0;
+        qreal a = 0;
+        qreal b = 0;
+    };
+
+    // Not for QML, returns the comvertion from srgb of a QColor and Lab colorspace
+    static ColorUtils::LabColor colorToLab(const QColor &color);
 };

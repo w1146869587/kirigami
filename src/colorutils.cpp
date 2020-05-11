@@ -211,9 +211,8 @@ QColor ColorUtils::tintWithAlpha(const QColor &targetColor, const QColor &tintCo
     );
 }
 
-qreal ColorUtils::chroma(const QColor &color)
+ColorUtils::LabColor ColorUtils::colorToLab(const QColor &color)
 {
-    // TODO: this lab conversion should be accessible elsewhere too?
     //  http://wiki.nuaj.net/index.php/Color_Transforms#RGB_.E2.86.92_XYZ
     // First: convert to XYZ
     qreal r = color.redF();
@@ -267,10 +266,18 @@ qreal ColorUtils::chroma(const QColor &color)
         z = (7.787 * z) +  (16.0 / 116.0);
     }
 
-    qreal cieL = (116 * y) - 16;
-    qreal ciea = 500 * (x - y);
-    qreal cieb = 200 * (y - z);
+    LabColor labColor;
+    labColor.l = (116 * y) - 16;
+    labColor.a = 500 * (x - y);
+    labColor.b = 200 * (y - z);
 
-    // Third: chroma is hypotenuse of a and b
-    return sqrt(pow(ciea,2) + pow(cieb, 2));
+    return labColor;
+}
+
+qreal ColorUtils::chroma(const QColor &color)
+{
+    LabColor labColor = colorToLab(color);
+
+    // Chroma is hypotenuse of a and b
+    return sqrt(pow(labColor.a, 2) + pow(labColor.b, 2));
 }

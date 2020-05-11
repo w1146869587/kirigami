@@ -177,6 +177,7 @@ void ImageColors::update()
 inline int squareDistance(QRgb color1, QRgb color2)
 {
     // https://en.wikipedia.org/wiki/Color_difference
+    // Using RGB distance for performance, as CIEDE2000 istoo complicated
     if (qRed(color1) - qRed(color2) < 128) {
         return 2 * pow(qRed(color1) - qRed(color2), 2) +
             4 * pow(qGreen(color1) - qGreen(color2), 2) +
