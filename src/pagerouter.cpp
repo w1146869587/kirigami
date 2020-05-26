@@ -365,11 +365,11 @@ QSet<QObject*> flatParentTree(QObject* object)
             while (parent != nullptr) {
                 out << parent;
                 // We manually call metaObject()->inherits() and
-                // use a C-style cast because qobject_cast seems
+                // use a reinterpret cast because qobject_cast seems
                 // to have stability issues here due to mutable 
                 // pointer mechanics.
                 if (parent->metaObject()->inherits(metaObject)) {
-                    climbItemParents(out, (QQuickItem*)parent);
+                    climbItemParents(out, reinterpret_cast<QQuickItem*>(parent));
                 }
                 parent = parent->parent();
             }
