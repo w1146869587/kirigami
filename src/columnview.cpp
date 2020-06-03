@@ -1027,6 +1027,9 @@ void ColumnView::insertItem(int pos, QQuickItem *item)
     connect(item, &QObject::destroyed, m_contentItem, [this, item]() {
         removeItem(item);
     });
+    connect(item, &QQuickItem::implicitWidthChanged, m_contentItem, [this, item]() {
+        m_contentItem->layoutItems();
+    });
     ColumnViewAttached *attached = qobject_cast<ColumnViewAttached *>(qmlAttachedPropertiesObject<ColumnView>(item, true));
     attached->setOriginalParent(item->parentItem());
     attached->setShouldDeleteOnRemove(item->parentItem() == nullptr && QQmlEngine::objectOwnership(item) == QQmlEngine::JavaScriptOwnership);
@@ -1455,6 +1458,9 @@ void ColumnView::contentChildren_append(QQmlListProperty<QQuickItem> *prop, QQui
     connect(item, &QObject::destroyed, view->m_contentItem, [view, item]() {
         view->removeItem(item);
     });
+    connect(item, &QQuickItem::implicitWidthChanged, view->m_contentItem, [view, item]() {
+        view->m_contentItem->layoutItems();
+    });
 
     ColumnViewAttached *attached = qobject_cast<ColumnViewAttached *>(qmlAttachedPropertiesObject<ColumnView>(item, true));
     attached->setOriginalParent(item->parentItem());
@@ -1524,6 +1530,9 @@ void ColumnView::contentData_append(QQmlListProperty<QObject> *prop, QObject *ob
         view->m_contentItem->m_items.append(item);
         connect(item, &QObject::destroyed, view->m_contentItem, [view, item]() {
             view->removeItem(item);
+        });
+        connect(item, &QQuickItem::implicitWidthChanged, view->m_contentItem, [view, item]() {
+            view->m_contentItem->layoutItems();
         });
 
         ColumnViewAttached *attached = qobject_cast<ColumnViewAttached *>(qmlAttachedPropertiesObject<ColumnView>(item, true));

@@ -30,7 +30,7 @@ T.AbstractApplicationHeader {
     background: Rectangle {
         // Always use window bg color for toolbar, even if the page
         // it's located on uses a different color set
-        Theme.colorSet: Theme.Window
+        Theme.colorSet: Theme.Header
         Theme.inherit: false
         color: Theme.backgroundColor
         Separator {
