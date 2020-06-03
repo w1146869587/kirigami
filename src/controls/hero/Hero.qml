@@ -87,8 +87,8 @@ Item {
             ParallelAnimation {
                 NumberAnimation { target: __transformer; id: __transformerX; properties: "x"; duration: Units.longDuration-50; easing.type: Easing.InOutExpo }
                 NumberAnimation { target: __transformer; id: __transformerY; properties: "y"; duration: Units.longDuration; easing.type: Easing.InOutExpo }
-                NumberAnimation { target: __private.parent.child; id: __transformerWidth; properties: "implicitWidth"; duration: Units.longDuration-50; easing.type: Easing.InOutExpo }
-                NumberAnimation { target: __private.parent.child; id: __transformerHeight; properties: "implicitHeight"; duration: Units.longDuration; easing.type: Easing.InOutExpo }
+                NumberAnimation { target: __private.parent.child; id: __transformerWidth; properties: "implicitWidth,width"; duration: Units.longDuration-50; easing.type: Easing.InOutExpo }
+                NumberAnimation { target: __private.parent.child; id: __transformerHeight; properties: "implicitHeight,height"; duration: Units.longDuration; easing.type: Easing.InOutExpo }
             }
             ParallelAnimation {
                 NumberAnimation { target: __private.parent.child; properties: "opacity"; from: 1; to: 0 }
@@ -97,8 +97,8 @@ Item {
             ParallelAnimation {
                 NumberAnimation { target: __transformer; id: __returnX; properties: "x"; }
                 NumberAnimation { target: __transformer; id: __returnY; properties: "y"; }
-                NumberAnimation { target: __private.parent.child; id: __returnWidth; properties: "implicitWidth"; }
-                NumberAnimation { target: __private.parent.child; id: __returnHeight; properties: "implicitHeight";}
+                NumberAnimation { target: __private.parent.child; id: __returnWidth; properties: "implicitWidth,width"; }
+                NumberAnimation { target: __private.parent.child; id: __returnHeight; properties: "implicitHeight,height";}
             }
             ScriptAction {
                 script: {
