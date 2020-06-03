@@ -6,7 +6,7 @@
 
 import QtQuick 2.1
 import QtQuick.Templates 2.2 as T2
-import org.kde.kirigami 2.11
+import org.kde.kirigami 2.14
 import "private"
 
 /**
@@ -434,6 +434,15 @@ T2.Drawer {
     property QtObject __internal: QtObject {
         //here in order to not be accessible from outside
         property bool completed: false
+        property SplitHandle splitHandle: SplitHandle {
+            parent: root.contentItem
+            anchors {
+                right: parent.right
+                top: parent.top
+                bottom: parent.bottom
+            }
+            target: root.contentItem
+        }
         property SequentialAnimation positionResetAnim: SequentialAnimation {
             id: positionResetAnim
             property alias to: internalAnim.to
