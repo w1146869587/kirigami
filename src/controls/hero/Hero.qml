@@ -1,5 +1,6 @@
 import QtQuick 2.10
 import QtQuick.Layouts 1.10
+import QtQuick.Controls 2.10 as QQC2
 import org.kde.kirigami 2.13
 
 Item {
@@ -35,11 +36,28 @@ Item {
             id: __transformer
         }
         property Item buddy
+        readonly property Item uberRoot: {
+            try {
+                return applicationWindow().contentItem
+            } catch (error) {
+                let parent = __private;
+                let previousParent = __private;
+                while (parent != null) {
+                    previousParent = parent;
+                    parent = parent.parent;
+                }
+                return previousParent
+            }
+        }
         SequentialAnimation {
             id: __animator
             ScriptAction {
                 script: {
                     __private.buddy.opacity = 0
+
+                    __private.parent.child.parent = __private.uberRoot
+                    __private.parent.child.x = __private.parent.ScenePosition.x
+                    __private.parent.child.y = __private.parent.ScenePosition.y
 
                     __private.parent.width = __private.parent.width + 0
                     __private.parent.height = __private.parent.height + 0
@@ -137,14 +155,14 @@ Item {
         console.assert(target instanceof Hero)
         __private.buddy = target
         child.transform = [ __transformer ]
-        __transformerX.to = (x - target.x)
-        __transformerY.to = (target.y - y)
-        __transformerWidth.to = target.width
-        __transformerHeight.to = target.height
+        __transformerX.to = (target.ScenePosition.x - ScenePosition.x)
+        __transformerY.to = (target.ScenePosition.y - ScenePosition.y)
+        __transformerWidth.to = target.width+0
+        __transformerHeight.to = target.height+0
         __returnX.to = 0
         __returnY.to = 0
-        __returnWidth.to = child.width
-        __returnHeight.to = child.height
+        __returnWidth.to = child.width+0
+        __returnHeight.to = child.height+0
         __animator.restart()
     }
 }
