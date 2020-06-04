@@ -90,10 +90,8 @@ Item {
                 NumberAnimation { target: __private.parent.child; id: __transformerWidth; properties: "implicitWidth,width"; duration: Units.longDuration-50; easing.type: Easing.InOutExpo }
                 NumberAnimation { target: __private.parent.child; id: __transformerHeight; properties: "implicitHeight,height"; duration: Units.longDuration; easing.type: Easing.InOutExpo }
             }
-            ParallelAnimation {
-                NumberAnimation { target: __private.parent.child; properties: "opacity"; from: 1; to: 0 }
-                NumberAnimation { target: __private.buddy; properties: "opacity"; from: 0; to: 1 }
-            }
+            NumberAnimation { target: __private.buddy; properties: "opacity"; from: 0; to: 1 }
+            NumberAnimation { target: __private.parent.child; properties: "opacity"; from: 1; to: 0 }
             ParallelAnimation {
                 NumberAnimation { target: __transformer; id: __returnX; properties: "x"; }
                 NumberAnimation { target: __transformer; id: __returnY; properties: "y"; }
