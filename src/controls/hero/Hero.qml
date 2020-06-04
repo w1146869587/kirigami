@@ -37,6 +37,12 @@ Item {
             id: __transformer
         }
         property Item buddy
+        property real toTransformX
+        property real toTransformY
+        property real toTransformWidth
+        property real toTransformHeight
+        property real returnWidth
+        property real returnHeight
         readonly property Item uberRoot: {
             try {
                 return applicationWindow().contentItem
@@ -50,44 +56,9 @@ Item {
                 return previousParent
             }
         }
-        SequentialAnimation {
-            id: __animator
-            ScriptAction {
-                script: {
-                    __private.buddy.opacity = 0
-
-                    __private.parent.child.parent = __private.uberRoot
-                    __private.parent.child.x = __private.parent.ScenePosition.x
-                    __private.parent.child.y = __private.parent.ScenePosition.y
-
-                    Binder.breakBindings(__private.parent)
-                }
-            }
-            ParallelAnimation {
-                NumberAnimation { target: __transformer; id: __transformerX; properties: "x"; duration: Units.longDuration-50; easing.type: Easing.InOutExpo }
-                NumberAnimation { target: __transformer; id: __transformerY; properties: "y"; duration: Units.longDuration; easing.type: Easing.InOutExpo }
-                NumberAnimation { target: __private.parent.child; id: __transformerWidth; properties: "width"; duration: Units.longDuration; easing.type: Easing.InOutExpo }
-                NumberAnimation { target: __private.parent.child; id: __transformerHeight; properties: "height"; duration: Units.longDuration; easing.type: Easing.InOutExpo }
-            }
-            NumberAnimation { target: __private.buddy; properties: "opacity"; from: 0; to: 1 }
-            NumberAnimation { target: __private.parent.child; properties: "opacity"; from: 1; to: 0 }
-            ParallelAnimation {
-                NumberAnimation { target: __transformer; id: __returnX; properties: "x"; }
-                NumberAnimation { target: __transformer; id: __returnY; properties: "y"; }
-                NumberAnimation { target: __private.parent.child; id: __returnWidth; properties: "width"; }
-                NumberAnimation { target: __private.parent.child; id: __returnHeight; properties: "height";}
-            }
-            ScriptAction {
-                script: Binder.restoreBindings(__private.parent, __private.parent.child)
-            }
-            ScriptAction {
-                script: {
-                    __private.parent.child.parent = __private.parent
-                    __private.parent.child.x = 0
-                    __private.parent.child.y = 0
-                }
-            }
-            NumberAnimation { target: __private.parent.child; properties: "opacity"; from: 0; to: 1 }
+        Loader {
+            id: __aniLoader
+            onStatusChanged: if (__aniLoader.status == Loader.Ready) item.animation.restart()
         }
     }
 
@@ -108,14 +79,12 @@ Item {
         console.assert(target instanceof Hero)
         __private.buddy = target
         child.transform = [ __transformer ]
-        __transformerX.to = (target.ScenePosition.x - ScenePosition.x)
-        __transformerY.to = (target.ScenePosition.y - ScenePosition.y)
-        __transformerWidth.to = target.width+0
-        __transformerHeight.to = target.height+0
-        __returnX.to = 0
-        __returnY.to = 0
-        __returnWidth.to = child.width+0
-        __returnHeight.to = child.height+0
-        __animator.restart()
+        __private.toTransformX = (target.ScenePosition.x - ScenePosition.x)
+        __private.toTransformY = (target.ScenePosition.y - ScenePosition.y)
+        __private.toTransformWidth = target.width+0
+        __private.toTransformHeight = target.height+0
+        __private.returnWidth = child.width+0
+        __private.returnHeight = child.height+0
+        __aniLoader.source = "Animation.qml"
     }
 }
