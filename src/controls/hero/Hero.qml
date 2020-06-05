@@ -38,6 +38,10 @@ Item {
 
     property int animationType: Hero.AnimationType.Resize
 
+    // TODO: Wire up to page stuff for automatic hero animations between
+    // heroes sharing the same tag in different routes
+    property string tag
+
     Item {
         id: __private
         Translate {
