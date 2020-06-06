@@ -1,0 +1,124 @@
+# Kiszel Kristóf <kiszel.kristof@gmail.com>, 2017, 2018.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2018-10-13 21:10+0200\n"
+"Last-Translator: Kristof Kiszel <kiszel.kristof@gmail.com>\n"
+"Language-Team: Hungarian <kde-l10n-hu@kde.org>\n"
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 2.0\n"
+
+#: controls/AboutPage.qml:66
+msgctxt "AboutPage|"
+msgid "About"
+msgstr ""
+
+#: controls/AboutPage.qml:103
+#, qt-format
+msgctxt "AboutPage|"
+msgid "Send an email to %1"
+msgstr ""
+
+#: controls/AboutPage.qml:152
+msgctxt "AboutPage|"
+msgid "Copyright"
+msgstr ""
+
+#: controls/AboutPage.qml:175
+msgctxt "AboutPage|"
+msgid "License:"
+msgstr ""
+
+#: controls/AboutPage.qml:188
+#, qt-format
+msgctxt "AboutPage|"
+msgid "License: %1"
+msgstr ""
+
+#: controls/AboutPage.qml:199
+msgctxt "AboutPage|"
+msgid "Libraries in use"
+msgstr ""
+
+#: controls/AboutPage.qml:213
+msgctxt "AboutPage|"
+msgid "Authors"
+msgstr ""
+
+#: controls/AboutPage.qml:223
+msgctxt "AboutPage|"
+msgid "Credits"
+msgstr ""
+
+#: controls/AboutPage.qml:234
+msgctxt "AboutPage|"
+msgid "Translators"
+msgstr ""
+
+#: controls/ContextDrawer.qml:66
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "Műveletek"
+
+#: controls/GlobalDrawer.qml:466
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "Vissza"
+
+#: controls/GlobalDrawer.qml:522
+msgctxt "GlobalDrawer|"
+msgid "Close Sidebar"
+msgstr ""
+
+#: controls/PasswordField.qml:32
+msgctxt "PasswordField|"
+msgid "Password"
+msgstr ""
+
+#: controls/SearchField.qml:31
+msgctxt "SearchField|"
+msgid "Search..."
+msgstr ""
+
+#: controls/templates/private/BackButton.qml:34
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "Vissza"
+
+#: controls/templates/private/ForwardButton.qml:30
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "Előre"
+
+#: controls/ToolBarApplicationHeader.qml:113
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "További műveletek"
+
+#: controls/UrlButton.qml:45
+msgctxt "UrlButton|"
+msgid "Copy link address"
+msgstr ""
+
+#: settings.cpp:197
+#, qt-format
+msgctxt "Settings|"
+msgid "KDE Frameworks %1"
+msgstr ""
+
+#: settings.cpp:199
+#, qt-format
+msgctxt "Settings|"
+msgid "The %1 windowing system"
+msgstr ""
+
+#: settings.cpp:200
+#, qt-format
+msgctxt "Settings|"
+msgid "Qt %2 (built against %3)"
+msgstr ""
