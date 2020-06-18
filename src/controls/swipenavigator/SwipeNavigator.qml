@@ -43,6 +43,19 @@ GridLayout {
     property bool big: false
 
     /**
+     * fixed: bool
+     *
+     * Whether or not the SwipeNavigator should present tabs in a fixed presentation
+     * rather than an adaptive presentation.
+     *
+     * Setting this to true:
+     * - disables adaptive layouting on tabs
+     * - forces all tabs to be the same width
+     * - disables adaptive scrolling
+     */
+    property bool fixed: false
+
+    /**
      * header: Item
      *
      * The item that will be displayed before the tabs.

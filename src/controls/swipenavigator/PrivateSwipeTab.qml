@@ -112,7 +112,8 @@ Rectangle {
                 text: modelData.title
 
                 Layout.fillWidth: true
-                Layout.alignment: (Qt.AlignLeft | Qt.AlignVCenter)
+                horizontalAlignment: swipeNavigatorRoot.fixed ? Text.AlignHCenter : -1
+                Layout.alignment: swipeNavigatorRoot.fixed ? (Qt.AlignHCenter | Qt.AlignVCenter) : (Qt.AlignLeft | Qt.AlignVCenter)
             }
         }
     }

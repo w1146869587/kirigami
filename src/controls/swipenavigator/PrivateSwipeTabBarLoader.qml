@@ -26,6 +26,10 @@ Loader {
         PrivateSwipeTabBar {}
     }
     Component {
+        id: fixed
+        PrivateFixedSwipeTabBar {}
+    }
+    Component {
         id: scrollable
         ScrollView {
             id: view
@@ -58,5 +62,10 @@ Loader {
             }
         }
     }
-    sourceComponent: shouldScroll ? scrollable : nonScrollable
+    sourceComponent: {
+        if (swipeNavigatorRoot.fixed)
+            return fixed
+        else
+            return shouldScroll ? scrollable : nonScrollable
+    }
 }
