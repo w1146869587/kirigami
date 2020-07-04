@@ -1,0 +1,125 @@
+# Adrián Chaves Fernández (Gallaecio) <adriyetichaves@gmail.com>, 2017.
+# Adrián Chaves (Gallaecio) <adrian@chaves.io>, 2018, 2019.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2019-11-26 23:14+0100\n"
+"Last-Translator: Adrián Chaves (Gallaecio) <adrian@chaves.io>\n"
+"Language-Team: Galician <proxecto@trasno.gal>\n"
+"Language: gl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 19.08.3\n"
+"X-Qt-Contexts: true\n"
+
+#: controls/AboutPage.qml:66
+msgctxt "AboutPage|"
+msgid "About"
+msgstr "Sobre"
+
+#: controls/AboutPage.qml:103
+#, qt-format
+msgctxt "AboutPage|"
+msgid "Send an email to %1"
+msgstr ""
+
+#: controls/AboutPage.qml:152
+msgctxt "AboutPage|"
+msgid "Copyright"
+msgstr "Dereitos de copia"
+
+#: controls/AboutPage.qml:175
+msgctxt "AboutPage|"
+msgid "License:"
+msgstr "Licenza:"
+
+#: controls/AboutPage.qml:188
+#, qt-format
+msgctxt "AboutPage|"
+msgid "License: %1"
+msgstr "Licenza: %1"
+
+#: controls/AboutPage.qml:199
+msgctxt "AboutPage|"
+msgid "Libraries in use"
+msgstr "Bibliotecas usadas"
+
+#: controls/AboutPage.qml:213
+msgctxt "AboutPage|"
+msgid "Authors"
+msgstr "Autores"
+
+#: controls/AboutPage.qml:223
+msgctxt "AboutPage|"
+msgid "Credits"
+msgstr "Recoñecementos"
+
+#: controls/AboutPage.qml:234
+msgctxt "AboutPage|"
+msgid "Translators"
+msgstr "Tradutores"
+
+#: controls/ContextDrawer.qml:66
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "Accións"
+
+#: controls/GlobalDrawer.qml:466
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "Atrás"
+
+#: controls/GlobalDrawer.qml:557
+msgctxt "GlobalDrawer|"
+msgid "Close Sidebar"
+msgstr ""
+
+#: controls/PasswordField.qml:32
+msgctxt "PasswordField|"
+msgid "Password"
+msgstr "Contrasinal"
+
+#: controls/SearchField.qml:31
+msgctxt "SearchField|"
+msgid "Search..."
+msgstr "Buscar…"
+
+#: controls/templates/private/BackButton.qml:34
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "Volver"
+
+#: controls/templates/private/ForwardButton.qml:30
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "Continuar"
+
+#: controls/ToolBarApplicationHeader.qml:113
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "Máis accións"
+
+#: controls/UrlButton.qml:45
+msgctxt "UrlButton|"
+msgid "Copy link address"
+msgstr "Copiar o enderezo da ligazón"
+
+#: settings.cpp:197
+#, qt-format
+msgctxt "Settings|"
+msgid "KDE Frameworks %1"
+msgstr "Versión %1 das infraestruturas de KDE"
+
+#: settings.cpp:199
+#, qt-format
+msgctxt "Settings|"
+msgid "The %1 windowing system"
+msgstr "O sistema de xanelas %1"
+
+#: settings.cpp:200
+#, qt-format
+msgctxt "Settings|"
+msgid "Qt %2 (built against %3)"
+msgstr "Qt %2 (construído sobre %3)"
