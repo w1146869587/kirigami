@@ -58,6 +58,7 @@ OverlayDrawer {
     handleOpenIcon.source: null
     handleVisible: (modal || !drawerOpen) && (typeof(applicationWindow)===typeof(Function) && applicationWindow() ? applicationWindow().controlsVisible : true) && (!isMenu || Settings.isMobile)
 
+
     enabled: !isMenu || Settings.isMobile
 
     /**
@@ -475,6 +476,7 @@ OverlayDrawer {
 
                         Repeater {
                             id: actionsRepeater
+                            focus: false
 
                             readonly property bool withSections: {
                                 for (var i = 0; i < root.actions.length; i++) {
@@ -485,6 +487,23 @@ OverlayDrawer {
                                 }
                                 return true;
                             }
+
+                            Keys.onUpPressed: {
+                                console.log("hello")
+                                if (index > 1) {
+                                    actionsRepeater.itemAt(index - 1).forceActiveFocus()
+                                }
+                                event.accept = true
+                            }
+                            Keys.onDownPressed: {
+                                if (index < root.actions.length) {
+                                    actionsRepeater.itemAt(index + 1).forceActiveFocus()
+                                }
+                            }
+
+
+                            //KeyNavigation.up: actionsRepeater.itemAt(index - 1)
+                            //KeyNavigation.down: actionsRepeater.itemAt(index + 1)
 
                             model: root.actions
                             delegate: Column {
