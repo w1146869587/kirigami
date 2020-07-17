@@ -119,7 +119,7 @@ AbstractListItem {
                 Layout.fillWidth: true
                 color: (listItem.highlighted || listItem.checked || (listItem.pressed && listItem.supportsMouseEvents)) ? listItem.activeTextColor : listItem.textColor
                 elide: Text.ElideRight
-                font.weight: listItem.bold ? Font.Bold : Font.Normal
+                font.bold: listItem.bold
                 opacity: 1
             }
             QQC2.Label {
