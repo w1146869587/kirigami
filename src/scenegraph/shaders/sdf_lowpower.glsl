@@ -208,8 +208,7 @@ const lowp float sdf_default_smoothing = 0.625;
 //
 lowp vec4 sdf_render(in lowp float sdf, in lowp vec4 sourceColor, in lowp vec4 sdfColor, in lowp float alpha, in lowp float smoothing)
 {
-   lowp float g = fwidth(sdf);
-   return mix(sourceColor, sdfColor, alpha * (1.0 - smoothstep(-smoothing * g, smoothing * g, sdf)));
+    return mix(sourceColor, sdfColor, alpha * (1.0 - clamp(sdf * 300.0, 0.0, 1.0)));
 }
 
 // Render an sdf shape.

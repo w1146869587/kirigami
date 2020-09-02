@@ -216,6 +216,7 @@ class ShadowedRectangle : public QQuickItem
      */
     Q_PROPERTY(CornersGroup *corners READ corners CONSTANT)
 
+    Q_PROPERTY(bool softwareRendering READ isSoftwareRendering NOTIFY softwareRenderingChanged)
 public:
     ShadowedRectangle(QQuickItem *parent = nullptr);
     ~ShadowedRectangle() override;
@@ -234,7 +235,13 @@ public:
 
     void componentComplete() override;
 
+    bool isSoftwareRendering() const;
+
+Q_SIGNALS:
+    void softwareRenderingChanged();
+
 protected:
+    PaintedRectangleItem *softwareItem() const;
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
     QSGNode *updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData *data) override;
 

@@ -232,7 +232,9 @@ void ShadowedRectangle::setRadius(qreal newRadius)
     }
 
     m_radius = newRadius;
-    update();
+    if (!isSoftwareRendering()) {
+        update();
+    }
     Q_EMIT radiusChanged();
 }
 
@@ -248,7 +250,9 @@ void ShadowedRectangle::setColor(const QColor & newColor)
     }
 
     m_color = newColor;
-    update();
+    if (!isSoftwareRendering()) {
+        update();
+    }
     Q_EMIT colorChanged();
 }
 
@@ -259,10 +263,22 @@ void ShadowedRectangle::componentComplete()
     checkSoftwareItem();
 }
 
+bool ShadowedRectangle::isSoftwareRendering() const
+{
+    return window() && window()->rendererInterface()->graphicsApi() == QSGRendererInterface::Software;
+}
+
+PaintedRectangleItem *ShadowedRectangle::softwareItem() const
+{
+    return m_softwareItem;
+}
+
 void ShadowedRectangle::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
 {
     if (change == QQuickItem::ItemSceneChange && value.window) {
         checkSoftwareItem();
+        //TODO: only conditionally emit?
+        emit softwareRenderingChanged();
     }
 }
 
@@ -270,11 +286,18 @@ QSGNode *ShadowedRectangle::updatePaintNode(QSGNode *node, QQuickItem::UpdatePai
 {
     Q_UNUSED(data);
 
-    if (!node) {
-        node = new ShadowedRectangleNode{};
+    auto shadowNode = static_cast<ShadowedRectangleNode*>(node);
+
+    if (!shadowNode) {
+        shadowNode = new ShadowedRectangleNode{};
+
+        // Cache lowPower state so we only execute the full check once.
+        static bool lowPower = QByteArrayList{"1", "true"}.contains(qgetenv("KIRIGAMI_LOWPOWER_HARDWARE").toLower());
+        if (lowPower) {
+            shadowNode->setShaderType(ShadowedRectangleMaterial::ShaderType::LowPower);
+        }
     }
 
-    auto shadowNode = static_cast<ShadowedRectangleNode*>(node);
     shadowNode->setBorderEnabled(m_border->isEnabled());
     shadowNode->setRect(boundingRect());
     shadowNode->setSize(m_shadow->size());
@@ -290,7 +313,7 @@ QSGNode *ShadowedRectangle::updatePaintNode(QSGNode *node, QQuickItem::UpdatePai
 
 void ShadowedRectangle::checkSoftwareItem()
 {
-    if (!m_softwareItem && window() && window()->rendererInterface()->graphicsApi() == QSGRendererInterface::Software) {
+    if (!m_softwareItem && isSoftwareRendering()) {
         m_softwareItem = new PaintedRectangleItem{this};
         // The software item is added as a "normal" child item, this means it
         // will be part of the normal item sort order. Since there is no way to

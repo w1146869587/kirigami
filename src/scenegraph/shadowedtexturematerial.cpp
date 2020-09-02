@@ -18,7 +18,7 @@ ShadowedTextureMaterial::ShadowedTextureMaterial()
 
 QSGMaterialShader* ShadowedTextureMaterial::createShader() const
 {
-    return new ShadowedTextureShader{};
+    return new ShadowedTextureShader{shaderType};
 }
 
 QSGMaterialType* ShadowedTextureMaterial::type() const
@@ -42,22 +42,10 @@ int ShadowedTextureMaterial::compare(const QSGMaterial *other) const
     return result;
 }
 
-ShadowedTextureShader::ShadowedTextureShader()
+ShadowedTextureShader::ShadowedTextureShader(ShadowedRectangleMaterial::ShaderType shaderType)
+    : ShadowedRectangleShader(shaderType)
 {
-    auto header = QOpenGLContext::currentContext()->isOpenGLES() ? QStringLiteral("header_es.glsl") : QStringLiteral("header_desktop.glsl");
-
-    auto shaderRoot = QStringLiteral(":/org/kde/kirigami/shaders/");
-
-    setShaderSourceFiles(QOpenGLShader::Vertex, {
-        shaderRoot + header,
-        shaderRoot + QStringLiteral("shadowedrectangle.vert")
-    });
-
-    setShaderSourceFiles(QOpenGLShader::Fragment, {
-        shaderRoot + header,
-        shaderRoot + QStringLiteral("sdf.glsl"),
-        shaderRoot + QStringLiteral("shadowedtexture.frag")
-    });
+    setShader(shaderType, QStringLiteral("shadowedtexture"));
 }
 
 void ShadowedTextureShader::initialize()
