@@ -81,6 +81,33 @@ AbstractListItem {
      */
     property alias reserveSpaceForLabel: labelItem.visible
 
+    /**
+     * thumbnail: var
+     * A single image that will be displayed in the list item.
+     * The thumbnail can be a grouped property with name,size,color etc, as QtQuickControls2 icons are defined.
+     * The thumbnail can also be either a QIcon, a string name of a fdo compatible name,
+     * or any url accepted by the Image element.
+     * @since 5.75
+     * @since org.kde.kirigami 2.17
+     */
+    property var thumbnail
+
+    /**
+     * thumbnailSize: int
+     * The preferred size for the thumbnail
+     * @since 5.75
+     * @since org.kde.kirigami 2.17
+     */
+    property alias thumbnailSize: thumbnailItem.size
+
+    /**
+     * reserveSpaceForThumbnail: bool
+     * If true, even when there is no thumbnail the space will be reserved for it
+     * @since 5.75
+     * @since org.kde.kirigami 2.17
+     */
+    property alias reserveSpaceForThumbnail: thumbnailItem.visible
+
     default property alias _basicDefault: layout.data
 
     icon: action ? action.icon.name || action.icon.source : undefined
@@ -131,6 +158,28 @@ AbstractListItem {
                 opacity: listItem.bold ? 0.9 : 0.7
                 visible: text.length > 0
             }
+        }
+        Icon {
+            id: thumbnailItem
+            source: {
+                if (!listItem.thumbnail) {
+                    return undefined
+                }
+                if (listItem.thumbnail.hasOwnProperty) {
+                    if (listItem.thumbnail.hasOwnProperty("name") && listItem.thumbnail.name !== "")
+                        return listItem.thumbnail.name;
+                    if (listItem.thumbnail.hasOwnProperty("source"))
+                      return listItem.thumbnail.source;
+                }
+                return listItem.thumbnail;
+            }
+            property int size: Units.iconSizes.smallMedium
+            Layout.minimumHeight: size
+            Layout.maximumHeight: size
+            Layout.minimumWidth: size
+            selected: (listItem.highlighted || listItem.checked || (listItem.pressed && listItem.supportsMouseEvents))
+            opacity: 1
+            visible: source != undefined
         }
     }
 }
