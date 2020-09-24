@@ -433,7 +433,7 @@ QQC2.Page {
                     (typeof applicationWindow === "undefined" ||
                     (!applicationWindow().header || applicationWindow().header.toString().indexOf("ToolBarApplicationHeader") === -1) &&
                     (!applicationWindow().footer || applicationWindow().footer.toString().indexOf("ToolBarApplicationHeader") === -1))
-            source: Qt.resolvedUrl("./private/ActionButton.qml")
+            source: Qt.resolvedUrl("./private/globaltoolbar/ToolBarPageFooter.qml")
         }
     ]
 

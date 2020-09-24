@@ -9,7 +9,7 @@ import QtQuick.Layouts 1.2
 import QtQml.Models 2.2
 import QtQuick.Templates 2.0 as T
 import QtQuick.Controls 2.0 as QQC2
-import org.kde.kirigami 2.7
+import org.kde.kirigami 2.14
 import "private/globaltoolbar" as GlobalToolBar
 import "templates" as KT
 
@@ -419,10 +419,34 @@ T.Control {
         readonly property int leftReservedSpace: globalToolBarUI.item ? globalToolBarUI.item.leftReservedSpace : 0
         readonly property int rightReservedSpace: globalToolBarUI.item ? globalToolBarUI.item.rightReservedSpace : 0
         readonly property int height: globalToolBarUI.height
-        readonly property Item leftHandleAnchor: globalToolBarUI.item ? globalToolBarUI.item.leftHandleAnchor : null
-        readonly property Item rightHandleAnchor: globalToolBarUI.item ? globalToolBarUI.item.rightHandleAnchor : null
+        readonly property Item leftHandleAnchor: globalToolBarFooter.visible ? leftFooterHandleAnchor : (globalToolBarUI.item ? globalToolBarUI.item.leftHandleAnchor : null)
+        readonly property Item rightHandleAnchor: globalToolBarFooter.visible ? rightFooterHandleAnchor : (globalToolBarUI.item ? globalToolBarUI.item.rightHandleAnchor : null)
     }
 
+    RowLayout {
+        id: globalToolBarFooter
+        anchors {
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
+            bottomMargin: Units.smallSpacing
+        }
+        z: 100
+        visible: globalToolBar.actualStyle !== ApplicationHeaderStyle.Titles  && globalToolBar.actualStyle !== ApplicationHeaderStyle.ToolBar
+        Rectangle {
+            id: leftFooterHandleAnchor
+            implicitWidth: Units.iconSizes.smallMedium
+            implicitHeight: implicitWidth
+            color: Theme.backgroundColor
+        }
+        Item {Layout.fillWidth: true}
+        Rectangle {
+            id: rightFooterHandleAnchor
+            implicitWidth: Units.iconSizes.smallMedium
+            implicitHeight: implicitWidth
+            color: Theme.backgroundColor
+        }
+    }
     QQC2.StackView {
         id: layersStack
         z: 99
