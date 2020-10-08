@@ -139,12 +139,13 @@ QtObject {
     function open() {
         openAnimation.running = true;
         root.sheetOpen = true;
+        contentLayout.initialHeight = contentLayout.height
         mainItem.visible = true;
     }
 
     function close() {
         if (root.sheetOpen) {
-            closeAnimation.running = true;
+            root.sheetOpen = false
         }
     }
 
@@ -173,7 +174,7 @@ QtObject {
         if (sheetOpen) {
             open();
         } else {
-            closeAnimation.running = true;
+            closeAnimation.restart()
             Qt.inputMethod.hide();
         }
     }
@@ -317,6 +318,7 @@ QtObject {
                 NumberAnimation {
                     target: outerFlickable
                     properties: "contentY"
+                    from: outerFlickable.contentY + (contentLayout.initialHeight - contentLayout.height)
                     to: outerFlickable.visibleArea.yPosition < (1 - outerFlickable.visibleArea.heightRatio)/2 ? -mainItem.height : outerFlickable.contentHeight
                     duration: Units.longDuration
                     easing.type: Easing.InQuad
@@ -331,8 +333,9 @@ QtObject {
             }
             ScriptAction {
                 script: {
+                    contentLayout.initialHeight = 0
                     scrollView.flickableItem.contentY = -mainItem.height;
-                    mainItem.visible = root.sheetOpen = false;
+                    mainItem.visible = false;
                 }
             }
         }
@@ -473,7 +476,7 @@ QtObject {
                 }
 
                 if (shouldClose) {
-                    closeAnimation.restart();
+                    root.sheetOpen = false
                 } else if (scrollView.flickableItem.atYBeginning || scrollView.flickableItem.atYEnd) {
                     resetAnimation.restart();
                 }
@@ -493,6 +496,7 @@ QtObject {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: mainItem.contentItemPreferredWidth <= 0 ? mainItem.width : Math.max(mainItem.width/2, Math.min(mainItem.contentItemMaximumWidth, mainItem.contentItemPreferredWidth)) - root.leftInset - root.rightInset
                 height: Math.min(implicitHeight, parent.height) - root.topInset - root.bottomInset
+                property real initialHeight
 
                 Behavior on height {
                     NumberAnimation {
