@@ -97,7 +97,8 @@ AbstractApplicationWindow {
     property alias pageStack: __pageStack
 
     //redefines here as here we can know a pointer to PageRow
-    wideScreen: width >= (applicationWindow().pageStack.defaultColumnWidth) + (contextDrawer ? contextDrawer.width : 0) + (globalDrawer ? globalDrawer.width : 0)
+    // we negate the canBeEnabled check because we don't want to factor in the automatic drawer provided by Kirigami for page actions for our calculations
+    wideScreen: width >= (root.pageStack.defaultColumnWidth) + ((contextDrawer && !(contextDrawer instanceof Kirigami.ContextDrawer)) ? contextDrawer.width : 0) + (globalDrawer ? globalDrawer.width : 0)
 
     Component.onCompleted: {
         if (pageStack.currentItem) {
